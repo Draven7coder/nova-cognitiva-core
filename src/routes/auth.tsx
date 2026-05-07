@@ -42,11 +42,6 @@ function AuthPage() {
 
   const google = async () => {
     try {
-      const { lovable } = await import("@/integrations/lovable/index").catch(() => ({ lovable: null as any }));
-      if (lovable) {
-        await lovable.auth.signInWithOAuth("google", { redirect_uri: `${window.location.origin}/app` });
-        return;
-      }
       const { error } = await supabase.auth.signInWithOAuth({ provider: "google", options: { redirectTo: `${window.location.origin}/app` } });
       if (error) throw error;
     } catch (e: any) { toast.error(e.message); }
