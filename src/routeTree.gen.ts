@@ -9,38 +9,224 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppSombraRouteImport } from './routes/app.sombra'
+import { Route as AppRelatoriosRouteImport } from './routes/app.relatorios'
+import { Route as AppPropositoRouteImport } from './routes/app.proposito'
+import { Route as AppPerformanceRouteImport } from './routes/app.performance'
+import { Route as AppMissoesRouteImport } from './routes/app.missoes'
+import { Route as AppManualRouteImport } from './routes/app.manual'
+import { Route as AppIntelectoRouteImport } from './routes/app.intelecto'
+import { Route as AppIdentidadeRouteImport } from './routes/app.identidade'
+import { Route as AppIdeiasRouteImport } from './routes/app.ideias'
+import { Route as AppEvolucaoRouteImport } from './routes/app.evolucao'
+import { Route as AppConfigRouteImport } from './routes/app.config'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSombraRoute = AppSombraRouteImport.update({
+  id: '/sombra',
+  path: '/sombra',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRelatoriosRoute = AppRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPropositoRoute = AppPropositoRouteImport.update({
+  id: '/proposito',
+  path: '/proposito',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPerformanceRoute = AppPerformanceRouteImport.update({
+  id: '/performance',
+  path: '/performance',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMissoesRoute = AppMissoesRouteImport.update({
+  id: '/missoes',
+  path: '/missoes',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppManualRoute = AppManualRouteImport.update({
+  id: '/manual',
+  path: '/manual',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppIntelectoRoute = AppIntelectoRouteImport.update({
+  id: '/intelecto',
+  path: '/intelecto',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppIdentidadeRoute = AppIdentidadeRouteImport.update({
+  id: '/identidade',
+  path: '/identidade',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppIdeiasRoute = AppIdeiasRouteImport.update({
+  id: '/ideias',
+  path: '/ideias',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEvolucaoRoute = AppEvolucaoRouteImport.update({
+  id: '/evolucao',
+  path: '/evolucao',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppConfigRoute = AppConfigRouteImport.update({
+  id: '/config',
+  path: '/config',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/app/config': typeof AppConfigRoute
+  '/app/evolucao': typeof AppEvolucaoRoute
+  '/app/ideias': typeof AppIdeiasRoute
+  '/app/identidade': typeof AppIdentidadeRoute
+  '/app/intelecto': typeof AppIntelectoRoute
+  '/app/manual': typeof AppManualRoute
+  '/app/missoes': typeof AppMissoesRoute
+  '/app/performance': typeof AppPerformanceRoute
+  '/app/proposito': typeof AppPropositoRoute
+  '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/sombra': typeof AppSombraRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/app/config': typeof AppConfigRoute
+  '/app/evolucao': typeof AppEvolucaoRoute
+  '/app/ideias': typeof AppIdeiasRoute
+  '/app/identidade': typeof AppIdentidadeRoute
+  '/app/intelecto': typeof AppIntelectoRoute
+  '/app/manual': typeof AppManualRoute
+  '/app/missoes': typeof AppMissoesRoute
+  '/app/performance': typeof AppPerformanceRoute
+  '/app/proposito': typeof AppPropositoRoute
+  '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/sombra': typeof AppSombraRoute
+  '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/app/config': typeof AppConfigRoute
+  '/app/evolucao': typeof AppEvolucaoRoute
+  '/app/ideias': typeof AppIdeiasRoute
+  '/app/identidade': typeof AppIdentidadeRoute
+  '/app/intelecto': typeof AppIntelectoRoute
+  '/app/manual': typeof AppManualRoute
+  '/app/missoes': typeof AppMissoesRoute
+  '/app/performance': typeof AppPerformanceRoute
+  '/app/proposito': typeof AppPropositoRoute
+  '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/sombra': typeof AppSombraRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/config'
+    | '/app/evolucao'
+    | '/app/ideias'
+    | '/app/identidade'
+    | '/app/intelecto'
+    | '/app/manual'
+    | '/app/missoes'
+    | '/app/performance'
+    | '/app/proposito'
+    | '/app/relatorios'
+    | '/app/sombra'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/auth'
+    | '/app/config'
+    | '/app/evolucao'
+    | '/app/ideias'
+    | '/app/identidade'
+    | '/app/intelecto'
+    | '/app/manual'
+    | '/app/missoes'
+    | '/app/performance'
+    | '/app/proposito'
+    | '/app/relatorios'
+    | '/app/sombra'
+    | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/auth'
+    | '/app/config'
+    | '/app/evolucao'
+    | '/app/ideias'
+    | '/app/identidade'
+    | '/app/intelecto'
+    | '/app/manual'
+    | '/app/missoes'
+    | '/app/performance'
+    | '/app/proposito'
+    | '/app/relatorios'
+    | '/app/sombra'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +234,130 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/sombra': {
+      id: '/app/sombra'
+      path: '/sombra'
+      fullPath: '/app/sombra'
+      preLoaderRoute: typeof AppSombraRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/relatorios': {
+      id: '/app/relatorios'
+      path: '/relatorios'
+      fullPath: '/app/relatorios'
+      preLoaderRoute: typeof AppRelatoriosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/proposito': {
+      id: '/app/proposito'
+      path: '/proposito'
+      fullPath: '/app/proposito'
+      preLoaderRoute: typeof AppPropositoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/performance': {
+      id: '/app/performance'
+      path: '/performance'
+      fullPath: '/app/performance'
+      preLoaderRoute: typeof AppPerformanceRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/missoes': {
+      id: '/app/missoes'
+      path: '/missoes'
+      fullPath: '/app/missoes'
+      preLoaderRoute: typeof AppMissoesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/manual': {
+      id: '/app/manual'
+      path: '/manual'
+      fullPath: '/app/manual'
+      preLoaderRoute: typeof AppManualRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/intelecto': {
+      id: '/app/intelecto'
+      path: '/intelecto'
+      fullPath: '/app/intelecto'
+      preLoaderRoute: typeof AppIntelectoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/identidade': {
+      id: '/app/identidade'
+      path: '/identidade'
+      fullPath: '/app/identidade'
+      preLoaderRoute: typeof AppIdentidadeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/ideias': {
+      id: '/app/ideias'
+      path: '/ideias'
+      fullPath: '/app/ideias'
+      preLoaderRoute: typeof AppIdeiasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/evolucao': {
+      id: '/app/evolucao'
+      path: '/evolucao'
+      fullPath: '/app/evolucao'
+      preLoaderRoute: typeof AppEvolucaoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/config': {
+      id: '/app/config'
+      path: '/config'
+      fullPath: '/app/config'
+      preLoaderRoute: typeof AppConfigRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppConfigRoute: typeof AppConfigRoute
+  AppEvolucaoRoute: typeof AppEvolucaoRoute
+  AppIdeiasRoute: typeof AppIdeiasRoute
+  AppIdentidadeRoute: typeof AppIdentidadeRoute
+  AppIntelectoRoute: typeof AppIntelectoRoute
+  AppManualRoute: typeof AppManualRoute
+  AppMissoesRoute: typeof AppMissoesRoute
+  AppPerformanceRoute: typeof AppPerformanceRoute
+  AppPropositoRoute: typeof AppPropositoRoute
+  AppRelatoriosRoute: typeof AppRelatoriosRoute
+  AppSombraRoute: typeof AppSombraRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppConfigRoute: AppConfigRoute,
+  AppEvolucaoRoute: AppEvolucaoRoute,
+  AppIdeiasRoute: AppIdeiasRoute,
+  AppIdentidadeRoute: AppIdentidadeRoute,
+  AppIntelectoRoute: AppIntelectoRoute,
+  AppManualRoute: AppManualRoute,
+  AppMissoesRoute: AppMissoesRoute,
+  AppPerformanceRoute: AppPerformanceRoute,
+  AppPropositoRoute: AppPropositoRoute,
+  AppRelatoriosRoute: AppRelatoriosRoute,
+  AppSombraRoute: AppSombraRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
