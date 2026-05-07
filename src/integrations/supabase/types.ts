@@ -14,7 +14,174 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ai_reports: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          metrics: Json | null
+          scope: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          metrics?: Json | null
+          scope?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          metrics?: Json | null
+          scope?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      identity: {
+        Row: {
+          archetype: string | null
+          central_phrase: string | null
+          existential_mission: string | null
+          future_identity: string | null
+          moral_code: string | null
+          philosophy: string | null
+          principles: string | null
+          strengths: string | null
+          updated_at: string
+          user_id: string
+          values_text: string | null
+          weaknesses: string | null
+          worldview: string | null
+        }
+        Insert: {
+          archetype?: string | null
+          central_phrase?: string | null
+          existential_mission?: string | null
+          future_identity?: string | null
+          moral_code?: string | null
+          philosophy?: string | null
+          principles?: string | null
+          strengths?: string | null
+          updated_at?: string
+          user_id: string
+          values_text?: string | null
+          weaknesses?: string | null
+          worldview?: string | null
+        }
+        Update: {
+          archetype?: string | null
+          central_phrase?: string | null
+          existential_mission?: string | null
+          future_identity?: string | null
+          moral_code?: string | null
+          philosophy?: string | null
+          principles?: string | null
+          strengths?: string | null
+          updated_at?: string
+          user_id?: string
+          values_text?: string | null
+          weaknesses?: string | null
+          worldview?: string | null
+        }
+        Relationships: []
+      }
+      journal_entries: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          module: string
+          tags: string[] | null
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          module?: string
+          tags?: string[] | null
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          module?: string
+          tags?: string[] | null
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      missions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          due_at: string | null
+          id: string
+          status: Database["public"]["Enums"]["mission_status"]
+          title: string
+          type: Database["public"]["Enums"]["mission_type"]
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["mission_status"]
+          title: string
+          type?: Database["public"]["Enums"]["mission_type"]
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["mission_status"]
+          title?: string
+          type?: Database["public"]["Enums"]["mission_type"]
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          central_phrase: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          central_phrase?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          central_phrase?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +190,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      mission_status: "active" | "done" | "failed" | "archived"
+      mission_type:
+        | "daily"
+        | "weekly"
+        | "campaign"
+        | "side"
+        | "challenge"
+        | "project"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +324,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      mission_status: ["active", "done", "failed", "archived"],
+      mission_type: [
+        "daily",
+        "weekly",
+        "campaign",
+        "side",
+        "challenge",
+        "project",
+      ],
+    },
   },
 } as const
