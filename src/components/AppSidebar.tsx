@@ -15,6 +15,7 @@ const modules = [
   { title: "Propósito Supremo", url: "/app/proposito", icon: Crosshair },
   { title: "Centro Intelectual", url: "/app/intelecto", icon: BookOpen },
   { title: "Manual Operacional", url: "/app/manual", icon: Settings2 },
+  { title: "Protocolos Operacionais", url: "/app/protocolos", icon: Cog },
   { title: "Performance", url: "/app/performance", icon: Activity },
   { title: "Sistema de Missões", url: "/app/missoes", icon: Swords },
   { title: "Banco de Ideias", url: "/app/ideias", icon: Lightbulb },
