@@ -166,6 +166,8 @@ function Dashboard() {
         </div>
       </HudCard>
 
+      <div className="grid lg:grid-cols-3 gap-4">
+        <HudCard title="EVOLUÇÃO TEMPORAL · 14D" className="lg:col-span-2">
           <div className="h-[200px]">
             <ResponsiveContainer>
               <LineChart data={evoData}>
