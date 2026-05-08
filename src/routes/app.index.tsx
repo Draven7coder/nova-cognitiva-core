@@ -132,8 +132,40 @@ function Dashboard() {
         ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-4">
-        <HudCard title="EVOLUÇÃO TEMPORAL · 14D" className="lg:col-span-2">
+      <HudCard title="⚙ RITUAL DE INICIALIZAÇÃO DO DIA">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <div className="font-display text-foreground">Alinhamento antes da execução</div>
+            <p className="text-xs text-muted-foreground font-mono mt-1">
+              Calibre mente, prioridade, risco e identidade em 5 minutos.
+            </p>
+          </div>
+          <Link to="/app/protocolos">
+            <Button variant="outline" size="sm" className="font-mono text-[10px] tracking-widest">
+              <Cog className="size-3 mr-2" /> ABRIR PROTOCOLO
+            </Button>
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+          {[
+            { to: "/app/protocolos", hash: "descarga", icon: Brain, label: "Descarga Mental" },
+            { to: "/app/protocolos", hash: "prioridades", icon: Target, label: "Prioridades" },
+            { to: "/app/protocolos", hash: "risco", icon: AlertTriangle, label: "Risco / Sabotagem" },
+            { to: "/app/protocolos", hash: "identidade", icon: Fingerprint, label: "Reforço Identidade" },
+          ].map((it) => (
+            <Link
+              key={it.label}
+              to={it.to}
+              hash={it.hash}
+              className="hud-panel p-3 hover:border-primary/60 transition-colors group"
+            >
+              <it.icon className="size-4 text-primary mb-2 group-hover:hud-text-glow" />
+              <div className="font-mono text-[10px] tracking-widest text-foreground/90">{it.label.toUpperCase()}</div>
+            </Link>
+          ))}
+        </div>
+      </HudCard>
+
           <div className="h-[200px]">
             <ResponsiveContainer>
               <LineChart data={evoData}>
