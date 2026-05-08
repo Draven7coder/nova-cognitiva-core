@@ -22,6 +22,7 @@ import { Route as AppManualRouteImport } from './routes/app.manual'
 import { Route as AppIntelectoRouteImport } from './routes/app.intelecto'
 import { Route as AppIdentidadeRouteImport } from './routes/app.identidade'
 import { Route as AppIdeiasRouteImport } from './routes/app.ideias'
+import { Route as AppFumRouteImport } from './routes/app.fum'
 import { Route as AppEvolucaoRouteImport } from './routes/app.evolucao'
 import { Route as AppConfigRouteImport } from './routes/app.config'
 
@@ -90,6 +91,11 @@ const AppIdeiasRoute = AppIdeiasRouteImport.update({
   path: '/ideias',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFumRoute = AppFumRouteImport.update({
+  id: '/fum',
+  path: '/fum',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppEvolucaoRoute = AppEvolucaoRouteImport.update({
   id: '/evolucao',
   path: '/evolucao',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/app/config': typeof AppConfigRoute
   '/app/evolucao': typeof AppEvolucaoRoute
+  '/app/fum': typeof AppFumRoute
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
   '/app/intelecto': typeof AppIntelectoRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/app/config': typeof AppConfigRoute
   '/app/evolucao': typeof AppEvolucaoRoute
+  '/app/fum': typeof AppFumRoute
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
   '/app/intelecto': typeof AppIntelectoRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/app/config': typeof AppConfigRoute
   '/app/evolucao': typeof AppEvolucaoRoute
+  '/app/fum': typeof AppFumRoute
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
   '/app/intelecto': typeof AppIntelectoRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/app/config'
     | '/app/evolucao'
+    | '/app/fum'
     | '/app/ideias'
     | '/app/identidade'
     | '/app/intelecto'
@@ -176,6 +186,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/app/config'
     | '/app/evolucao'
+    | '/app/fum'
     | '/app/ideias'
     | '/app/identidade'
     | '/app/intelecto'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/app/config'
     | '/app/evolucao'
+    | '/app/fum'
     | '/app/ideias'
     | '/app/identidade'
     | '/app/intelecto'
@@ -304,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIdeiasRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/fum': {
+      id: '/app/fum'
+      path: '/fum'
+      fullPath: '/app/fum'
+      preLoaderRoute: typeof AppFumRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/evolucao': {
       id: '/app/evolucao'
       path: '/evolucao'
@@ -324,6 +343,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppConfigRoute: typeof AppConfigRoute
   AppEvolucaoRoute: typeof AppEvolucaoRoute
+  AppFumRoute: typeof AppFumRoute
   AppIdeiasRoute: typeof AppIdeiasRoute
   AppIdentidadeRoute: typeof AppIdentidadeRoute
   AppIntelectoRoute: typeof AppIntelectoRoute
@@ -339,6 +359,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppConfigRoute: AppConfigRoute,
   AppEvolucaoRoute: AppEvolucaoRoute,
+  AppFumRoute: AppFumRoute,
   AppIdeiasRoute: AppIdeiasRoute,
   AppIdentidadeRoute: AppIdentidadeRoute,
   AppIntelectoRoute: AppIntelectoRoute,
