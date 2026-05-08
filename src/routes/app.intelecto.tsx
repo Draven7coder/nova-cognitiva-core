@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ModulePage, HudCard } from "@/components/ModulePage";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,11 +6,24 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Brain, Network, Workflow, Cpu, Binary, Layers, FlaskConical, Radio, Lightbulb, Library, ArrowRight } from "lucide-react";
 
 export const Route = createFileRoute("/app/intelecto")({ component: IntelectoPage });
 
-const AREAS = ["matemática", "física", "programação", "IA", "filosofia", "psicologia", "línguas", "ciência", "estratégia", "arte", "livros"];
+const AREAS = ["matemática", "física", "programação", "IA", "filosofia", "psicologia", "línguas", "ciência", "estratégia", "arte", "livros", "meta-sistemas"];
+
+const META_SUBSECTIONS = [
+  { key: "frameworks-mentais", label: "Frameworks Mentais", icon: Brain, desc: "Modelos reutilizáveis para estruturar pensamento." },
+  { key: "modelagem-universal", label: "Modelagem Universal", icon: Layers, desc: "Tradução de qualquer fenômeno em estrutura formal." },
+  { key: "pensamento-sistemico", label: "Pensamento Sistêmico", icon: Network, desc: "Relações, ciclos, feedback e emergência." },
+  { key: "computacao-cientifica", label: "Computação Científica", icon: Cpu, desc: "Simulação numérica e exploração computacional." },
+  { key: "logica-formal", label: "Lógica Formal Aplicada", icon: Binary, desc: "Coerência, prova e validade estrutural." },
+  { key: "engenharia-abstracao", label: "Engenharia de Abstração", icon: Workflow, desc: "Construção e refino de camadas conceituais." },
+  { key: "simulacao-sistemas", label: "Simulação de Sistemas", icon: FlaskConical, desc: "Execução de modelos em múltiplos cenários." },
+  { key: "protocolos-cognitivos", label: "Protocolos Cognitivos", icon: Radio, desc: "Rotinas mentais para raciocínio avançado." },
+  { key: "teorias-pessoais", label: "Teorias Pessoais", icon: Lightbulb, desc: "Hipóteses originais e construções autorais." },
+  { key: "arquiteturas-conhecimento", label: "Arquiteturas de Conhecimento", icon: Library, desc: "Organização viva e modular do saber." },
+];
 
 function IntelectoPage() {
   const { user } = useAuth();
