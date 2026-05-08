@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppSombraRouteImport } from './routes/app.sombra'
 import { Route as AppRelatoriosRouteImport } from './routes/app.relatorios'
+import { Route as AppProtocolosRouteImport } from './routes/app.protocolos'
 import { Route as AppPropositoRouteImport } from './routes/app.proposito'
 import { Route as AppPerformanceRouteImport } from './routes/app.performance'
 import { Route as AppMissoesRouteImport } from './routes/app.missoes'
@@ -54,6 +55,11 @@ const AppSombraRoute = AppSombraRouteImport.update({
 const AppRelatoriosRoute = AppRelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProtocolosRoute = AppProtocolosRouteImport.update({
+  id: '/protocolos',
+  path: '/protocolos',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPropositoRoute = AppPropositoRouteImport.update({
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/app/missoes': typeof AppMissoesRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
+  '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
   '/app/sombra': typeof AppSombraRoute
   '/app/': typeof AppIndexRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/app/missoes': typeof AppMissoesRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
+  '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
   '/app/sombra': typeof AppSombraRoute
   '/app': typeof AppIndexRoute
@@ -157,6 +165,7 @@ export interface FileRoutesById {
   '/app/missoes': typeof AppMissoesRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
+  '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
   '/app/sombra': typeof AppSombraRoute
   '/app/': typeof AppIndexRoute
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/app/missoes'
     | '/app/performance'
     | '/app/proposito'
+    | '/app/protocolos'
     | '/app/relatorios'
     | '/app/sombra'
     | '/app/'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/app/missoes'
     | '/app/performance'
     | '/app/proposito'
+    | '/app/protocolos'
     | '/app/relatorios'
     | '/app/sombra'
     | '/app'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/app/missoes'
     | '/app/performance'
     | '/app/proposito'
+    | '/app/protocolos'
     | '/app/relatorios'
     | '/app/sombra'
     | '/app/'
@@ -265,6 +277,13 @@ declare module '@tanstack/react-router' {
       path: '/relatorios'
       fullPath: '/app/relatorios'
       preLoaderRoute: typeof AppRelatoriosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/protocolos': {
+      id: '/app/protocolos'
+      path: '/protocolos'
+      fullPath: '/app/protocolos'
+      preLoaderRoute: typeof AppProtocolosRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/proposito': {
@@ -351,6 +370,7 @@ interface AppRouteChildren {
   AppMissoesRoute: typeof AppMissoesRoute
   AppPerformanceRoute: typeof AppPerformanceRoute
   AppPropositoRoute: typeof AppPropositoRoute
+  AppProtocolosRoute: typeof AppProtocolosRoute
   AppRelatoriosRoute: typeof AppRelatoriosRoute
   AppSombraRoute: typeof AppSombraRoute
   AppIndexRoute: typeof AppIndexRoute
@@ -367,6 +387,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMissoesRoute: AppMissoesRoute,
   AppPerformanceRoute: AppPerformanceRoute,
   AppPropositoRoute: AppPropositoRoute,
+  AppProtocolosRoute: AppProtocolosRoute,
   AppRelatoriosRoute: AppRelatoriosRoute,
   AppSombraRoute: AppSombraRoute,
   AppIndexRoute: AppIndexRoute,
