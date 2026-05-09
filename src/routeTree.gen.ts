@@ -20,6 +20,7 @@ import { Route as AppPropositoRouteImport } from './routes/app.proposito'
 import { Route as AppPerformanceRouteImport } from './routes/app.performance'
 import { Route as AppMissoesRouteImport } from './routes/app.missoes'
 import { Route as AppManualRouteImport } from './routes/app.manual'
+import { Route as AppLaboratorioRouteImport } from './routes/app.laboratorio'
 import { Route as AppIntelectoRouteImport } from './routes/app.intelecto'
 import { Route as AppIdentidadeRouteImport } from './routes/app.identidade'
 import { Route as AppIdeiasRouteImport } from './routes/app.ideias'
@@ -82,6 +83,11 @@ const AppManualRoute = AppManualRouteImport.update({
   path: '/manual',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLaboratorioRoute = AppLaboratorioRouteImport.update({
+  id: '/laboratorio',
+  path: '/laboratorio',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppIntelectoRoute = AppIntelectoRouteImport.update({
   id: '/intelecto',
   path: '/intelecto',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
   '/app/intelecto': typeof AppIntelectoRoute
+  '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
   '/app/performance': typeof AppPerformanceRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
   '/app/intelecto': typeof AppIntelectoRoute
+  '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
   '/app/performance': typeof AppPerformanceRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
   '/app/intelecto': typeof AppIntelectoRoute
+  '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
   '/app/performance': typeof AppPerformanceRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/app/ideias'
     | '/app/identidade'
     | '/app/intelecto'
+    | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
     | '/app/performance'
@@ -200,6 +210,7 @@ export interface FileRouteTypes {
     | '/app/ideias'
     | '/app/identidade'
     | '/app/intelecto'
+    | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
     | '/app/performance'
@@ -219,6 +230,7 @@ export interface FileRouteTypes {
     | '/app/ideias'
     | '/app/identidade'
     | '/app/intelecto'
+    | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
     | '/app/performance'
@@ -314,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppManualRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/laboratorio': {
+      id: '/app/laboratorio'
+      path: '/laboratorio'
+      fullPath: '/app/laboratorio'
+      preLoaderRoute: typeof AppLaboratorioRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/intelecto': {
       id: '/app/intelecto'
       path: '/intelecto'
@@ -366,6 +385,7 @@ interface AppRouteChildren {
   AppIdeiasRoute: typeof AppIdeiasRoute
   AppIdentidadeRoute: typeof AppIdentidadeRoute
   AppIntelectoRoute: typeof AppIntelectoRoute
+  AppLaboratorioRoute: typeof AppLaboratorioRoute
   AppManualRoute: typeof AppManualRoute
   AppMissoesRoute: typeof AppMissoesRoute
   AppPerformanceRoute: typeof AppPerformanceRoute
@@ -383,6 +403,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppIdeiasRoute: AppIdeiasRoute,
   AppIdentidadeRoute: AppIdentidadeRoute,
   AppIntelectoRoute: AppIntelectoRoute,
+  AppLaboratorioRoute: AppLaboratorioRoute,
   AppManualRoute: AppManualRoute,
   AppMissoesRoute: AppMissoesRoute,
   AppPerformanceRoute: AppPerformanceRoute,
