@@ -191,7 +191,7 @@ function Protocolos() {
           </HudCard>
 
           {/* CAMADA 1 — LIMPEZA MENTAL */}
-          <HudCard title="🧩 CAMADA 1 · LIMPEZA MENTAL" id="camada-1">
+          <HudCard title="🧩 CAMADA 1 · LIMPEZA MENTAL">
             <div className="flex items-center gap-2 text-primary mb-2">
               <Brain className="size-4" />
               <span className="font-display text-sm">Descarrego cognitivo</span>
