@@ -14,6 +14,7 @@ const modules = [
   { title: "Identidade", url: "/app/identidade", icon: Fingerprint },
   { title: "Propósito Supremo", url: "/app/proposito", icon: Crosshair },
   { title: "Centro Intelectual", url: "/app/intelecto", icon: BookOpen },
+  { title: "Laboratório Estratégico", url: "/app/laboratorio", icon: FlaskConical },
   { title: "Manual Operacional", url: "/app/manual", icon: Settings2 },
   { title: "Protocolos Operacionais", url: "/app/protocolos", icon: Cog },
   { title: "Performance", url: "/app/performance", icon: Activity },
