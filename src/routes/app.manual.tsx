@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Sparkles, Brain, Layers, Activity } from "lucide-react";
+import { ProtectedField } from "@/components/ProtectedField";
 
 export const Route = createFileRoute("/app/manual")({ component: ManualPage });
 
@@ -52,9 +53,20 @@ function ManualPage() {
 
         <TabsContent value="mapeamento" className="mt-4">
           <div className="grid md:grid-cols-2 gap-4">
-            {["Horários de Pico Cognitivo", "Gatilhos Emocionais", "Ambientes Ideais", "Ambientes Tóxicos", "Padrões de Procrastinação", "Hacks Mentais", "Protocolos de Recuperação", "Estados Mentais", "Técnicas de Foco", "Sabotagens Recorrentes"].map((t) => (
-              <HudCard key={t} title={t.toUpperCase()}>
-                <Textarea className="min-h-[110px] bg-input/40 font-mono text-xs border-border/50" placeholder="..." />
+            {[
+              ["pico-cognitivo","Horários de Pico Cognitivo"],
+              ["gatilhos-emocionais","Gatilhos Emocionais"],
+              ["ambientes-ideais","Ambientes Ideais"],
+              ["ambientes-toxicos","Ambientes Tóxicos"],
+              ["procrastinacao","Padrões de Procrastinação"],
+              ["hacks-mentais","Hacks Mentais"],
+              ["recuperacao","Protocolos de Recuperação"],
+              ["estados-mentais","Estados Mentais"],
+              ["foco","Técnicas de Foco"],
+              ["sabotagens","Sabotagens Recorrentes"],
+            ].map(([k,t]) => (
+              <HudCard key={k} title={t.toUpperCase()}>
+                <ProtectedField module="manual" fieldKey={k} placeholder="..." minHeight={110} />
               </HudCard>
             ))}
           </div>
