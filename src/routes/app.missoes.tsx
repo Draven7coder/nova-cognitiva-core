@@ -76,6 +76,31 @@ function MissoesPage() {
         </div>
       </HudCard>
 
+      <HudCard title="♟️ MISSÕES COGNITIVAS · TREINO DE ELITE">
+        <p className="text-xs text-muted-foreground mb-3">
+          Quests de pensamento estratégico profundo. XP cognitivo · profundidade de cálculo · streaks de treino.
+        </p>
+        <div className="grid sm:grid-cols-2 gap-2">
+          {COGNITIVE_PRESETS.map((p) => (
+            <button key={p.title}
+              onClick={async () => {
+                const { error } = await supabase.from("missions").insert({ user_id: user!.id, title: p.title, type: "cognitive" as any, xp: p.xp, description: p.desc });
+                if (error) toast.error(error.message);
+                else { toast.success("Missão cognitiva ativada."); load(); }
+              }}
+              className="text-left hud-panel hud-corner p-3 hover:border-primary/60 transition">
+              <div className="flex justify-between items-start gap-2">
+                <div>
+                  <div className="font-display text-sm text-foreground">{p.title}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{p.desc}</div>
+                </div>
+                <div className="font-mono text-[10px] text-primary tracking-widest shrink-0">+{p.xp} XP</div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </HudCard>
+
       <HudCard title="MISSÕES ATIVAS">
         {active.length === 0 ? <div className="text-sm text-muted-foreground">Nenhuma missão ativa.</div> : (
           <ul className="space-y-2">
