@@ -11,11 +11,19 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/missoes")({ component: MissoesPage });
 
-const TYPES = ["daily", "weekly", "campaign", "side", "challenge", "project"] as const;
+const TYPES = ["daily", "weekly", "campaign", "side", "challenge", "project", "cognitive"] as const;
 const TYPE_LABEL: Record<string, string> = {
   daily: "Diária", weekly: "Semanal", campaign: "Campanha",
-  side: "Side Quest", challenge: "Desafio", project: "Projeto",
+  side: "Side Quest", challenge: "Desafio", project: "Projeto", cognitive: "♟️ Cognitiva",
 };
+
+const COGNITIVE_PRESETS = [
+  { title: "Partida Cognitiva de Alta Profundidade", xp: 50, desc: "Pré-partida + hipótese + 5 níveis + análise sem engine + revisão engine + insight." },
+  { title: "Sessão de Treino Invisível (15 min)", xp: 20, desc: "Visualização sem tabuleiro · cálculo mental." },
+  { title: "Estudo de Partida Clássica", xp: 25, desc: "Análise profunda de 1 partida magistral." },
+  { title: "Catalogar 3 Padrões Táticos", xp: 15, desc: "Reconhecimento estrutural." },
+  { title: "Pensamento de 10ª Ordem · Decisão Real", xp: 30, desc: "Aplicar arquitetura cognitiva a uma decisão concreta." },
+];
 
 function MissoesPage() {
   const { user } = useAuth();
