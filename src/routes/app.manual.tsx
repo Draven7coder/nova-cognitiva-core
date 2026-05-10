@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { Sparkles, Brain, Layers, Activity } from "lucide-react";
+import { ProtectedField } from "@/components/ProtectedField";
 
 export const Route = createFileRoute("/app/manual")({ component: ManualPage });
 
