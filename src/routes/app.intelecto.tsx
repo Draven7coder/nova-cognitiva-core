@@ -59,6 +59,24 @@ function IntelectoPage() {
         ))}
       </div>
 
+      <Link to="/app/xadrez" className="block group">
+        <div className="hud-panel hud-corner p-5 border border-primary/40 hover:border-primary transition hud-glow">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Crown className="size-6 text-primary shrink-0" />
+              <div>
+                <div className="font-mono text-[10px] tracking-[0.4em] text-primary/80">ESTRATÉGIA COGNITIVA</div>
+                <div className="font-display text-xl text-foreground hud-text-glow mt-1">♟️ Xadrez · Pensamento Estratégico</div>
+                <p className="text-xs text-muted-foreground mt-1 max-w-xl">
+                  Laboratório de cognição profunda · cálculo, padrões, ordens de pensamento, arquitetura de decisão.
+                </p>
+              </div>
+            </div>
+            <ArrowRight className="size-5 text-primary group-hover:translate-x-1 transition" />
+          </div>
+        </div>
+      </Link>
+
       {isMeta ? (
         <>
           <HudCard title="META-SISTEMAS · NÚCLEO DE ENGENHARIA COGNITIVA">
