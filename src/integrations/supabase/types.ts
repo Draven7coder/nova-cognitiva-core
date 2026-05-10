@@ -41,6 +41,36 @@ export type Database = {
         }
         Relationships: []
       }
+      field_versions: {
+        Row: {
+          content: string
+          created_at: string
+          field_key: string
+          id: string
+          module: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          field_key: string
+          id?: string
+          module: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          field_key?: string
+          id?: string
+          module?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: []
+      }
       identity: {
         Row: {
           archetype: string | null
