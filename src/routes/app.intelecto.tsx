@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Brain, Network, Workflow, Cpu, Binary, Layers, FlaskConical, Radio, Lightbulb, Library, ArrowRight } from "lucide-react";
+import { Brain, Network, Workflow, Cpu, Binary, Layers, FlaskConical, Radio, Lightbulb, Library, ArrowRight, Crown } from "lucide-react";
 
 export const Route = createFileRoute("/app/intelecto")({ component: IntelectoPage });
 
