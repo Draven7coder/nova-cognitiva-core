@@ -11,11 +11,19 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/app/missoes")({ component: MissoesPage });
 
-const TYPES = ["daily", "weekly", "campaign", "side", "challenge", "project"] as const;
+const TYPES = ["daily", "weekly", "campaign", "side", "challenge", "project", "cognitive"] as const;
 const TYPE_LABEL: Record<string, string> = {
   daily: "Diária", weekly: "Semanal", campaign: "Campanha",
-  side: "Side Quest", challenge: "Desafio", project: "Projeto",
+  side: "Side Quest", challenge: "Desafio", project: "Projeto", cognitive: "♟️ Cognitiva",
 };
+
+const COGNITIVE_PRESETS = [
+  { title: "Partida Cognitiva de Alta Profundidade", xp: 50, desc: "Pré-partida + hipótese + 5 níveis + análise sem engine + revisão engine + insight." },
+  { title: "Sessão de Treino Invisível (15 min)", xp: 20, desc: "Visualização sem tabuleiro · cálculo mental." },
+  { title: "Estudo de Partida Clássica", xp: 25, desc: "Análise profunda de 1 partida magistral." },
+  { title: "Catalogar 3 Padrões Táticos", xp: 15, desc: "Reconhecimento estrutural." },
+  { title: "Pensamento de 10ª Ordem · Decisão Real", xp: 30, desc: "Aplicar arquitetura cognitiva a uma decisão concreta." },
+];
 
 function MissoesPage() {
   const { user } = useAuth();
@@ -65,6 +73,31 @@ function MissoesPage() {
           </Select>
           <Input type="number" value={xp} onChange={(e) => setXp(parseInt(e.target.value) || 0)} className="w-20 bg-input/40 font-mono text-xs" />
           <Button onClick={create} className="font-mono text-xs tracking-widest"><Plus className="size-3 mr-1" />REGISTRAR</Button>
+        </div>
+      </HudCard>
+
+      <HudCard title="♟️ MISSÕES COGNITIVAS · TREINO DE ELITE">
+        <p className="text-xs text-muted-foreground mb-3">
+          Quests de pensamento estratégico profundo. XP cognitivo · profundidade de cálculo · streaks de treino.
+        </p>
+        <div className="grid sm:grid-cols-2 gap-2">
+          {COGNITIVE_PRESETS.map((p) => (
+            <button key={p.title}
+              onClick={async () => {
+                const { error } = await supabase.from("missions").insert({ user_id: user!.id, title: p.title, type: "cognitive" as any, xp: p.xp, description: p.desc });
+                if (error) toast.error(error.message);
+                else { toast.success("Missão cognitiva ativada."); load(); }
+              }}
+              className="text-left hud-panel hud-corner p-3 hover:border-primary/60 transition">
+              <div className="flex justify-between items-start gap-2">
+                <div>
+                  <div className="font-display text-sm text-foreground">{p.title}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{p.desc}</div>
+                </div>
+                <div className="font-mono text-[10px] text-primary tracking-widest shrink-0">+{p.xp} XP</div>
+              </div>
+            </button>
+          ))}
         </div>
       </HudCard>
 
