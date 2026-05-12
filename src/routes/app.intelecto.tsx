@@ -47,7 +47,12 @@ function IntelectoPage() {
   const isMeta = area === "meta-sistemas";
 
   return (
-    <ModulePage code="// INT 03" title="Centro Intelectual" subtitle="Segundo cérebro · notas, mapas, insights, conexões.">
+    <ModulePage code="// INT 03" title="Centro Intelectual" subtitle="Segundo cérebro · notas, mapas, insights, conexões · memória permanente.">
+      <div className="hud-panel hud-corner p-3 flex items-center gap-2 text-xs text-muted-foreground">
+        <span className="size-1.5 rounded-full bg-primary animate-pulse-ring" />
+        <span className="font-mono text-[10px] tracking-widest text-primary">MEMÓRIA PERMANENTE ATIVA</span>
+        <span>· cada nota registrada é preservada cronologicamente · nada se perde.</span>
+      </div>
       <div className="flex flex-wrap gap-2">
         {AREAS.map((a) => (
           <button key={a} onClick={() => setArea(a)}
