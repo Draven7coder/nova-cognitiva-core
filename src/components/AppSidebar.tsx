@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Fingerprint, Crosshair, BookOpen, Settings2, Activity,
-  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical,
+  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -18,6 +18,7 @@ const modules = [
   { title: "Manual Operacional", url: "/app/manual", icon: Settings2 },
   { title: "Protocolos Operacionais", url: "/app/protocolos", icon: Cog },
   { title: "Performance", url: "/app/performance", icon: Activity },
+  { title: "Hidratação Operacional", url: "/app/hidratacao", icon: Droplet },
   { title: "Sistema de Missões", url: "/app/missoes", icon: Swords },
   { title: "Banco de Ideias", url: "/app/ideias", icon: Lightbulb },
   { title: "Sombra", url: "/app/sombra", icon: Moon },

@@ -71,6 +71,33 @@ export type Database = {
         }
         Relationships: []
       }
+      hydration_logs: {
+        Row: {
+          amount_ml: number
+          consumed_at: string
+          created_at: string
+          id: string
+          note: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_ml: number
+          consumed_at?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_ml?: number
+          consumed_at?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       identity: {
         Row: {
           archetype: string | null
