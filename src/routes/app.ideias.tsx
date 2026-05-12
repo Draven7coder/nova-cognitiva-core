@@ -35,7 +35,12 @@ function IdeiasPage() {
   );
 
   return (
-    <ModulePage code="// IDE 07" title="Banco de Ideias" subtitle="Teorias, paradoxos, observações, invenções, insights.">
+    <ModulePage code="// IDE 07" title="Banco de Ideias" subtitle="Teorias, paradoxos, observações, invenções, insights · memória permanente.">
+      <div className="hud-panel hud-corner p-3 flex items-center gap-2 text-xs text-muted-foreground">
+        <span className="size-1.5 rounded-full bg-primary animate-pulse-ring" />
+        <span className="font-mono text-[10px] tracking-widest text-primary">MEMÓRIA PERMANENTE ATIVA</span>
+        <span>· cada ideia armazenada é imutável · histórico cronológico preservado.</span>
+      </div>
       <HudCard title="NOVA IDEIA">
         <Input placeholder="Título" value={title} onChange={(e) => setTitle(e.target.value)} className="bg-input/40 font-mono text-xs mb-2" />
         <Textarea placeholder="Descrição" value={content} onChange={(e) => setContent(e.target.value)} className="min-h-[100px] bg-input/40 font-mono text-xs mb-2" />

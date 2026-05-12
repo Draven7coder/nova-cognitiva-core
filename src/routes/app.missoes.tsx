@@ -56,7 +56,12 @@ function MissoesPage() {
   const done = list.filter((m) => m.status === "done");
 
   return (
-    <ModulePage code="// MSN 06" title="Sistema de Missões" subtitle="Execução gamificada · campanhas, missões, XP, evolução.">
+    <ModulePage code="// MSN 06" title="Sistema de Missões" subtitle="Execução gamificada · campanhas, missões, XP, evolução · histórico imutável.">
+      <div className="hud-panel hud-corner p-3 flex items-center gap-2 text-xs text-muted-foreground">
+        <span className="size-1.5 rounded-full bg-primary animate-pulse-ring" />
+        <span className="font-mono text-[10px] tracking-widest text-primary">MEMÓRIA PERMANENTE ATIVA</span>
+        <span>· missões e XP persistidos · arquivo histórico inalterável.</span>
+      </div>
       <div className="grid md:grid-cols-3 gap-4">
         <HudCard title="NÍVEL ATUAL"><div className="font-display text-5xl text-primary hud-text-glow">{level}</div><div className="text-xs text-muted-foreground mt-1">{totalXP} XP acumulado</div></HudCard>
         <HudCard title="MISSÕES ATIVAS"><div className="font-display text-5xl text-primary hud-text-glow">{active.length}</div><div className="text-xs text-muted-foreground mt-1">em execução</div></HudCard>
