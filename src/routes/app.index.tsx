@@ -40,18 +40,27 @@ function Dashboard() {
   const [insight, setInsight] = useState<string>("Aguardando primeira análise da IA. Execute uma sincronização para mapear seu QI Funcional Operacional.");
   const [missions, setMissions] = useState<any[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
+  const [jarvis, setJarvis] = useState<{ weakness: number; evolution: number; alert: number; topAlert?: any }>({ weakness: 0, evolution: 0, alert: 0 });
 
   useEffect(() => {
     (async () => {
-      const [{ data: m }, { data: r }] = await Promise.all([
+      const [{ data: m }, { data: r }, { data: ji }] = await Promise.all([
         supabase.from("missions").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(5),
         supabase.from("ai_reports").select("*").order("created_at", { ascending: false }).limit(1),
+        supabase.from("jarvis_insights").select("kind,title,severity,created_at").eq("status", "active").order("created_at", { ascending: false }).limit(50),
       ]);
       setMissions(m ?? []);
       if (r?.[0]) {
         if (r[0].metrics) setMetrics(r[0].metrics as any);
         setInsight(r[0].content.split("\n").slice(0, 4).join("\n"));
       }
+      const list = ji ?? [];
+      setJarvis({
+        weakness: list.filter((x) => x.kind === "weakness").length,
+        evolution: list.filter((x) => x.kind === "evolution").length,
+        alert: list.filter((x) => x.kind === "alert").length,
+        topAlert: list.find((x) => x.kind === "alert") ?? list.find((x) => x.kind === "weakness"),
+      });
     })();
   }, [user]);
 
