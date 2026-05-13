@@ -175,6 +175,37 @@ function Dashboard() {
         </div>
       </HudCard>
 
+      <HudCard title="🤖 JARVIS · ESPELHO COGNITIVO">
+        <div className="grid lg:grid-cols-4 gap-3">
+          <Link to="/app/jarvis" className="hud-panel p-3 hover:border-primary/60 transition-colors group">
+            <div className="flex items-center gap-2 mb-2">
+              <Bot className="size-4 text-primary group-hover:hud-text-glow" />
+              <span className="font-mono text-[10px] tracking-widest text-foreground/90">ABRIR JARVIS</span>
+            </div>
+            <div className="text-[10px] text-muted-foreground font-mono leading-relaxed">
+              Observador contínuo de padrões, fraquezas e evoluções.
+            </div>
+          </Link>
+          <div className="hud-panel p-3">
+            <div className="flex items-center gap-2"><ShieldAlert className="size-4 text-destructive" /><span className="font-mono text-[10px] tracking-widest text-destructive">FRAQUEZAS</span></div>
+            <div className="font-display text-3xl text-destructive hud-text-glow mt-1">{jarvis.weakness}</div>
+          </div>
+          <div className="hud-panel p-3">
+            <div className="flex items-center gap-2"><TrendUp className="size-4 text-primary" /><span className="font-mono text-[10px] tracking-widest text-primary">EVOLUÇÕES</span></div>
+            <div className="font-display text-3xl text-primary hud-text-glow mt-1">{jarvis.evolution}</div>
+          </div>
+          <div className="hud-panel p-3">
+            <div className="flex items-center gap-2"><AlertTriangle className="size-4 text-amber-400" /><span className="font-mono text-[10px] tracking-widest text-amber-400">ALERTAS</span></div>
+            <div className="font-display text-3xl text-amber-400 hud-text-glow mt-1">{jarvis.alert}</div>
+          </div>
+        </div>
+        {jarvis.topAlert && (
+          <div className="mt-3 text-xs font-mono text-muted-foreground border-t border-border/40 pt-3">
+            <span className="text-primary">▸ ÚLTIMO INSIGHT:</span> {jarvis.topAlert.title}
+          </div>
+        )}
+      </HudCard>
+
       <div className="grid lg:grid-cols-3 gap-4">
         <HudCard title="EVOLUÇÃO TEMPORAL · 14D" className="lg:col-span-2">
           <div className="h-[200px]">
