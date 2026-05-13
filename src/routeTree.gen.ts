@@ -22,6 +22,7 @@ import { Route as AppPerformanceRouteImport } from './routes/app.performance'
 import { Route as AppMissoesRouteImport } from './routes/app.missoes'
 import { Route as AppManualRouteImport } from './routes/app.manual'
 import { Route as AppLaboratorioRouteImport } from './routes/app.laboratorio'
+import { Route as AppJarvisRouteImport } from './routes/app.jarvis'
 import { Route as AppIntelectoRouteImport } from './routes/app.intelecto'
 import { Route as AppIdentidadeRouteImport } from './routes/app.identidade'
 import { Route as AppIdeiasRouteImport } from './routes/app.ideias'
@@ -95,6 +96,11 @@ const AppLaboratorioRoute = AppLaboratorioRouteImport.update({
   path: '/laboratorio',
   getParentRoute: () => AppRoute,
 } as any)
+const AppJarvisRoute = AppJarvisRouteImport.update({
+  id: '/jarvis',
+  path: '/jarvis',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppIntelectoRoute = AppIntelectoRouteImport.update({
   id: '/intelecto',
   path: '/intelecto',
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
   '/app/intelecto': typeof AppIntelectoRoute
+  '/app/jarvis': typeof AppJarvisRoute
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
   '/app/intelecto': typeof AppIntelectoRoute
+  '/app/jarvis': typeof AppJarvisRoute
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
   '/app/intelecto': typeof AppIntelectoRoute
+  '/app/jarvis': typeof AppJarvisRoute
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/app/ideias'
     | '/app/identidade'
     | '/app/intelecto'
+    | '/app/jarvis'
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/app/ideias'
     | '/app/identidade'
     | '/app/intelecto'
+    | '/app/jarvis'
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
@@ -253,6 +264,7 @@ export interface FileRouteTypes {
     | '/app/ideias'
     | '/app/identidade'
     | '/app/intelecto'
+    | '/app/jarvis'
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
@@ -364,6 +376,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLaboratorioRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/jarvis': {
+      id: '/app/jarvis'
+      path: '/jarvis'
+      fullPath: '/app/jarvis'
+      preLoaderRoute: typeof AppJarvisRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/intelecto': {
       id: '/app/intelecto'
       path: '/intelecto'
@@ -424,6 +443,7 @@ interface AppRouteChildren {
   AppIdeiasRoute: typeof AppIdeiasRoute
   AppIdentidadeRoute: typeof AppIdentidadeRoute
   AppIntelectoRoute: typeof AppIntelectoRoute
+  AppJarvisRoute: typeof AppJarvisRoute
   AppLaboratorioRoute: typeof AppLaboratorioRoute
   AppManualRoute: typeof AppManualRoute
   AppMissoesRoute: typeof AppMissoesRoute
@@ -444,6 +464,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppIdeiasRoute: AppIdeiasRoute,
   AppIdentidadeRoute: AppIdentidadeRoute,
   AppIntelectoRoute: AppIntelectoRoute,
+  AppJarvisRoute: AppJarvisRoute,
   AppLaboratorioRoute: AppLaboratorioRoute,
   AppManualRoute: AppManualRoute,
   AppMissoesRoute: AppMissoesRoute,
@@ -466,3 +487,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
