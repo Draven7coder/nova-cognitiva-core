@@ -146,6 +146,48 @@ export type Database = {
         }
         Relationships: []
       }
+      jarvis_insights: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          kind: string
+          metadata: Json | null
+          severity: string
+          source_module: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind: string
+          metadata?: Json | null
+          severity?: string
+          source_module?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          metadata?: Json | null
+          severity?: string
+          source_module?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           content: string
