@@ -10,7 +10,7 @@ import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip,
 } from "recharts";
-import { Sparkles, Target, Flame, Calendar, Cog, Brain, AlertTriangle, Fingerprint } from "lucide-react";
+import { Sparkles, Target, Flame, Calendar, Cog, Brain, AlertTriangle, Fingerprint, Bot, ShieldAlert, TrendingUp as TrendUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
