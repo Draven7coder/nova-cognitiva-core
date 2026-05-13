@@ -10,7 +10,7 @@ import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip,
 } from "recharts";
-import { Sparkles, Target, Flame, Calendar, Cog, Brain, AlertTriangle, Fingerprint } from "lucide-react";
+import { Sparkles, Target, Flame, Calendar, Cog, Brain, AlertTriangle, Fingerprint, Bot, ShieldAlert, TrendingUp as TrendUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
@@ -40,18 +40,27 @@ function Dashboard() {
   const [insight, setInsight] = useState<string>("Aguardando primeira análise da IA. Execute uma sincronização para mapear seu QI Funcional Operacional.");
   const [missions, setMissions] = useState<any[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
+  const [jarvis, setJarvis] = useState<{ weakness: number; evolution: number; alert: number; topAlert?: any }>({ weakness: 0, evolution: 0, alert: 0 });
 
   useEffect(() => {
     (async () => {
-      const [{ data: m }, { data: r }] = await Promise.all([
+      const [{ data: m }, { data: r }, { data: ji }] = await Promise.all([
         supabase.from("missions").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(5),
         supabase.from("ai_reports").select("*").order("created_at", { ascending: false }).limit(1),
+        supabase.from("jarvis_insights").select("kind,title,severity,created_at").eq("status", "active").order("created_at", { ascending: false }).limit(50),
       ]);
       setMissions(m ?? []);
       if (r?.[0]) {
         if (r[0].metrics) setMetrics(r[0].metrics as any);
         setInsight(r[0].content.split("\n").slice(0, 4).join("\n"));
       }
+      const list = ji ?? [];
+      setJarvis({
+        weakness: list.filter((x) => x.kind === "weakness").length,
+        evolution: list.filter((x) => x.kind === "evolution").length,
+        alert: list.filter((x) => x.kind === "alert").length,
+        topAlert: list.find((x) => x.kind === "alert") ?? list.find((x) => x.kind === "weakness"),
+      });
     })();
   }, [user]);
 
@@ -164,6 +173,37 @@ function Dashboard() {
             </Link>
           ))}
         </div>
+      </HudCard>
+
+      <HudCard title="🤖 JARVIS · ESPELHO COGNITIVO">
+        <div className="grid lg:grid-cols-4 gap-3">
+          <Link to="/app/jarvis" className="hud-panel p-3 hover:border-primary/60 transition-colors group">
+            <div className="flex items-center gap-2 mb-2">
+              <Bot className="size-4 text-primary group-hover:hud-text-glow" />
+              <span className="font-mono text-[10px] tracking-widest text-foreground/90">ABRIR JARVIS</span>
+            </div>
+            <div className="text-[10px] text-muted-foreground font-mono leading-relaxed">
+              Observador contínuo de padrões, fraquezas e evoluções.
+            </div>
+          </Link>
+          <div className="hud-panel p-3">
+            <div className="flex items-center gap-2"><ShieldAlert className="size-4 text-destructive" /><span className="font-mono text-[10px] tracking-widest text-destructive">FRAQUEZAS</span></div>
+            <div className="font-display text-3xl text-destructive hud-text-glow mt-1">{jarvis.weakness}</div>
+          </div>
+          <div className="hud-panel p-3">
+            <div className="flex items-center gap-2"><TrendUp className="size-4 text-primary" /><span className="font-mono text-[10px] tracking-widest text-primary">EVOLUÇÕES</span></div>
+            <div className="font-display text-3xl text-primary hud-text-glow mt-1">{jarvis.evolution}</div>
+          </div>
+          <div className="hud-panel p-3">
+            <div className="flex items-center gap-2"><AlertTriangle className="size-4 text-amber-400" /><span className="font-mono text-[10px] tracking-widest text-amber-400">ALERTAS</span></div>
+            <div className="font-display text-3xl text-amber-400 hud-text-glow mt-1">{jarvis.alert}</div>
+          </div>
+        </div>
+        {jarvis.topAlert && (
+          <div className="mt-3 text-xs font-mono text-muted-foreground border-t border-border/40 pt-3">
+            <span className="text-primary">▸ ÚLTIMO INSIGHT:</span> {jarvis.topAlert.title}
+          </div>
+        )}
       </HudCard>
 
       <div className="grid lg:grid-cols-3 gap-4">
