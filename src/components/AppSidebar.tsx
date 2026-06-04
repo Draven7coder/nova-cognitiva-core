@@ -23,6 +23,7 @@ const modules = [
   { title: "Banco de Ideias", url: "/app/ideias", icon: Lightbulb },
   { title: "Sombra", url: "/app/sombra", icon: Moon },
   { title: "Evolução", url: "/app/evolucao", icon: TrendingUp },
+  { title: "Loop OODA", url: "/app/ooda", icon: Compass },
   { title: "JARVIS", url: "/app/jarvis", icon: Bot },
   { title: "Relatórios da IA", url: "/app/relatorios", icon: Brain },
   { title: "Configurações", url: "/app/config", icon: Settings },
