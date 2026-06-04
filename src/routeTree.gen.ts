@@ -19,6 +19,7 @@ import { Route as AppRelatoriosRouteImport } from './routes/app.relatorios'
 import { Route as AppProtocolosRouteImport } from './routes/app.protocolos'
 import { Route as AppPropositoRouteImport } from './routes/app.proposito'
 import { Route as AppPerformanceRouteImport } from './routes/app.performance'
+import { Route as AppOodaRouteImport } from './routes/app.ooda'
 import { Route as AppMissoesRouteImport } from './routes/app.missoes'
 import { Route as AppManualRouteImport } from './routes/app.manual'
 import { Route as AppLaboratorioRouteImport } from './routes/app.laboratorio'
@@ -79,6 +80,11 @@ const AppPropositoRoute = AppPropositoRouteImport.update({
 const AppPerformanceRoute = AppPerformanceRouteImport.update({
   id: '/performance',
   path: '/performance',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOodaRoute = AppOodaRouteImport.update({
+  id: '/ooda',
+  path: '/ooda',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMissoesRoute = AppMissoesRouteImport.update({
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
+  '/app/ooda': typeof AppOodaRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
+  '/app/ooda': typeof AppOodaRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
@@ -198,6 +206,7 @@ export interface FileRoutesById {
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
+  '/app/ooda': typeof AppOodaRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
@@ -223,6 +232,7 @@ export interface FileRouteTypes {
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
+    | '/app/ooda'
     | '/app/performance'
     | '/app/proposito'
     | '/app/protocolos'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
+    | '/app/ooda'
     | '/app/performance'
     | '/app/proposito'
     | '/app/protocolos'
@@ -268,6 +279,7 @@ export interface FileRouteTypes {
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
+    | '/app/ooda'
     | '/app/performance'
     | '/app/proposito'
     | '/app/protocolos'
@@ -353,6 +365,13 @@ declare module '@tanstack/react-router' {
       path: '/performance'
       fullPath: '/app/performance'
       preLoaderRoute: typeof AppPerformanceRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/ooda': {
+      id: '/app/ooda'
+      path: '/ooda'
+      fullPath: '/app/ooda'
+      preLoaderRoute: typeof AppOodaRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/missoes': {
@@ -447,6 +466,7 @@ interface AppRouteChildren {
   AppLaboratorioRoute: typeof AppLaboratorioRoute
   AppManualRoute: typeof AppManualRoute
   AppMissoesRoute: typeof AppMissoesRoute
+  AppOodaRoute: typeof AppOodaRoute
   AppPerformanceRoute: typeof AppPerformanceRoute
   AppPropositoRoute: typeof AppPropositoRoute
   AppProtocolosRoute: typeof AppProtocolosRoute
@@ -468,6 +488,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppLaboratorioRoute: AppLaboratorioRoute,
   AppManualRoute: AppManualRoute,
   AppMissoesRoute: AppMissoesRoute,
+  AppOodaRoute: AppOodaRoute,
   AppPerformanceRoute: AppPerformanceRoute,
   AppPropositoRoute: AppPropositoRoute,
   AppProtocolosRoute: AppProtocolosRoute,
@@ -487,3 +508,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
