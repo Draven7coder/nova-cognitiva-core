@@ -16,6 +16,10 @@ const TYPE_LABEL: Record<string, string> = {
   daily: "Diária", weekly: "Semanal", campaign: "Campanha",
   side: "Side Quest", challenge: "Desafio", project: "Projeto", cognitive: "♟️ Cognitiva",
 };
+const RECURRENCE = ["once", "daily", "weekly", "monthly", "permanent"] as const;
+const REC_LABEL: Record<string, string> = {
+  once: "Única", daily: "Diária", weekly: "Semanal", monthly: "Mensal", permanent: "Permanente",
+};
 
 const COGNITIVE_PRESETS = [
   { title: "Partida Cognitiva de Alta Profundidade", xp: 50, desc: "Pré-partida + hipótese + 5 níveis + análise sem engine + revisão engine + insight." },
@@ -25,35 +29,65 @@ const COGNITIVE_PRESETS = [
   { title: "Pensamento de 10ª Ordem · Decisão Real", xp: 30, desc: "Aplicar arquitetura cognitiva a uma decisão concreta." },
 ];
 
+function isSameDay(iso: string | null): boolean {
+  if (!iso) return false;
+  const d = new Date(iso); const n = new Date();
+  return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
+}
+
 function MissoesPage() {
   const { user } = useAuth();
   const [list, setList] = useState<any[]>([]);
+  const [completions, setCompletions] = useState<any[]>([]);
   const [title, setTitle] = useState("");
   const [type, setType] = useState<typeof TYPES[number]>("daily");
+  const [recurrence, setRecurrence] = useState<typeof RECURRENCE[number]>("daily");
   const [xp, setXp] = useState(10);
 
   const load = async () => {
-    const { data } = await supabase.from("missions").select("*").order("created_at", { ascending: false });
-    setList(data ?? []);
+    const [{ data: m }, { data: c }] = await Promise.all([
+      supabase.from("missions").select("*").order("created_at", { ascending: false }),
+      supabase.from("mission_completions").select("*").order("completed_at", { ascending: false }).limit(300),
+    ]);
+    setList(m ?? []);
+    setCompletions(c ?? []);
   };
   useEffect(() => { load(); }, [user]);
 
   const create = async () => {
     if (!title.trim()) return;
-    const { error } = await supabase.from("missions").insert({ user_id: user!.id, title, type, xp });
+    const { error } = await supabase.from("missions").insert({ user_id: user!.id, title, type, xp, recurrence } as any);
     if (error) toast.error(error.message);
     else { setTitle(""); load(); toast.success("Missão registrada."); }
   };
-  const complete = async (id: string) => {
-    await supabase.from("missions").update({ status: "done", completed_at: new Date().toISOString() }).eq("id", id);
+  const complete = async (m: any) => {
+    await supabase.from("mission_completions").insert({ user_id: user!.id, mission_id: m.id, quality: 5 } as any);
+    if (m.recurrence && m.recurrence !== "once") {
+      const within48h = m.last_completed_at && (Date.now() - new Date(m.last_completed_at).getTime()) < 1000 * 60 * 60 * 48;
+      await supabase.from("missions").update({
+        last_completed_at: new Date().toISOString(),
+        streak: (within48h ? (m.streak ?? 0) : 0) + 1,
+      } as any).eq("id", m.id);
+      toast.success("Execução registrada · streak preservado.");
+    } else {
+      await supabase.from("missions").update({ status: "done", completed_at: new Date().toISOString() }).eq("id", m.id);
+      toast.success("Missão arquivada.");
+    }
     load();
   };
-  const del = async (id: string) => { await supabase.from("missions").delete().eq("id", id); load(); };
+  const del = async (id: string) => {
+    if (!confirm("Excluir esta missão? O histórico de execuções será preservado.")) return;
+    await supabase.from("missions").delete().eq("id", id); load();
+  };
 
-  const totalXP = list.filter((m) => m.status === "done").reduce((a, b) => a + b.xp, 0);
+  const totalXP = completions.reduce((acc, c) => {
+    const mis = list.find((x) => x.id === c.mission_id);
+    return acc + (mis?.xp ?? 0);
+  }, 0);
   const level = Math.floor(totalXP / 100) + 1;
   const active = list.filter((m) => m.status === "active");
   const done = list.filter((m) => m.status === "done");
+  const todayCount = completions.filter((c) => isSameDay(c.completed_at)).length;
 
   return (
     <ModulePage code="// MSN 06" title="Sistema de Missões" subtitle="Execução gamificada · campanhas, missões, XP, evolução · histórico imutável.">
