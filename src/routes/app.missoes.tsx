@@ -96,10 +96,11 @@ function MissoesPage() {
         <span className="font-mono text-[10px] tracking-widest text-primary">MEMÓRIA PERMANENTE ATIVA</span>
         <span>· missões e XP persistidos · arquivo histórico inalterável.</span>
       </div>
-      <div className="grid md:grid-cols-3 gap-4">
-        <HudCard title="NÍVEL ATUAL"><div className="font-display text-5xl text-primary hud-text-glow">{level}</div><div className="text-xs text-muted-foreground mt-1">{totalXP} XP acumulado</div></HudCard>
+      <div className="grid md:grid-cols-4 gap-4">
+        <HudCard title="NÍVEL ATUAL"><div className="font-display text-5xl text-primary hud-text-glow">{level}</div><div className="text-xs text-muted-foreground mt-1">{totalXP} XP histórico</div></HudCard>
         <HudCard title="MISSÕES ATIVAS"><div className="font-display text-5xl text-primary hud-text-glow">{active.length}</div><div className="text-xs text-muted-foreground mt-1">em execução</div></HudCard>
-        <HudCard title="CONCLUÍDAS"><div className="font-display text-5xl text-primary hud-text-glow">{done.length}</div><div className="text-xs text-muted-foreground mt-1">total histórico</div></HudCard>
+        <HudCard title="EXECUÇÕES HOJE"><div className="font-display text-5xl text-primary hud-text-glow">{todayCount}</div><div className="text-xs text-muted-foreground mt-1">disparos no dia</div></HudCard>
+        <HudCard title="ARQUIVADAS"><div className="font-display text-5xl text-primary hud-text-glow">{done.length}</div><div className="text-xs text-muted-foreground mt-1">missões fechadas</div></HudCard>
       </div>
 
       <HudCard title="NOVA MISSÃO">
@@ -109,6 +110,10 @@ function MissoesPage() {
           <Select value={type} onValueChange={(v) => setType(v as any)}>
             <SelectTrigger className="w-36 bg-input/40 font-mono text-xs"><SelectValue /></SelectTrigger>
             <SelectContent>{TYPES.map((t) => <SelectItem key={t} value={t}>{TYPE_LABEL[t]}</SelectItem>)}</SelectContent>
+          </Select>
+          <Select value={recurrence} onValueChange={(v) => setRecurrence(v as any)}>
+            <SelectTrigger className="w-36 bg-input/40 font-mono text-xs"><SelectValue /></SelectTrigger>
+            <SelectContent>{RECURRENCE.map((r) => <SelectItem key={r} value={r}>{REC_LABEL[r]}</SelectItem>)}</SelectContent>
           </Select>
           <Input type="number" value={xp} onChange={(e) => setXp(parseInt(e.target.value) || 0)} className="w-20 bg-input/40 font-mono text-xs" />
           <Button onClick={create} className="font-mono text-xs tracking-widest"><Plus className="size-3 mr-1" />REGISTRAR</Button>
@@ -123,7 +128,7 @@ function MissoesPage() {
           {COGNITIVE_PRESETS.map((p) => (
             <button key={p.title}
               onClick={async () => {
-                const { error } = await supabase.from("missions").insert({ user_id: user!.id, title: p.title, type: "cognitive" as any, xp: p.xp, description: p.desc });
+                const { error } = await supabase.from("missions").insert({ user_id: user!.id, title: p.title, type: "cognitive" as any, xp: p.xp, description: p.desc, recurrence: "daily" } as any);
                 if (error) toast.error(error.message);
                 else { toast.success("Missão cognitiva ativada."); load(); }
               }}
@@ -143,17 +148,24 @@ function MissoesPage() {
       <HudCard title="MISSÕES ATIVAS">
         {active.length === 0 ? <div className="text-sm text-muted-foreground">Nenhuma missão ativa.</div> : (
           <ul className="space-y-2">
-            {active.map((m) => (
-              <li key={m.id} className="flex items-center gap-3 p-3 border border-border/40 rounded hover:border-primary/40 transition">
-                <Swords className="size-4 text-primary" />
-                <div className="flex-1">
-                  <div className="text-sm">{m.title}</div>
-                  <div className="font-mono text-[10px] text-muted-foreground">{TYPE_LABEL[m.type]} · +{m.xp} XP</div>
-                </div>
-                <Button size="icon" variant="ghost" onClick={() => complete(m.id)}><Check className="size-4 text-primary" /></Button>
-                <Button size="icon" variant="ghost" onClick={() => del(m.id)}><Trash2 className="size-4 text-destructive" /></Button>
-              </li>
-            ))}
+            {active.map((m) => {
+              const doneToday = isSameDay(m.last_completed_at);
+              return (
+                <li key={m.id} className="flex items-center gap-3 p-3 border border-border/40 rounded hover:border-primary/40 transition">
+                  <Swords className={`size-4 ${doneToday ? "text-primary/40" : "text-primary"}`} />
+                  <div className="flex-1">
+                    <div className="text-sm">{m.title}</div>
+                    <div className="font-mono text-[10px] text-muted-foreground">
+                      {TYPE_LABEL[m.type]} · {REC_LABEL[m.recurrence ?? "once"]} · +{m.xp} XP
+                      {(m.streak ?? 0) > 0 && <span className="text-primary"> · 🔥 streak {m.streak}</span>}
+                      {doneToday && <span className="text-primary/80"> · ✓ executada hoje</span>}
+                    </div>
+                  </div>
+                  <Button size="icon" variant="ghost" onClick={() => complete(m)}><Check className="size-4 text-primary" /></Button>
+                  <Button size="icon" variant="ghost" onClick={() => del(m.id)}><Trash2 className="size-4 text-destructive" /></Button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </HudCard>
