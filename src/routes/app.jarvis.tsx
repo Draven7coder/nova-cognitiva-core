@@ -162,12 +162,16 @@ function JarvisPage() {
               </div>
             </div>
           </div>
-          <Button onClick={runJarvis} disabled={analyzing} className="mt-4 w-full font-mono text-xs tracking-widest">
+          <Button onClick={() => runJarvis("jarvis")} disabled={analyzing} className="mt-4 w-full font-mono text-xs tracking-widest">
             {analyzing ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Sparkles className="size-3 mr-2" />}
             {analyzing ? "VARRENDO..." : "EXECUTAR VARREDURA"}
           </Button>
+          <Button onClick={() => runJarvis("global")} disabled={analyzing} variant="outline" className="mt-2 w-full font-mono text-xs tracking-widest border-primary/40">
+            {analyzing ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Sparkles className="size-3 mr-2" />}
+            VISÃO TOTAL · 3 NÍVEIS
+          </Button>
           <div className="mt-3 text-[10px] font-mono text-muted-foreground leading-relaxed">
-            Cruza identidade, missões, diário, hidratação e relatórios anteriores.
+            Varredura: identidade, missões, diário, hidratação. Visão Total: + OODA, execuções, histórico de insights.
           </div>
         </HudCard>
 
