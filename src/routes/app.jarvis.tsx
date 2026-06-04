@@ -55,26 +55,39 @@ function JarvisPage() {
 
   useEffect(() => { if (user) load(); }, [user]);
 
-  const runJarvis = async () => {
+  const runJarvis = async (mode: "jarvis" | "global" = "jarvis") => {
     setAnalyzing(true);
     try {
-      const [{ data: ident }, { data: missAll }, { data: journal }, { data: hyd }, { data: prevReports }] = await Promise.all([
+      const baseQueries: Promise<any>[] = [
         supabase.from("identity").select("*").maybeSingle(),
-        supabase.from("missions").select("title,status,type,xp,created_at,completed_at").limit(100),
+        supabase.from("missions").select("title,status,type,xp,recurrence,streak,last_completed_at,created_at,completed_at").limit(150),
         supabase.from("journal_entries").select("title,content,module,created_at").order("created_at", { ascending: false }).limit(40),
-        supabase.from("hydration_logs").select("amount_ml,consumed_at").order("consumed_at", { ascending: false }).limit(50),
+        supabase.from("hydration_logs").select("amount_ml,consumed_at").order("consumed_at", { ascending: false }).limit(60),
         supabase.from("ai_reports").select("scope,content,created_at").order("created_at", { ascending: false }).limit(5),
-      ]);
+      ];
+      const globalQueries: Promise<any>[] = mode === "global" ? [
+        supabase.from("mission_completions").select("mission_id,completed_at,quality").order("completed_at", { ascending: false }).limit(200),
+        supabase.from("ooda_entries").select("tag,observe,orient,counter_argument,decide,act,comfort_zone,data_integrity,created_at").order("created_at", { ascending: false }).limit(30),
+        supabase.from("jarvis_insights").select("kind,title,description,severity,status,created_at").order("created_at", { ascending: false }).limit(40),
+      ] : [];
+
+      const results = await Promise.all([...baseQueries, ...globalQueries]);
+      const [ident, missAll, journal, hyd, prevReports, completions, ooda, prevInsights] = results.map((r: any) => r.data);
 
       const { data, error } = await supabase.functions.invoke("ai-analyst", {
         body: {
-          scope: "jarvis",
+          scope: mode,
           context: {
             identity: ident,
             missions: missAll,
             journal,
             hydration: hyd,
             previous_reports: prevReports,
+            ...(mode === "global" ? {
+              mission_completions: completions,
+              ooda_cycles: ooda,
+              previous_insights: prevInsights,
+            } : {}),
             now: new Date().toISOString(),
           },
         },
@@ -89,7 +102,7 @@ function JarvisPage() {
 
       setReport(content);
       await supabase.from("ai_reports").insert({
-        user_id: user!.id, scope: "jarvis", content, metrics: null,
+        user_id: user!.id, scope: mode === "global" ? "jarvis-global" : "jarvis", content, metrics: null,
       });
 
       if (ins) {
@@ -99,7 +112,7 @@ function JarvisPage() {
             user_id: user!.id, kind, title: x.title ?? "—",
             description: x.description ?? null,
             severity: ["low","medium","high","critical"].includes(x.severity) ? x.severity : "medium",
-            source_module: "jarvis", status: "active",
+            source_module: mode === "global" ? "jarvis-global" : "jarvis", status: "active",
           }));
         push("weakness", ins.weaknesses);
         push("evolution", ins.evolutions);
@@ -107,7 +120,7 @@ function JarvisPage() {
         if (rows.length) await supabase.from("jarvis_insights").insert(rows);
       }
 
-      toast.success("JARVIS · Varredura concluída.");
+      toast.success(mode === "global" ? "JARVIS · Visão Total concluída." : "JARVIS · Varredura concluída.");
       load();
     } catch (e: any) {
       toast.error(e.message ?? "Falha na análise JARVIS");
