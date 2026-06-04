@@ -218,6 +218,44 @@ export type Database = {
         }
         Relationships: []
       }
+      mission_completions: {
+        Row: {
+          completed_at: string
+          created_at: string
+          id: string
+          mission_id: string
+          notes: string | null
+          quality: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          mission_id: string
+          notes?: string | null
+          quality?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          id?: string
+          mission_id?: string
+          notes?: string | null
+          quality?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mission_completions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       missions: {
         Row: {
           completed_at: string | null
@@ -225,7 +263,10 @@ export type Database = {
           description: string | null
           due_at: string | null
           id: string
+          last_completed_at: string | null
+          recurrence: string
           status: Database["public"]["Enums"]["mission_status"]
+          streak: number
           title: string
           type: Database["public"]["Enums"]["mission_type"]
           user_id: string
@@ -237,7 +278,10 @@ export type Database = {
           description?: string | null
           due_at?: string | null
           id?: string
+          last_completed_at?: string | null
+          recurrence?: string
           status?: Database["public"]["Enums"]["mission_status"]
+          streak?: number
           title: string
           type?: Database["public"]["Enums"]["mission_type"]
           user_id: string
@@ -249,11 +293,62 @@ export type Database = {
           description?: string | null
           due_at?: string | null
           id?: string
+          last_completed_at?: string | null
+          recurrence?: string
           status?: Database["public"]["Enums"]["mission_status"]
+          streak?: number
           title?: string
           type?: Database["public"]["Enums"]["mission_type"]
           user_id?: string
           xp?: number
+        }
+        Relationships: []
+      }
+      ooda_entries: {
+        Row: {
+          act: string
+          comfort_zone: number
+          counter_argument: string
+          created_at: string
+          data_integrity: boolean
+          decide: string
+          id: string
+          integrity_note: string | null
+          observe: string
+          orient: string
+          tag: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          act?: string
+          comfort_zone?: number
+          counter_argument?: string
+          created_at?: string
+          data_integrity?: boolean
+          decide?: string
+          id?: string
+          integrity_note?: string | null
+          observe?: string
+          orient?: string
+          tag?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          act?: string
+          comfort_zone?: number
+          counter_argument?: string
+          created_at?: string
+          data_integrity?: boolean
+          decide?: string
+          id?: string
+          integrity_note?: string | null
+          observe?: string
+          orient?: string
+          tag?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
