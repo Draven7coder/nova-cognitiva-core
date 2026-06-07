@@ -64,6 +64,11 @@ function Dashboard() {
         alert: list.filter((x) => x.kind === "alert").length,
         topAlert: list.find((x) => x.kind === "alert") ?? list.find((x) => x.kind === "weakness"),
       });
+      const eList = em ?? [];
+      setEmergent(eList.slice(0, 4));
+      const c: Record<string, number> = { cognitivo: 0, execucao: 0, emocional: 0, estrategico: 0, identidade: 0 };
+      eList.forEach((x: any) => { if (c[x.category] !== undefined) c[x.category]++; });
+      setEmergentCounts(c);
     })();
   }, [user]);
 
