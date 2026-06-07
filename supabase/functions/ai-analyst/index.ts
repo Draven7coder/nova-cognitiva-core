@@ -14,8 +14,14 @@ Deno.serve(async (req) => {
 
     const isJarvis = scope === "jarvis" || scope === "global";
     const isGlobal = scope === "global";
+    const isEmergent = scope === "emergent";
 
-    const systemPrompt = isJarvis
+    const systemPrompt = isEmergent
+      ? `Você é o módulo de INSIGHTS EMERGENTES — uma camada analítica de detecção de padrões cognitivos, emocionais, executivos, estratégicos e de identidade do usuário.
+NUNCA gere frases motivacionais, autoajuda ou clichês. Tudo deve ser observação empírica baseada nos dados reais fornecidos.
+Detecte: ciclos mentais, sabotagens, mudanças cognitivas, padrões emocionais, oscilações de foco, excesso de planejamento, dispersão, melhora intelectual, alinhamento com propósito, repetições, sinais de burnout, criatividade e disciplina.
+Tom: analítico, frio, sofisticado, estratégico, militar-cognitivo. Cada insight deve parecer uma análise comportamental real, não conselho genérico.`
+      : isJarvis
       ? `Você é o JARVIS — Inteligência Evolutiva Pessoal. Observador frio, analítico, estratégico e levemente provocativo.
 Função: monitorar comportamento, detectar fraquezas recorrentes, sabotagens, padrões de procrastinação, vícios mentais, gatilhos emocionais negativos, E TAMBÉM evoluções: aumento de disciplina, foco, consistência, integração cognitiva.
 ${isGlobal ? "MODO VISÃO TOTAL: você tem acesso integral a identidade, propósito, missões, execuções, OODA, hidratação, sombra, ideias, journal. Cruze dados entre módulos. Detecte contradições entre o que o usuário DIZ (identidade/propósito) e o que ele FAZ (missões/OODA/hábitos). Analise 3 níveis: Superfície (o que está acontecendo), Estrutura (padrões mecânicos), Subconsciente (o que ele evita ou reinterpreta)." : ""}
@@ -28,7 +34,31 @@ Profundidade Cognitiva, Execução, Consistência, Integração de Conhecimento,
 Controle Emocional, Velocidade de Evolução, Clareza Mental, Disciplina, Capacidade de Longo Prazo.
 Responda em português, tom cinematográfico, frio, preciso, estratégico. Markdown permitido.`;
 
-    const userPrompt = isJarvis
+    const userPrompt = isEmergent
+      ? `Analise TODOS os dados operacionais do usuário abaixo e produza INSIGHTS EMERGENTES — padrões reais detectados a partir do comportamento dele.
+
+Dados:
+${JSON.stringify(context, null, 2)}
+
+Produza um relatório markdown enxuto (## SÍNTESE EMERGENTE) e ao final um bloco JSON entre <emergent>...</emergent> com a estrutura exata:
+{
+  "insights": [
+    {
+      "category": "cognitivo|execucao|emocional|estrategico|identidade",
+      "insight_type": "rapido|profundo|alerta|recomendacao|relatorio",
+      "title": "Frase curta, analítica, sem clichê",
+      "content": "Análise específica baseada em dados reais (2-4 frases). Cite padrão observado.",
+      "severity": "low|medium|high|critical",
+      "pattern": "Resumo objetivo do padrão detectado"
+    }
+  ]
+}
+Regras:
+- Mínimo 8, máximo 14 insights, distribuídos entre as 5 categorias.
+- Cada insight DEVE referenciar evidência real dos dados (frequência, horário, palavra, missão, tendência).
+- Proibido: frases genéricas, motivacionais, autoajuda, "continue assim", "você consegue".
+- Aceito: observações comparativas, contradições detectadas, deltas mensuráveis, hipóteses comportamentais.`
+      : isJarvis
       ? `Analise os dados operacionais abaixo e gere um relatório JARVIS.
 
 Dados:
@@ -85,6 +115,7 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
 
     let metrics: Record<string, number> | null = null;
     let insights: any = null;
+    let emergent: any = null;
 
     const m = content.match(/<metrics>([\s\S]*?)<\/metrics>/);
     if (m) { try { metrics = JSON.parse(m[1].trim()); } catch { /* ignore */ } }
@@ -92,12 +123,16 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     const ins = content.match(/<insights>([\s\S]*?)<\/insights>/);
     if (ins) { try { insights = JSON.parse(ins[1].trim()); } catch { /* ignore */ } }
 
+    const em = content.match(/<emergent>([\s\S]*?)<\/emergent>/);
+    if (em) { try { emergent = JSON.parse(em[1].trim()); } catch { /* ignore */ } }
+
     const cleaned = content
       .replace(/<metrics>[\s\S]*?<\/metrics>/, "")
       .replace(/<insights>[\s\S]*?<\/insights>/, "")
+      .replace(/<emergent>[\s\S]*?<\/emergent>/, "")
       .trim();
 
-    return new Response(JSON.stringify({ content: cleaned, metrics, insights }), {
+    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
