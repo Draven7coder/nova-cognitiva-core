@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ModulePage, HudCard } from "@/components/ModulePage";
+import { EmergentLink } from "@/components/EmergentLink";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ function RelatoriosPage() {
 
   return (
     <ModulePage code="// AIR 11" title="Relatórios da IA" subtitle="Análises automáticas: padrões, riscos, sabotagens, recomendações estratégicas.">
+      <EmergentLink note="Acesse a camada emergente: padrões reais detectados em tempo real." />
       <div className="flex flex-wrap gap-2">
         {SCOPES.map((s) => (
           <Button key={s} onClick={() => generate(s)} disabled={!!busy} className="font-mono text-xs tracking-widest hud-glow">

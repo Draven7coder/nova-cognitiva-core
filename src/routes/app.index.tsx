@@ -10,7 +10,7 @@ import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip,
 } from "recharts";
-import { Sparkles, Target, Flame, Calendar, Cog, Brain, AlertTriangle, Fingerprint, Bot, ShieldAlert, TrendingUp as TrendUp } from "lucide-react";
+import { Sparkles, Target, Flame, Calendar, Cog, Brain, AlertTriangle, Fingerprint, Bot, ShieldAlert, TrendingUp as TrendUp, Zap, HeartPulse, Compass } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
@@ -41,13 +41,16 @@ function Dashboard() {
   const [missions, setMissions] = useState<any[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [jarvis, setJarvis] = useState<{ weakness: number; evolution: number; alert: number; topAlert?: any }>({ weakness: 0, evolution: 0, alert: 0 });
+  const [emergent, setEmergent] = useState<any[]>([]);
+  const [emergentCounts, setEmergentCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     (async () => {
-      const [{ data: m }, { data: r }, { data: ji }] = await Promise.all([
+      const [{ data: m }, { data: r }, { data: ji }, { data: em }] = await Promise.all([
         supabase.from("missions").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(5),
         supabase.from("ai_reports").select("*").order("created_at", { ascending: false }).limit(1),
         supabase.from("jarvis_insights").select("kind,title,severity,created_at").eq("status", "active").order("created_at", { ascending: false }).limit(50),
+        supabase.from("emergent_insights").select("category,insight_type,title,severity,created_at").eq("status","active").order("created_at",{ ascending:false }).limit(50),
       ]);
       setMissions(m ?? []);
       if (r?.[0]) {
@@ -61,6 +64,11 @@ function Dashboard() {
         alert: list.filter((x) => x.kind === "alert").length,
         topAlert: list.find((x) => x.kind === "alert") ?? list.find((x) => x.kind === "weakness"),
       });
+      const eList = em ?? [];
+      setEmergent(eList.slice(0, 4));
+      const c: Record<string, number> = { cognitivo: 0, execucao: 0, emocional: 0, estrategico: 0, identidade: 0 };
+      eList.forEach((x: any) => { if (c[x.category] !== undefined) c[x.category]++; });
+      setEmergentCounts(c);
     })();
   }, [user]);
 
@@ -205,6 +213,44 @@ function Dashboard() {
           </div>
         )}
       </HudCard>
+
+      <HudCard title="✦ INSIGHTS EMERGENTES · DETECÇÃO DE PADRÕES REAIS">
+        <div className="grid lg:grid-cols-6 gap-3 mb-3">
+          <Link to="/app/insights" className="hud-panel p-3 hover:border-primary/60 transition-colors group lg:col-span-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="size-4 text-primary group-hover:hud-text-glow" />
+              <span className="font-mono text-[10px] tracking-widest text-foreground/90">ABRIR</span>
+            </div>
+            <div className="text-[10px] text-muted-foreground font-mono leading-relaxed">
+              Espelho evolutivo. Padrões reais, zero motivacional.
+            </div>
+          </Link>
+          {[
+            { k: "cognitivo", l: "COGNITIVO", icon: Brain, cls: "text-primary" },
+            { k: "execucao", l: "EXECUÇÃO", icon: Zap, cls: "text-amber-400" },
+            { k: "emocional", l: "EMOCIONAL", icon: HeartPulse, cls: "text-rose-400" },
+            { k: "estrategico", l: "ESTRATÉGICO", icon: Compass, cls: "text-cyan-300" },
+            { k: "identidade", l: "IDENTIDADE", icon: Fingerprint, cls: "text-violet-300" },
+          ].map((c) => (
+            <div key={c.k} className="hud-panel p-3">
+              <div className="flex items-center gap-2"><c.icon className={`size-4 ${c.cls}`} /><span className={`font-mono text-[10px] tracking-widest ${c.cls}`}>{c.l}</span></div>
+              <div className={`font-display text-2xl ${c.cls} hud-text-glow mt-1`}>{emergentCounts[c.k] ?? 0}</div>
+            </div>
+          ))}
+        </div>
+        {emergent.length === 0 ? (
+          <div className="text-xs font-mono text-muted-foreground">Nenhum insight emergente. Abra o módulo e execute a detecção.</div>
+        ) : (
+          <ul className="space-y-1">
+            {emergent.map((e, idx) => (
+              <li key={idx} className="text-xs font-mono text-foreground/80 border-t border-border/30 pt-1.5">
+                <span className="text-primary mr-2">▸ {e.category?.toUpperCase()}</span>{e.title}
+              </li>
+            ))}
+          </ul>
+        )}
+      </HudCard>
+
 
       <div className="grid lg:grid-cols-3 gap-4">
         <HudCard title="EVOLUÇÃO TEMPORAL · 14D" className="lg:col-span-2">

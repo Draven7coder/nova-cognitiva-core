@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ModulePage, HudCard } from "@/components/ModulePage";
 import { ProtectedField } from "@/components/ProtectedField";
+import { EmergentLink } from "@/components/EmergentLink";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, Legend } from "recharts";
 
 export const Route = createFileRoute("/app/evolucao")({ component: EvolucaoPage });
@@ -21,6 +22,7 @@ function EvolucaoPage() {
   }));
   return (
     <ModulePage code="// EVO 09" title="Evolução" subtitle="Linha do tempo evolutiva · 24 meses operacionais · narrativa versionada.">
+      <EmergentLink note="Sua linha evolutiva alimenta os insights de identidade e estratégicos." />
       <div className="hud-panel hud-corner p-3 flex items-center gap-2 text-xs text-muted-foreground">
         <span className="size-1.5 rounded-full bg-primary animate-pulse-ring" />
         <span className="font-mono text-[10px] tracking-widest text-primary">MEMÓRIA PERMANENTE ATIVA</span>
