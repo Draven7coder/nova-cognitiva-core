@@ -41,6 +41,51 @@ export type Database = {
         }
         Relationships: []
       }
+      emergent_insights: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          id: string
+          insight_type: string
+          pattern_data: Json | null
+          severity: string
+          source_scope: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          id?: string
+          insight_type?: string
+          pattern_data?: Json | null
+          severity?: string
+          source_scope?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          insight_type?: string
+          pattern_data?: Json | null
+          severity?: string
+          source_scope?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       field_versions: {
         Row: {
           content: string
