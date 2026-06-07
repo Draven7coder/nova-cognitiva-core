@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ModulePage, HudCard } from "@/components/ModulePage";
+import { EmergentLink } from "@/components/EmergentLink";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -45,6 +46,7 @@ function ManualPage() {
 
   return (
     <ModulePage code="// MAN 04" title="Manual Operacional" subtitle="Mapeamento do funcionamento mental · seu próprio sistema operacional.">
+      <EmergentLink note="Seus protocolos cognitivos alimentam insights cognitivos e de identidade." />
       <Tabs defaultValue="mapeamento">
         <TabsList className="bg-input/30 border border-border/40">
           <TabsTrigger value="mapeamento" className="font-mono text-[10px] tracking-widest"><Brain className="size-3 mr-1"/>MAPEAMENTO</TabsTrigger>

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ModulePage, HudCard } from "@/components/ModulePage";
 import { Progress } from "@/components/ui/progress";
 import { ProtectedField } from "@/components/ProtectedField";
+import { EmergentLink } from "@/components/EmergentLink";
 
 export const Route = createFileRoute("/app/performance")({ component: PerformancePage });
 
@@ -15,6 +16,7 @@ const SECTIONS = [
 function PerformancePage() {
   return (
     <ModulePage code="// PRF 05" title="Performance" subtitle="Física · Cognitiva · Emocional · Espiritual · observações versionadas.">
+      <EmergentLink note="Suas métricas físicas e cognitivas alimentam insights de execução." />
       <div className="hud-panel hud-corner p-3 flex items-center gap-2 text-xs text-muted-foreground">
         <span className="size-1.5 rounded-full bg-primary animate-pulse-ring" />
         <span className="font-mono text-[10px] tracking-widest text-primary">MEMÓRIA PERMANENTE ATIVA</span>
