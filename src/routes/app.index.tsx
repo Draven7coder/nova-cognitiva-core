@@ -10,7 +10,7 @@ import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip,
 } from "recharts";
-import { Sparkles, Target, Flame, Calendar, Cog, Brain, AlertTriangle, Fingerprint, Bot, ShieldAlert, TrendingUp as TrendUp } from "lucide-react";
+import { Sparkles, Target, Flame, Calendar, Cog, Brain, AlertTriangle, Fingerprint, Bot, ShieldAlert, TrendingUp as TrendUp, Zap, HeartPulse, Compass } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
@@ -41,13 +41,16 @@ function Dashboard() {
   const [missions, setMissions] = useState<any[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [jarvis, setJarvis] = useState<{ weakness: number; evolution: number; alert: number; topAlert?: any }>({ weakness: 0, evolution: 0, alert: 0 });
+  const [emergent, setEmergent] = useState<any[]>([]);
+  const [emergentCounts, setEmergentCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
     (async () => {
-      const [{ data: m }, { data: r }, { data: ji }] = await Promise.all([
+      const [{ data: m }, { data: r }, { data: ji }, { data: em }] = await Promise.all([
         supabase.from("missions").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(5),
         supabase.from("ai_reports").select("*").order("created_at", { ascending: false }).limit(1),
         supabase.from("jarvis_insights").select("kind,title,severity,created_at").eq("status", "active").order("created_at", { ascending: false }).limit(50),
+        supabase.from("emergent_insights").select("category,insight_type,title,severity,created_at").eq("status","active").order("created_at",{ ascending:false }).limit(50),
       ]);
       setMissions(m ?? []);
       if (r?.[0]) {
