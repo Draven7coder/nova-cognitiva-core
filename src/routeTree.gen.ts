@@ -25,6 +25,7 @@ import { Route as AppManualRouteImport } from './routes/app.manual'
 import { Route as AppLaboratorioRouteImport } from './routes/app.laboratorio'
 import { Route as AppJarvisRouteImport } from './routes/app.jarvis'
 import { Route as AppIntelectoRouteImport } from './routes/app.intelecto'
+import { Route as AppInsightsRouteImport } from './routes/app.insights'
 import { Route as AppIdentidadeRouteImport } from './routes/app.identidade'
 import { Route as AppIdeiasRouteImport } from './routes/app.ideias'
 import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
@@ -112,6 +113,11 @@ const AppIntelectoRoute = AppIntelectoRouteImport.update({
   path: '/intelecto',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInsightsRoute = AppInsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppIdentidadeRoute = AppIdentidadeRouteImport.update({
   id: '/identidade',
   path: '/identidade',
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/app/hidratacao': typeof AppHidratacaoRoute
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
+  '/app/insights': typeof AppInsightsRoute
   '/app/intelecto': typeof AppIntelectoRoute
   '/app/jarvis': typeof AppJarvisRoute
   '/app/laboratorio': typeof AppLaboratorioRoute
@@ -176,6 +183,7 @@ export interface FileRoutesByTo {
   '/app/hidratacao': typeof AppHidratacaoRoute
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
+  '/app/insights': typeof AppInsightsRoute
   '/app/intelecto': typeof AppIntelectoRoute
   '/app/jarvis': typeof AppJarvisRoute
   '/app/laboratorio': typeof AppLaboratorioRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/app/hidratacao': typeof AppHidratacaoRoute
   '/app/ideias': typeof AppIdeiasRoute
   '/app/identidade': typeof AppIdentidadeRoute
+  '/app/insights': typeof AppInsightsRoute
   '/app/intelecto': typeof AppIntelectoRoute
   '/app/jarvis': typeof AppJarvisRoute
   '/app/laboratorio': typeof AppLaboratorioRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/app/hidratacao'
     | '/app/ideias'
     | '/app/identidade'
+    | '/app/insights'
     | '/app/intelecto'
     | '/app/jarvis'
     | '/app/laboratorio'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/app/hidratacao'
     | '/app/ideias'
     | '/app/identidade'
+    | '/app/insights'
     | '/app/intelecto'
     | '/app/jarvis'
     | '/app/laboratorio'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/app/hidratacao'
     | '/app/ideias'
     | '/app/identidade'
+    | '/app/insights'
     | '/app/intelecto'
     | '/app/jarvis'
     | '/app/laboratorio'
@@ -409,6 +421,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIntelectoRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/insights': {
+      id: '/app/insights'
+      path: '/insights'
+      fullPath: '/app/insights'
+      preLoaderRoute: typeof AppInsightsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/identidade': {
       id: '/app/identidade'
       path: '/identidade'
@@ -461,6 +480,7 @@ interface AppRouteChildren {
   AppHidratacaoRoute: typeof AppHidratacaoRoute
   AppIdeiasRoute: typeof AppIdeiasRoute
   AppIdentidadeRoute: typeof AppIdentidadeRoute
+  AppInsightsRoute: typeof AppInsightsRoute
   AppIntelectoRoute: typeof AppIntelectoRoute
   AppJarvisRoute: typeof AppJarvisRoute
   AppLaboratorioRoute: typeof AppLaboratorioRoute
@@ -483,6 +503,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppHidratacaoRoute: AppHidratacaoRoute,
   AppIdeiasRoute: AppIdeiasRoute,
   AppIdentidadeRoute: AppIdentidadeRoute,
+  AppInsightsRoute: AppInsightsRoute,
   AppIntelectoRoute: AppIntelectoRoute,
   AppJarvisRoute: AppJarvisRoute,
   AppLaboratorioRoute: AppLaboratorioRoute,

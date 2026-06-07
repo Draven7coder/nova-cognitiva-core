@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Fingerprint, Crosshair, BookOpen, Settings2, Activity,
-  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass,
+  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -25,6 +25,7 @@ const modules = [
   { title: "Evolução", url: "/app/evolucao", icon: TrendingUp },
   { title: "Loop OODA", url: "/app/ooda", icon: Compass },
   { title: "JARVIS", url: "/app/jarvis", icon: Bot },
+  { title: "Insights Emergentes", url: "/app/insights", icon: Sparkles },
   { title: "Relatórios da IA", url: "/app/relatorios", icon: Brain },
   { title: "Configurações", url: "/app/config", icon: Settings },
 ];
