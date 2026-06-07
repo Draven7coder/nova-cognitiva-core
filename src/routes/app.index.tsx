@@ -214,6 +214,44 @@ function Dashboard() {
         )}
       </HudCard>
 
+      <HudCard title="✦ INSIGHTS EMERGENTES · DETECÇÃO DE PADRÕES REAIS">
+        <div className="grid lg:grid-cols-6 gap-3 mb-3">
+          <Link to="/app/insights" className="hud-panel p-3 hover:border-primary/60 transition-colors group lg:col-span-1">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="size-4 text-primary group-hover:hud-text-glow" />
+              <span className="font-mono text-[10px] tracking-widest text-foreground/90">ABRIR</span>
+            </div>
+            <div className="text-[10px] text-muted-foreground font-mono leading-relaxed">
+              Espelho evolutivo. Padrões reais, zero motivacional.
+            </div>
+          </Link>
+          {[
+            { k: "cognitivo", l: "COGNITIVO", icon: Brain, cls: "text-primary" },
+            { k: "execucao", l: "EXECUÇÃO", icon: Zap, cls: "text-amber-400" },
+            { k: "emocional", l: "EMOCIONAL", icon: HeartPulse, cls: "text-rose-400" },
+            { k: "estrategico", l: "ESTRATÉGICO", icon: Compass, cls: "text-cyan-300" },
+            { k: "identidade", l: "IDENTIDADE", icon: Fingerprint, cls: "text-violet-300" },
+          ].map((c) => (
+            <div key={c.k} className="hud-panel p-3">
+              <div className="flex items-center gap-2"><c.icon className={`size-4 ${c.cls}`} /><span className={`font-mono text-[10px] tracking-widest ${c.cls}`}>{c.l}</span></div>
+              <div className={`font-display text-2xl ${c.cls} hud-text-glow mt-1`}>{emergentCounts[c.k] ?? 0}</div>
+            </div>
+          ))}
+        </div>
+        {emergent.length === 0 ? (
+          <div className="text-xs font-mono text-muted-foreground">Nenhum insight emergente. Abra o módulo e execute a detecção.</div>
+        ) : (
+          <ul className="space-y-1">
+            {emergent.map((e, idx) => (
+              <li key={idx} className="text-xs font-mono text-foreground/80 border-t border-border/30 pt-1.5">
+                <span className="text-primary mr-2">▸ {e.category?.toUpperCase()}</span>{e.title}
+              </li>
+            ))}
+          </ul>
+        )}
+      </HudCard>
+
+
       <div className="grid lg:grid-cols-3 gap-4">
         <HudCard title="EVOLUÇÃO TEMPORAL · 14D" className="lg:col-span-2">
           <div className="h-[200px]">
