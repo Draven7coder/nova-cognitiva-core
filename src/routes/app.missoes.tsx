@@ -34,6 +34,32 @@ function isSameDay(iso: string | null): boolean {
   const d = new Date(iso); const n = new Date();
   return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
 }
+function isSameWeek(iso: string | null): boolean {
+  if (!iso) return false;
+  const d = new Date(iso); const n = new Date();
+  // ISO week: monday-based
+  const startOfWeek = (x: Date) => {
+    const t = new Date(x); const day = (t.getDay() + 6) % 7;
+    t.setHours(0, 0, 0, 0); t.setDate(t.getDate() - day); return t;
+  };
+  return startOfWeek(d).getTime() === startOfWeek(n).getTime();
+}
+function isSameMonth(iso: string | null): boolean {
+  if (!iso) return false;
+  const d = new Date(iso); const n = new Date();
+  return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth();
+}
+function doneForPeriod(m: any): boolean {
+  const last = m.last_completed_at;
+  switch (m.recurrence) {
+    case "daily": return isSameDay(last);
+    case "weekly": return isSameWeek(last);
+    case "monthly": return isSameMonth(last);
+    case "permanent": return false; // always available
+    case "once":
+    default: return m.status === "done";
+  }
+}
 
 function MissoesPage() {
   const { user } = useAuth();
