@@ -43,14 +43,27 @@ function Dashboard() {
   const [jarvis, setJarvis] = useState<{ weakness: number; evolution: number; alert: number; topAlert?: any }>({ weakness: 0, evolution: 0, alert: 0 });
   const [emergent, setEmergent] = useState<any[]>([]);
   const [emergentCounts, setEmergentCounts] = useState<Record<string, number>>({});
+  const [achievements, setAchievements] = useState({
+    missionsDone: 0, totalXP: 0, oodaCount: 0, journalCount: 0, insightsAccepted: 0, hydrationDays: 0,
+  });
 
   useEffect(() => {
     (async () => {
-      const [{ data: m }, { data: r }, { data: ji }, { data: em }] = await Promise.all([
+      const [
+        { data: m }, { data: r }, { data: ji }, { data: em },
+        { count: missionsDone }, { data: comps }, { count: oodaCount }, { count: journalCount },
+        { count: insightsAccepted }, { data: hyd },
+      ] = await Promise.all([
         supabase.from("missions").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(5),
         supabase.from("ai_reports").select("*").order("created_at", { ascending: false }).limit(1),
         supabase.from("jarvis_insights").select("kind,title,severity,created_at").eq("status", "active").order("created_at", { ascending: false }).limit(50),
         supabase.from("emergent_insights").select("category,insight_type,title,severity,created_at").eq("status","active").order("created_at",{ ascending:false }).limit(50),
+        supabase.from("mission_completions").select("*", { count: "exact", head: true }),
+        supabase.from("mission_completions").select("mission_id"),
+        supabase.from("ooda_entries").select("*", { count: "exact", head: true }),
+        supabase.from("journal_entries").select("*", { count: "exact", head: true }),
+        supabase.from("emergent_insights").select("*", { count: "exact", head: true }).gte("feedback_rating", 4),
+        supabase.from("hydration_logs").select("consumed_at").order("consumed_at", { ascending: false }).limit(500),
       ]);
       setMissions(m ?? []);
       if (r?.[0]) {
@@ -69,10 +82,37 @@ function Dashboard() {
       const c: Record<string, number> = { cognitivo: 0, execucao: 0, emocional: 0, estrategico: 0, identidade: 0 };
       eList.forEach((x: any) => { if (c[x.category] !== undefined) c[x.category]++; });
       setEmergentCounts(c);
+
+      // Aggregate XP from completions × mission XP — we already have completions list w/ mission ids
+      const { data: missAll } = await supabase.from("missions").select("id,xp");
+      const xpMap = new Map((missAll ?? []).map((x: any) => [x.id, x.xp ?? 0]));
+      const totalXP = (comps ?? []).reduce((acc: number, c: any) => acc + (xpMap.get(c.mission_id) ?? 0), 0);
+      const hydDays = new Set((hyd ?? []).map((h: any) => h.consumed_at?.slice(0, 10))).size;
+      setAchievements({
+        missionsDone: missionsDone ?? 0,
+        totalXP,
+        oodaCount: oodaCount ?? 0,
+        journalCount: journalCount ?? 0,
+        insightsAccepted: insightsAccepted ?? 0,
+        hydrationDays: hydDays,
+      });
     })();
   }, [user]);
 
-  const overallQI = Math.round(Object.values(metrics).reduce((a, b) => a + b, 0) / Object.values(metrics).length);
+  // Base QI from IA metrics (0-100 average)
+  const baseQI = Math.round(Object.values(metrics).reduce((a, b) => a + b, 0) / Object.values(metrics).length);
+  // Achievement bonus (0-400) — caps via diminishing returns to 500 total
+  const a = achievements;
+  const rawBonus =
+    a.missionsDone * 2.5 +
+    a.totalXP * 0.4 +
+    a.oodaCount * 6 +
+    a.journalCount * 1.5 +
+    a.insightsAccepted * 4 +
+    a.hydrationDays * 1.2;
+  const bonus = Math.min(400, Math.round(rawBonus));
+  const overallQI = Math.min(500, baseQI + bonus);
+  const qiPct = (overallQI / 500) * 100;
 
   const sync = async () => {
     setAnalyzing(true);
