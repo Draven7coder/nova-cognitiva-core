@@ -150,11 +150,21 @@ function Dashboard() {
         <HudCard title="QI FUNCIONAL OPERACIONAL" className="lg:col-span-1">
           <div className="flex items-baseline gap-2">
             <span className="font-display text-6xl text-primary hud-text-glow">{overallQI}</span>
-            <span className="font-mono text-xs text-muted-foreground">/ 100</span>
+            <span className="font-mono text-xs text-muted-foreground">/ 500</span>
           </div>
-          <Progress value={overallQI} className="mt-3 h-1" />
-          <div className="mt-4 text-xs text-muted-foreground leading-relaxed">
-            Índice cognitivo dinâmico calculado pela IA com base em 10 dimensões operacionais.
+          <Progress value={qiPct} className="mt-3 h-1" />
+          <div className="mt-3 grid grid-cols-2 gap-1 text-[10px] font-mono text-muted-foreground">
+            <div>Base IA: <span className="text-primary">{baseQI}</span></div>
+            <div>Bônus feitos: <span className="text-primary">+{bonus}</span></div>
+            <div>Missões: <span className="text-primary">{a.missionsDone}</span></div>
+            <div>XP: <span className="text-primary">{a.totalXP}</span></div>
+            <div>OODA: <span className="text-primary">{a.oodaCount}</span></div>
+            <div>Journal: <span className="text-primary">{a.journalCount}</span></div>
+            <div>Insights ✓4★: <span className="text-primary">{a.insightsAccepted}</span></div>
+            <div>Hidrat. dias: <span className="text-primary">{a.hydrationDays}</span></div>
+          </div>
+          <div className="mt-3 text-[10px] text-muted-foreground leading-relaxed">
+            QI escala 0–500 · base cognitiva da IA + realizações reais no sistema.
           </div>
           <Button onClick={sync} disabled={analyzing} className="mt-4 w-full font-mono text-xs tracking-widest">
             <Sparkles className="size-3 mr-2" />
