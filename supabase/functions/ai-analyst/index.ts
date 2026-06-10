@@ -54,10 +54,12 @@ Produza um relatório markdown enxuto (## SÍNTESE EMERGENTE) e ao final um bloc
   ]
 }
 Regras:
-- Mínimo 8, máximo 14 insights, distribuídos entre as 5 categorias.
+- Mínimo 8, máximo 14 insights, distribuídos entre as categorias permitidas.
 - Cada insight DEVE referenciar evidência real dos dados (frequência, horário, palavra, missão, tendência).
 - Proibido: frases genéricas, motivacionais, autoajuda, "continue assim", "você consegue".
-- Aceito: observações comparativas, contradições detectadas, deltas mensuráveis, hipóteses comportamentais.`
+- Aceito: observações comparativas, contradições detectadas, deltas mensuráveis, hipóteses comportamentais.
+- ADAPTAÇÃO POR FEEDBACK: se o contexto contiver "feedback_signal", priorize categorias/tipos com média de utilidade alta e EVITE replicar estilos de insights marcados como pouco úteis (rating <= 2) ou sinalizados como "não útil".
+- FILTRO ATIVO: se "settings.allowedCategories" ou "settings.allowedTypes" estiverem presentes, restrinja saída a essas categorias/tipos.`
       : isJarvis
       ? `Analise os dados operacionais abaixo e gere um relatório JARVIS.
 
