@@ -34,6 +34,32 @@ function isSameDay(iso: string | null): boolean {
   const d = new Date(iso); const n = new Date();
   return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
 }
+function isSameWeek(iso: string | null): boolean {
+  if (!iso) return false;
+  const d = new Date(iso); const n = new Date();
+  // ISO week: monday-based
+  const startOfWeek = (x: Date) => {
+    const t = new Date(x); const day = (t.getDay() + 6) % 7;
+    t.setHours(0, 0, 0, 0); t.setDate(t.getDate() - day); return t;
+  };
+  return startOfWeek(d).getTime() === startOfWeek(n).getTime();
+}
+function isSameMonth(iso: string | null): boolean {
+  if (!iso) return false;
+  const d = new Date(iso); const n = new Date();
+  return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth();
+}
+function doneForPeriod(m: any): boolean {
+  const last = m.last_completed_at;
+  switch (m.recurrence) {
+    case "daily": return isSameDay(last);
+    case "weekly": return isSameWeek(last);
+    case "monthly": return isSameMonth(last);
+    case "permanent": return false; // always available
+    case "once":
+    default: return m.status === "done";
+  }
+}
 
 function MissoesPage() {
   const { user } = useAuth();
@@ -149,19 +175,22 @@ function MissoesPage() {
         {active.length === 0 ? <div className="text-sm text-muted-foreground">Nenhuma missão ativa.</div> : (
           <ul className="space-y-2">
             {active.map((m) => {
-              const doneToday = isSameDay(m.last_completed_at);
+              const done = doneForPeriod(m);
+              const periodLabel = m.recurrence === "daily" ? "hoje"
+                : m.recurrence === "weekly" ? "esta semana"
+                : m.recurrence === "monthly" ? "este mês" : "";
               return (
-                <li key={m.id} className="flex items-center gap-3 p-3 border border-border/40 rounded hover:border-primary/40 transition">
-                  <Swords className={`size-4 ${doneToday ? "text-primary/40" : "text-primary"}`} />
+                <li key={m.id} className={`flex items-center gap-3 p-3 border border-border/40 rounded transition ${done ? "opacity-60" : "hover:border-primary/40"}`}>
+                  <Swords className={`size-4 ${done ? "text-primary/40" : "text-primary"}`} />
                   <div className="flex-1">
                     <div className="text-sm">{m.title}</div>
                     <div className="font-mono text-[10px] text-muted-foreground">
                       {TYPE_LABEL[m.type]} · {REC_LABEL[m.recurrence ?? "once"]} · +{m.xp} XP
                       {(m.streak ?? 0) > 0 && <span className="text-primary"> · 🔥 streak {m.streak}</span>}
-                      {doneToday && <span className="text-primary/80"> · ✓ executada hoje</span>}
+                      {done && periodLabel && <span className="text-primary/80"> · ✓ executada {periodLabel} · volta {m.recurrence === "daily" ? "amanhã" : m.recurrence === "weekly" ? "próx. semana" : "próx. mês"}</span>}
                     </div>
                   </div>
-                  <Button size="icon" variant="ghost" onClick={() => complete(m)}><Check className="size-4 text-primary" /></Button>
+                  <Button size="icon" variant="ghost" onClick={() => complete(m)} disabled={done}><Check className="size-4 text-primary" /></Button>
                   <Button size="icon" variant="ghost" onClick={() => del(m.id)}><Trash2 className="size-4 text-destructive" /></Button>
                 </li>
               );

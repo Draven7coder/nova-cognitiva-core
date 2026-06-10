@@ -43,14 +43,27 @@ function Dashboard() {
   const [jarvis, setJarvis] = useState<{ weakness: number; evolution: number; alert: number; topAlert?: any }>({ weakness: 0, evolution: 0, alert: 0 });
   const [emergent, setEmergent] = useState<any[]>([]);
   const [emergentCounts, setEmergentCounts] = useState<Record<string, number>>({});
+  const [achievements, setAchievements] = useState({
+    missionsDone: 0, totalXP: 0, oodaCount: 0, journalCount: 0, insightsAccepted: 0, hydrationDays: 0,
+  });
 
   useEffect(() => {
     (async () => {
-      const [{ data: m }, { data: r }, { data: ji }, { data: em }] = await Promise.all([
+      const [
+        { data: m }, { data: r }, { data: ji }, { data: em },
+        { count: missionsDone }, { data: comps }, { count: oodaCount }, { count: journalCount },
+        { count: insightsAccepted }, { data: hyd },
+      ] = await Promise.all([
         supabase.from("missions").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(5),
         supabase.from("ai_reports").select("*").order("created_at", { ascending: false }).limit(1),
         supabase.from("jarvis_insights").select("kind,title,severity,created_at").eq("status", "active").order("created_at", { ascending: false }).limit(50),
         supabase.from("emergent_insights").select("category,insight_type,title,severity,created_at").eq("status","active").order("created_at",{ ascending:false }).limit(50),
+        supabase.from("mission_completions").select("*", { count: "exact", head: true }),
+        supabase.from("mission_completions").select("mission_id"),
+        supabase.from("ooda_entries").select("*", { count: "exact", head: true }),
+        supabase.from("journal_entries").select("*", { count: "exact", head: true }),
+        supabase.from("emergent_insights").select("*", { count: "exact", head: true }).gte("feedback_rating", 4),
+        supabase.from("hydration_logs").select("consumed_at").order("consumed_at", { ascending: false }).limit(500),
       ]);
       setMissions(m ?? []);
       if (r?.[0]) {
@@ -69,10 +82,37 @@ function Dashboard() {
       const c: Record<string, number> = { cognitivo: 0, execucao: 0, emocional: 0, estrategico: 0, identidade: 0 };
       eList.forEach((x: any) => { if (c[x.category] !== undefined) c[x.category]++; });
       setEmergentCounts(c);
+
+      // Aggregate XP from completions × mission XP — we already have completions list w/ mission ids
+      const { data: missAll } = await supabase.from("missions").select("id,xp");
+      const xpMap = new Map((missAll ?? []).map((x: any) => [x.id, x.xp ?? 0]));
+      const totalXP = (comps ?? []).reduce((acc: number, c: any) => acc + (xpMap.get(c.mission_id) ?? 0), 0);
+      const hydDays = new Set((hyd ?? []).map((h: any) => h.consumed_at?.slice(0, 10))).size;
+      setAchievements({
+        missionsDone: missionsDone ?? 0,
+        totalXP,
+        oodaCount: oodaCount ?? 0,
+        journalCount: journalCount ?? 0,
+        insightsAccepted: insightsAccepted ?? 0,
+        hydrationDays: hydDays,
+      });
     })();
   }, [user]);
 
-  const overallQI = Math.round(Object.values(metrics).reduce((a, b) => a + b, 0) / Object.values(metrics).length);
+  // Base QI from IA metrics (0-100 average)
+  const baseQI = Math.round(Object.values(metrics).reduce((a, b) => a + b, 0) / Object.values(metrics).length);
+  // Achievement bonus (0-400) — caps via diminishing returns to 500 total
+  const a = achievements;
+  const rawBonus =
+    a.missionsDone * 2.5 +
+    a.totalXP * 0.4 +
+    a.oodaCount * 6 +
+    a.journalCount * 1.5 +
+    a.insightsAccepted * 4 +
+    a.hydrationDays * 1.2;
+  const bonus = Math.min(400, Math.round(rawBonus));
+  const overallQI = Math.min(500, baseQI + bonus);
+  const qiPct = (overallQI / 500) * 100;
 
   const sync = async () => {
     setAnalyzing(true);
@@ -110,11 +150,21 @@ function Dashboard() {
         <HudCard title="QI FUNCIONAL OPERACIONAL" className="lg:col-span-1">
           <div className="flex items-baseline gap-2">
             <span className="font-display text-6xl text-primary hud-text-glow">{overallQI}</span>
-            <span className="font-mono text-xs text-muted-foreground">/ 100</span>
+            <span className="font-mono text-xs text-muted-foreground">/ 500</span>
           </div>
-          <Progress value={overallQI} className="mt-3 h-1" />
-          <div className="mt-4 text-xs text-muted-foreground leading-relaxed">
-            Índice cognitivo dinâmico calculado pela IA com base em 10 dimensões operacionais.
+          <Progress value={qiPct} className="mt-3 h-1" />
+          <div className="mt-3 grid grid-cols-2 gap-1 text-[10px] font-mono text-muted-foreground">
+            <div>Base IA: <span className="text-primary">{baseQI}</span></div>
+            <div>Bônus feitos: <span className="text-primary">+{bonus}</span></div>
+            <div>Missões: <span className="text-primary">{a.missionsDone}</span></div>
+            <div>XP: <span className="text-primary">{a.totalXP}</span></div>
+            <div>OODA: <span className="text-primary">{a.oodaCount}</span></div>
+            <div>Journal: <span className="text-primary">{a.journalCount}</span></div>
+            <div>Insights ✓4★: <span className="text-primary">{a.insightsAccepted}</span></div>
+            <div>Hidrat. dias: <span className="text-primary">{a.hydrationDays}</span></div>
+          </div>
+          <div className="mt-3 text-[10px] text-muted-foreground leading-relaxed">
+            QI escala 0–500 · base cognitiva da IA + realizações reais no sistema.
           </div>
           <Button onClick={sync} disabled={analyzing} className="mt-4 w-full font-mono text-xs tracking-widest">
             <Sparkles className="size-3 mr-2" />

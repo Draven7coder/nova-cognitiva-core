@@ -46,6 +46,9 @@ export type Database = {
           category: string
           content: string
           created_at: string
+          feedback_note: string | null
+          feedback_rating: number | null
+          feedback_useful: boolean | null
           id: string
           insight_type: string
           pattern_data: Json | null
@@ -60,6 +63,9 @@ export type Database = {
           category: string
           content: string
           created_at?: string
+          feedback_note?: string | null
+          feedback_rating?: number | null
+          feedback_useful?: boolean | null
           id?: string
           insight_type?: string
           pattern_data?: Json | null
@@ -74,6 +80,9 @@ export type Database = {
           category?: string
           content?: string
           created_at?: string
+          feedback_note?: string | null
+          feedback_rating?: number | null
+          feedback_useful?: boolean | null
           id?: string
           insight_type?: string
           pattern_data?: Json | null

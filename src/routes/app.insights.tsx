@@ -1,19 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ModulePage, HudCard } from "@/components/ModulePage";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Sparkles, Brain, Zap, HeartPulse, Compass, Fingerprint,
   RefreshCw, AlertTriangle, CheckCircle2, Trash2, Activity,
+  Star, ThumbsUp, ThumbsDown, Settings as SettingsIcon, FileDown, Radio,
 } from "lucide-react";
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer,
   AreaChart, Area, XAxis, YAxis, Tooltip,
 } from "recharts";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export const Route = createFileRoute("/app/insights")({ component: InsightsPage });
 
@@ -27,6 +31,8 @@ type Insight = {
   pattern_data: any;
   status: "active" | "archived" | "dismissed";
   created_at: string;
+  feedback_rating?: number | null;
+  feedback_useful?: boolean | null;
 };
 
 const CATEGORY_META: Record<Insight["category"], { label: string; icon: any; color: string; ring: string }> = {
@@ -40,7 +46,6 @@ const CATEGORY_META: Record<Insight["category"], { label: string; icon: any; col
 const TYPE_LABEL: Record<Insight["insight_type"], string> = {
   rapido: "RÁPIDO", profundo: "PROFUNDO", alerta: "ALERTA", recomendacao: "RECOMENDAÇÃO", relatorio: "RELATÓRIO",
 };
-
 const SEVERITY_STYLES: Record<string, string> = {
   low: "border-muted/40 text-muted-foreground",
   medium: "border-primary/40 text-primary",
@@ -48,30 +53,66 @@ const SEVERITY_STYLES: Record<string, string> = {
   critical: "border-destructive/60 text-destructive",
 };
 
+type Settings = {
+  frequency: "realtime" | "daily" | "weekly";
+  categories: Record<Insight["category"], boolean>;
+  types: Record<Insight["insight_type"], boolean>;
+  realtimeMinIntervalMin: number;
+};
+const SETTINGS_KEY = "emergent.settings.v1";
+const LAST_RUN_KEY = "emergent.lastRunAt";
+const defaultSettings = (): Settings => ({
+  frequency: "daily",
+  categories: { cognitivo: true, execucao: true, emocional: true, estrategico: true, identidade: true },
+  types: { rapido: true, profundo: true, alerta: true, recomendacao: true, relatorio: true },
+  realtimeMinIntervalMin: 15,
+});
+
+function loadSettings(): Settings {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return defaultSettings();
+    return { ...defaultSettings(), ...JSON.parse(raw) };
+  } catch { return defaultSettings(); }
+}
+
 function InsightsPage() {
   const { user } = useAuth();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [report, setReport] = useState<string>("Sistema dormente. Execute uma varredura emergente para detectar padrões reais nos seus dados operacionais.");
   const [analyzing, setAnalyzing] = useState(false);
   const [filter, setFilter] = useState<"all" | Insight["category"]>("all");
+  const [settings, setSettings] = useState<Settings>(defaultSettings);
+  const [showSettings, setShowSettings] = useState(false);
+  const analyzingRef = useRef(false);
+  const debounceRef = useRef<number | null>(null);
 
-  const load = async () => {
+  useEffect(() => { setSettings(loadSettings()); }, []);
+  useEffect(() => { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); }, [settings]);
+
+  const load = useCallback(async () => {
     const { data } = await supabase
       .from("emergent_insights")
       .select("*").eq("status", "active")
       .order("created_at", { ascending: false }).limit(80);
     setInsights((data ?? []) as Insight[]);
-  };
+  }, []);
 
-  useEffect(() => { if (user) load(); }, [user]);
+  useEffect(() => { if (user) load(); }, [user, load]);
 
-  const runEmergent = async () => {
+  const runEmergent = useCallback(async (silent = false) => {
+    if (analyzingRef.current) return;
+    analyzingRef.current = true;
     setAnalyzing(true);
     try {
+      const allowedCategories = Object.entries(settings.categories).filter(([, v]) => v).map(([k]) => k);
+      const allowedTypes = Object.entries(settings.types).filter(([, v]) => v).map(([k]) => k);
+
       const [
         { data: ident }, { data: miss }, { data: completions },
         { data: journal }, { data: hyd }, { data: ooda },
         { data: ideas }, { data: prevReports }, { data: prevInsights },
+        { data: feedbackSample },
       ] = await Promise.all([
         supabase.from("identity").select("*").maybeSingle(),
         supabase.from("missions").select("title,status,type,xp,recurrence,streak,last_completed_at,created_at,completed_at").limit(120),
@@ -82,7 +123,20 @@ function InsightsPage() {
         supabase.from("journal_entries").select("title,content,module,created_at").eq("module", "ideias").limit(20),
         supabase.from("ai_reports").select("scope,content,created_at").order("created_at", { ascending: false }).limit(4),
         supabase.from("emergent_insights").select("category,title,severity,created_at").order("created_at", { ascending: false }).limit(30),
+        supabase.from("emergent_insights").select("category,insight_type,title,feedback_rating,feedback_useful").not("feedback_rating", "is", null).limit(40),
       ]);
+
+      // Aggregate feedback signal
+      const fbAgg: Record<string, { count: number; avg: number; useful: number; notUseful: number }> = {};
+      (feedbackSample ?? []).forEach((f: any) => {
+        const k = `${f.category}/${f.insight_type}`;
+        const a = (fbAgg[k] ??= { count: 0, avg: 0, useful: 0, notUseful: 0 });
+        a.count++;
+        a.avg += f.feedback_rating ?? 0;
+        if (f.feedback_useful === true) a.useful++;
+        if (f.feedback_useful === false) a.notUseful++;
+      });
+      Object.values(fbAgg).forEach((v) => { v.avg = v.count ? v.avg / v.count : 0; });
 
       const { data, error } = await supabase.functions.invoke("ai-analyst", {
         body: {
@@ -91,6 +145,8 @@ function InsightsPage() {
             identity: ident, missions: miss, mission_completions: completions,
             journal, hydration: hyd, ooda_cycles: ooda, ideas,
             previous_reports: prevReports, previous_emergent_insights: prevInsights,
+            settings: { allowedCategories, allowedTypes },
+            feedback_signal: fbAgg,
             now: new Date().toISOString(),
           },
         },
@@ -102,33 +158,69 @@ function InsightsPage() {
       const emergent = (data as any).emergent as { insights?: any[] } | null;
 
       setReport(content);
+      localStorage.setItem(LAST_RUN_KEY, new Date().toISOString());
+
       await supabase.from("ai_reports").insert({
         user_id: user!.id, scope: "emergent", content, metrics: null,
       });
 
       if (emergent?.insights?.length) {
-        const validCats = ["cognitivo","execucao","emocional","estrategico","identidade"];
-        const validTypes = ["rapido","profundo","alerta","recomendacao","relatorio"];
-        const rows = emergent.insights.slice(0, 14).map((x: any) => ({
-          user_id: user!.id,
-          category: validCats.includes(x.category) ? x.category : "cognitivo",
-          insight_type: validTypes.includes(x.insight_type) ? x.insight_type : "rapido",
-          title: (x.title ?? "—").slice(0, 200),
-          content: x.content ?? "",
-          severity: ["low","medium","high","critical"].includes(x.severity) ? x.severity : "medium",
-          pattern_data: x.pattern ? { pattern: x.pattern } : null,
-          status: "active",
-          source_scope: "emergent",
-        }));
+        const rows = emergent.insights.slice(0, 14)
+          .filter((x: any) => allowedCategories.includes(x.category) && allowedTypes.includes(x.insight_type))
+          .map((x: any) => ({
+            user_id: user!.id,
+            category: x.category, insight_type: x.insight_type,
+            title: (x.title ?? "—").slice(0, 200),
+            content: x.content ?? "",
+            severity: ["low","medium","high","critical"].includes(x.severity) ? x.severity : "medium",
+            pattern_data: x.pattern ? { pattern: x.pattern } : null,
+            status: "active", source_scope: "emergent",
+          }));
         if (rows.length) await supabase.from("emergent_insights").insert(rows);
       }
 
-      toast.success("Insights Emergentes atualizados.");
+      if (!silent) toast.success("Insights Emergentes atualizados.");
       load();
     } catch (e: any) {
-      toast.error(e.message ?? "Falha na análise emergente.");
-    } finally { setAnalyzing(false); }
+      if (!silent) toast.error(e.message ?? "Falha na análise emergente.");
+    } finally { analyzingRef.current = false; setAnalyzing(false); }
+  }, [settings, user, load]);
+
+  // Realtime: listen for behavior changes and live-reload + optionally trigger emergent
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel("emergent-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "emergent_insights" }, load)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "journal_entries" }, () => triggerAuto("journal"))
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "mission_completions" }, () => triggerAuto("mission"))
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "ooda_entries" }, () => triggerAuto("ooda"))
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const triggerAuto = (source: string) => {
+    if (settings.frequency !== "realtime") return;
+    const last = localStorage.getItem(LAST_RUN_KEY);
+    const minutes = settings.realtimeMinIntervalMin;
+    if (last && Date.now() - new Date(last).getTime() < minutes * 60_000) return;
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    debounceRef.current = window.setTimeout(() => {
+      toast.info(`Disparo automático (${source}) · varredura emergente em andamento`);
+      runEmergent(true);
+    }, 4000);
   };
+
+  // Daily/Weekly auto-trigger when page is opened
+  useEffect(() => {
+    if (!user) return;
+    const last = localStorage.getItem(LAST_RUN_KEY);
+    if (!last) return;
+    const ageMs = Date.now() - new Date(last).getTime();
+    if (settings.frequency === "daily" && ageMs > 24 * 3600_000) runEmergent(true);
+    if (settings.frequency === "weekly" && ageMs > 7 * 24 * 3600_000) runEmergent(true);
+  }, [user, settings.frequency, runEmergent]);
 
   const archive = async (id: string) => {
     await supabase.from("emergent_insights").update({ status: "archived" }).eq("id", id);
@@ -138,6 +230,16 @@ function InsightsPage() {
     if (!confirm("Remover este insight permanentemente?")) return;
     await supabase.from("emergent_insights").delete().eq("id", id);
     setInsights((s) => s.filter((i) => i.id !== id));
+  };
+  const rate = async (id: string, rating: number) => {
+    await supabase.from("emergent_insights").update({ feedback_rating: rating }).eq("id", id);
+    setInsights((s) => s.map((i) => i.id === id ? { ...i, feedback_rating: rating } : i));
+    toast.success(`Avaliado · ${rating}/5 · IA adaptará próximos insights.`);
+  };
+  const markUseful = async (id: string, useful: boolean) => {
+    await supabase.from("emergent_insights").update({ feedback_useful: useful }).eq("id", id);
+    setInsights((s) => s.map((i) => i.id === id ? { ...i, feedback_useful: useful } : i));
+    toast.success(useful ? "Marcado como útil" : "Marcado como pouco útil");
   };
 
   const counts = useMemo(() => {
@@ -168,7 +270,6 @@ function InsightsPage() {
   }, [insights]);
 
   const heatmap = useMemo(() => {
-    // 5 categorias × 4 severidades
     const sevs = ["low","medium","high","critical"] as const;
     const cats = Object.keys(CATEGORY_META) as Insight["category"][];
     return cats.map((c) => ({
@@ -179,17 +280,163 @@ function InsightsPage() {
 
   const filtered = filter === "all" ? insights : insights.filter((i) => i.category === filter);
 
+  const exportPDF = async () => {
+    try {
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+      const W = doc.internal.pageSize.getWidth();
+      const margin = 36;
+      let y = margin;
+
+      doc.setFillColor(10, 18, 28); doc.rect(0, 0, W, 70, "F");
+      doc.setTextColor(120, 230, 255); doc.setFontSize(18);
+      doc.text("EMERGENT INSIGHTS · RELATÓRIO OPERACIONAL", margin, 36);
+      doc.setFontSize(9); doc.setTextColor(160, 200, 220);
+      doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}`, margin, 54);
+      y = 100;
+
+      doc.setTextColor(20, 20, 20); doc.setFontSize(11);
+      doc.text("RESUMO POR CATEGORIA", margin, y); y += 6;
+      autoTable(doc, {
+        startY: y + 4,
+        head: [["Categoria", "Total"]],
+        body: Object.entries(CATEGORY_META).map(([k, m]) => [m.label, String(counts[k] ?? 0)]),
+        styles: { fontSize: 9 }, theme: "grid",
+        headStyles: { fillColor: [16, 40, 60], textColor: 200 },
+      });
+      y = (doc as any).lastAutoTable.finalY + 16;
+
+      doc.setFontSize(11); doc.text("LINHA DO TEMPO · 14 DIAS", margin, y); y += 6;
+      autoTable(doc, {
+        startY: y + 4,
+        head: [["Dia", "Detecções"]],
+        body: timeline.map((t) => [t.d, String(t.v)]),
+        styles: { fontSize: 8 }, theme: "striped",
+        headStyles: { fillColor: [16, 40, 60], textColor: 200 },
+      });
+      y = (doc as any).lastAutoTable.finalY + 16;
+
+      doc.setFontSize(11); doc.text("HEATMAP · CATEGORIA × SEVERIDADE", margin, y); y += 6;
+      autoTable(doc, {
+        startY: y + 4,
+        head: [["Categoria", "LOW", "MED", "HIGH", "CRIT"]],
+        body: heatmap.map((r) => [CATEGORY_META[r.cat].label, ...r.cells.map(String)]),
+        styles: { fontSize: 9 }, theme: "grid",
+        headStyles: { fillColor: [16, 40, 60], textColor: 200 },
+      });
+      y = (doc as any).lastAutoTable.finalY + 16;
+
+      const alerts = insights.filter((i) => i.severity === "high" || i.severity === "critical");
+      doc.setFontSize(11); doc.text(`ALERTAS CRÍTICOS (${alerts.length})`, margin, y); y += 6;
+      if (alerts.length) {
+        autoTable(doc, {
+          startY: y + 4,
+          head: [["Sev", "Categoria", "Título", "Conteúdo"]],
+          body: alerts.map((a) => [a.severity.toUpperCase(), CATEGORY_META[a.category].label, a.title, a.content]),
+          styles: { fontSize: 8, cellWidth: "wrap" }, theme: "grid",
+          columnStyles: { 2: { cellWidth: 120 }, 3: { cellWidth: 280 } },
+          headStyles: { fillColor: [60, 16, 16], textColor: 240 },
+        });
+        y = (doc as any).lastAutoTable.finalY + 16;
+      }
+
+      doc.setFontSize(11); doc.text("INSIGHTS DETECTADOS", margin, y);
+      autoTable(doc, {
+        startY: y + 6,
+        head: [["Categoria", "Tipo", "Sev", "Título", "Conteúdo", "Rating"]],
+        body: insights.map((i) => [
+          CATEGORY_META[i.category].label,
+          TYPE_LABEL[i.insight_type],
+          i.severity.toUpperCase(),
+          i.title,
+          i.content,
+          i.feedback_rating ? `${i.feedback_rating}/5` : "—",
+        ]),
+        styles: { fontSize: 7, cellWidth: "wrap" }, theme: "striped",
+        columnStyles: { 3: { cellWidth: 110 }, 4: { cellWidth: 230 } },
+        headStyles: { fillColor: [16, 40, 60], textColor: 220 },
+      });
+
+      doc.save(`emergent-insights-${new Date().toISOString().slice(0, 10)}.pdf`);
+      toast.success("PDF exportado.");
+    } catch (e: any) {
+      toast.error(e.message ?? "Falha ao gerar PDF");
+    }
+  };
+
+  const toggleCat = (k: Insight["category"]) =>
+    setSettings((s) => ({ ...s, categories: { ...s.categories, [k]: !s.categories[k] } }));
+  const toggleType = (k: Insight["insight_type"]) =>
+    setSettings((s) => ({ ...s, types: { ...s.types, [k]: !s.types[k] } }));
+
   return (
     <ModulePage
       code="// EMG 14"
       title="Insights Emergentes da IA"
       subtitle="Espelho evolutivo · Detecção contínua de padrões reais a partir do seu comportamento."
     >
-      <div className="hud-panel hud-corner p-3 flex items-center gap-2 text-xs text-muted-foreground">
+      <div className="hud-panel hud-corner p-3 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
         <span className="size-1.5 rounded-full bg-primary animate-pulse-ring" />
-        <span className="font-mono text-[10px] tracking-widest text-primary">DETECÇÃO COMPORTAMENTAL ATIVA</span>
+        <span className="font-mono text-[10px] tracking-widest text-primary">
+          DETECÇÃO {settings.frequency === "realtime" ? "TEMPO REAL · LIVE" : settings.frequency.toUpperCase()}
+        </span>
         <span>· análise empírica · zero motivacional · padrões reais.</span>
+        <div className="ml-auto flex gap-2">
+          <Button size="sm" variant="outline" onClick={exportPDF} className="font-mono text-[10px] tracking-widest h-7">
+            <FileDown className="size-3 mr-1" /> EXPORTAR PDF
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setShowSettings((v) => !v)} className="font-mono text-[10px] tracking-widest h-7">
+            <SettingsIcon className="size-3 mr-1" /> CONFIG
+          </Button>
+        </div>
       </div>
+
+      {showSettings && (
+        <HudCard title="⚙ CONFIGURAÇÕES DE DETECÇÃO">
+          <div className="grid lg:grid-cols-3 gap-4">
+            <div>
+              <div className="font-mono text-[10px] tracking-widest text-primary/80 mb-2">FREQUÊNCIA</div>
+              {(["realtime","daily","weekly"] as const).map((f) => (
+                <label key={f} className="flex items-center gap-2 p-2 border border-border/40 rounded cursor-pointer hover:border-primary/60 mb-1">
+                  <input type="radio" name="freq" checked={settings.frequency === f}
+                    onChange={() => setSettings((s) => ({ ...s, frequency: f }))} />
+                  <span className="font-mono text-xs">
+                    {f === "realtime" ? <><Radio className="inline size-3 mr-1" /> TEMPO REAL · gatilhos automáticos</> : f === "daily" ? "DIÁRIA" : "SEMANAL"}
+                  </span>
+                </label>
+              ))}
+              {settings.frequency === "realtime" && (
+                <div className="mt-2">
+                  <div className="font-mono text-[10px] text-muted-foreground tracking-widest mb-1">INTERVALO MÍNIMO (MIN)</div>
+                  <input type="number" min={5} max={240} value={settings.realtimeMinIntervalMin}
+                    onChange={(e) => setSettings((s) => ({ ...s, realtimeMinIntervalMin: parseInt(e.target.value) || 15 }))}
+                    className="w-24 bg-input/40 border border-border/40 rounded px-2 py-1 font-mono text-xs" />
+                </div>
+              )}
+            </div>
+            <div>
+              <div className="font-mono text-[10px] tracking-widest text-primary/80 mb-2">CATEGORIAS ATIVAS</div>
+              {(Object.keys(CATEGORY_META) as Insight["category"][]).map((k) => (
+                <div key={k} className="flex items-center justify-between py-1.5 border-b border-border/30">
+                  <span className={`font-mono text-xs ${CATEGORY_META[k].color}`}>{CATEGORY_META[k].label}</span>
+                  <Switch checked={settings.categories[k]} onCheckedChange={() => toggleCat(k)} />
+                </div>
+              ))}
+            </div>
+            <div>
+              <div className="font-mono text-[10px] tracking-widest text-primary/80 mb-2">TIPOS ATIVOS</div>
+              {(Object.keys(TYPE_LABEL) as Insight["insight_type"][]).map((k) => (
+                <div key={k} className="flex items-center justify-between py-1.5 border-b border-border/30">
+                  <span className="font-mono text-xs">{TYPE_LABEL[k]}</span>
+                  <Switch checked={settings.types[k]} onCheckedChange={() => toggleType(k)} />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-3 text-[10px] font-mono text-muted-foreground">
+            Filtros aplicam-se à próxima detecção. Em tempo real, novas inserções de journal/missões/OODA disparam varredura (com cooldown).
+          </div>
+        </HudCard>
+      )}
 
       <div className="grid lg:grid-cols-4 gap-4">
         <HudCard title="MOTOR EMERGENTE" className="lg:col-span-1">
@@ -204,12 +451,12 @@ function InsightsPage() {
               </div>
             </div>
           </div>
-          <Button onClick={runEmergent} disabled={analyzing} className="mt-4 w-full font-mono text-xs tracking-widest">
+          <Button onClick={() => runEmergent(false)} disabled={analyzing} className="mt-4 w-full font-mono text-xs tracking-widest">
             {analyzing ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Sparkles className="size-3 mr-2" />}
             {analyzing ? "VARRENDO PADRÕES..." : "DETECTAR PADRÕES"}
           </Button>
           <div className="mt-3 text-[10px] font-mono text-muted-foreground leading-relaxed">
-            Cruza identidade, missões, execuções, OODA, journal, hidratação e ideias.
+            Cruza identidade, missões, execuções, OODA, journal, hidratação, ideias e feedback de avaliações.
           </div>
         </HudCard>
 
@@ -327,17 +574,38 @@ function InsightsPage() {
                       <AlertTriangle className="inline size-3 mr-1" /> PADRÃO: {i.pattern_data.pattern}
                     </div>
                   )}
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="font-mono text-[9px] text-muted-foreground/60">
-                      {new Date(i.created_at).toLocaleString("pt-BR")}
-                    </span>
-                    <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => archive(i.id)} className="h-6 text-[10px] font-mono">
-                        <CheckCircle2 className="size-3 mr-1" /> ARQUIVAR
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => remove(i.id)} className="h-6 text-[10px] font-mono">
-                        <Trash2 className="size-3" />
-                      </Button>
+
+                  <div className="mt-3 pt-3 border-t border-border/30 space-y-2">
+                    <div className="flex items-center gap-1">
+                      <span className="font-mono text-[9px] text-muted-foreground tracking-widest mr-1">PRECISÃO</span>
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <button key={n} onClick={() => rate(i.id, n)} className="hover:scale-110 transition">
+                          <Star className={`size-3.5 ${(i.feedback_rating ?? 0) >= n ? "text-amber-400 fill-amber-400" : "text-muted-foreground/40"}`} />
+                        </button>
+                      ))}
+                      <div className="ml-auto flex gap-1">
+                        <Button size="sm" variant="ghost" onClick={() => markUseful(i.id, true)}
+                          className={`h-6 px-2 text-[10px] font-mono ${i.feedback_useful === true ? "text-primary" : "text-muted-foreground"}`}>
+                          <ThumbsUp className="size-3 mr-1" /> ÚTIL
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => markUseful(i.id, false)}
+                          className={`h-6 px-2 text-[10px] font-mono ${i.feedback_useful === false ? "text-destructive" : "text-muted-foreground"}`}>
+                          <ThumbsDown className="size-3" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-[9px] text-muted-foreground/60">
+                        {new Date(i.created_at).toLocaleString("pt-BR")}
+                      </span>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="ghost" onClick={() => archive(i.id)} className="h-6 text-[10px] font-mono">
+                          <CheckCircle2 className="size-3 mr-1" /> ARQUIVAR
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => remove(i.id)} className="h-6 text-[10px] font-mono">
+                          <Trash2 className="size-3" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
