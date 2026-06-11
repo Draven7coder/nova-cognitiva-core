@@ -41,6 +41,119 @@ export type Database = {
         }
         Relationships: []
       }
+      chain_subtasks: {
+        Row: {
+          chain_id: string
+          code: string
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          module: string | null
+          order_index: number
+          status: string
+          title: string
+          unlocks_subtask_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chain_id: string
+          code: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          module?: string | null
+          order_index?: number
+          status?: string
+          title: string
+          unlocks_subtask_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chain_id?: string
+          code?: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          module?: string | null
+          order_index?: number
+          status?: string
+          title?: string
+          unlocks_subtask_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chain_subtasks_chain_id_fkey"
+            columns: ["chain_id"]
+            isOneToOne: false
+            referencedRelation: "operational_chains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_checkins: {
+        Row: {
+          ai_summary: string | null
+          bottleneck: string | null
+          check_date: string
+          created_at: string
+          discomfort: string | null
+          energy: number | null
+          focus: number | null
+          id: string
+          main_mission: string | null
+          mood: number | null
+          notes: string | null
+          operational_mode: string | null
+          sleep_quality: number | null
+          stress: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_summary?: string | null
+          bottleneck?: string | null
+          check_date?: string
+          created_at?: string
+          discomfort?: string | null
+          energy?: number | null
+          focus?: number | null
+          id?: string
+          main_mission?: string | null
+          mood?: number | null
+          notes?: string | null
+          operational_mode?: string | null
+          sleep_quality?: number | null
+          stress?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_summary?: string | null
+          bottleneck?: string | null
+          check_date?: string
+          created_at?: string
+          discomfort?: string | null
+          energy?: number | null
+          focus?: number | null
+          id?: string
+          main_mission?: string | null
+          mood?: number | null
+          notes?: string | null
+          operational_mode?: string | null
+          sleep_quality?: number | null
+          stress?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       emergent_insights: {
         Row: {
           category: string
@@ -401,6 +514,51 @@ export type Database = {
           observe?: string
           orient?: string
           tag?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      operational_chains: {
+        Row: {
+          archived_at: string | null
+          code: string
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          primary_module: string | null
+          priority: number
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string | null
+          code: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          primary_module?: string | null
+          priority?: number
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          archived_at?: string | null
+          code?: string
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          primary_module?: string | null
+          priority?: number
+          status?: string
+          title?: string
           updated_at?: string
           user_id?: string
         }
