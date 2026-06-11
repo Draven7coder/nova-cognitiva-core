@@ -10,8 +10,11 @@ import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip,
 } from "recharts";
-import { Sparkles, Target, Flame, Calendar, Cog, Brain, AlertTriangle, Fingerprint, Bot, ShieldAlert, TrendingUp as TrendUp, Zap, HeartPulse, Compass } from "lucide-react";
+import { Sparkles, Target, Flame, Calendar, Cog, Brain, AlertTriangle, Fingerprint, Bot, ShieldAlert, TrendingUp as TrendUp, Zap, HeartPulse, Compass, Swords, Shield, Skull, Crosshair, ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
 
@@ -46,6 +49,16 @@ function Dashboard() {
   const [achievements, setAchievements] = useState({
     missionsDone: 0, totalXP: 0, oodaCount: 0, journalCount: 0, insightsAccepted: 0, hydrationDays: 0,
   });
+  const [chains, setChains] = useState<any[]>([]);
+  const [chainSubs, setChainSubs] = useState<any[]>([]);
+  const [checkin, setCheckin] = useState<any>(null);
+  const [ciSleep, setCiSleep] = useState(5);
+  const [ciEnergy, setCiEnergy] = useState(5);
+  const [ciFocus, setCiFocus] = useState(5);
+  const [ciMood, setCiMood] = useState(5);
+  const [ciStress, setCiStress] = useState(5);
+  const [ciDiscomfort, setCiDiscomfort] = useState("");
+  const [savingCheckin, setSavingCheckin] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -96,8 +109,72 @@ function Dashboard() {
         insightsAccepted: insightsAccepted ?? 0,
         hydrationDays: hydDays,
       });
+
+      // Load chains, subtasks and today's check-in
+      const today = new Date().toISOString().slice(0, 10);
+      const [{ data: ch }, { data: csb }, { data: ci }] = await Promise.all([
+        (supabase as any).from("operational_chains").select("*").order("priority", { ascending: false }),
+        (supabase as any).from("chain_subtasks").select("*").order("order_index", { ascending: true }),
+        (supabase as any).from("daily_checkins").select("*").eq("check_date", today).maybeSingle(),
+      ]);
+      setChains(ch ?? []);
+      setChainSubs(csb ?? []);
+      if (ci) {
+        setCheckin(ci);
+        setCiSleep(ci.sleep_quality ?? 5); setCiEnergy(ci.energy ?? 5);
+        setCiFocus(ci.focus ?? 5); setCiMood(ci.mood ?? 5); setCiStress(ci.stress ?? 5);
+        setCiDiscomfort(ci.discomfort ?? "");
+      }
     })();
   }, [user]);
+
+  // Operational mode auto-derivation
+  function deriveMode(s: number, e: number, f: number, m: number, st: number): { code: string; label: string; desc: string; icon: any; cls: string } {
+    const composite = (s + e + f + m + (10 - st)) / 5;
+    if (composite >= 8) return { code: "guerra", label: "⚔️ GUERRA", desc: "desempenho máximo · tarefas complexas · alta intensidade.", icon: Swords, cls: "text-rose-400 border-rose-400/60" };
+    if (composite >= 6) return { code: "estrategico", label: "🎯 ESTRATÉGICO", desc: "progresso consistente · equilíbrio execução/recuperação.", icon: Crosshair, cls: "text-primary border-primary/60" };
+    if (composite >= 4) return { code: "recuperacao", label: "🛡️ RECUPERAÇÃO", desc: "redução de intensidade · preservar continuidade.", icon: Shield, cls: "text-amber-400 border-amber-400/60" };
+    return { code: "sobrevivencia", label: "🌑 SOBREVIVÊNCIA", desc: "execução mínima para não quebrar hábitos.", icon: Skull, cls: "text-muted-foreground border-border" };
+  }
+  const mode = deriveMode(ciSleep, ciEnergy, ciFocus, ciMood, ciStress);
+
+  // Auto main mission: subtask of highest-priority active chain
+  const activeChains = chains.filter((c) => c.status === "ativa");
+  const topChain = activeChains[0];
+  const topChainSubs = topChain ? chainSubs.filter((s) => s.chain_id === topChain.id).sort((a, b) => a.order_index - b.order_index) : [];
+  const mainSubtask = topChainSubs.find((s) => s.status !== "done");
+  const mainMission = checkin?.main_mission ?? (topChain && mainSubtask
+    ? `Cadeia ${topChain.code} · ${mainSubtask.code} — ${mainSubtask.title}`
+    : topChain ? `Cadeia ${topChain.code} — ${topChain.title}` : "Defina sua primeira Cadeia Operacional.");
+
+  const saveCheckin = async () => {
+    setSavingCheckin(true);
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const m = deriveMode(ciSleep, ciEnergy, ciFocus, ciMood, ciStress);
+      const { error } = await (supabase as any).from("daily_checkins").upsert({
+        user_id: user!.id, check_date: today,
+        sleep_quality: ciSleep, energy: ciEnergy, focus: ciFocus, mood: ciMood, stress: ciStress,
+        discomfort: ciDiscomfort || null, operational_mode: m.code,
+        main_mission: topChain && mainSubtask
+          ? `Cadeia ${topChain.code} · ${mainSubtask.code} — ${mainSubtask.title}`
+          : null,
+      }, { onConflict: "user_id,check_date" });
+      if (error) throw error;
+      toast.success(`Check-in registrado · modo ${m.label}.`);
+      const { data: ci } = await (supabase as any).from("daily_checkins").select("*").eq("check_date", today).maybeSingle();
+      setCheckin(ci);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setSavingCheckin(false); }
+  };
+
+  const MODULE_PATHS: Record<string, string> = {
+    identidade: "/app/identidade", proposito: "/app/proposito", intelecto: "/app/intelecto",
+    laboratorio: "/app/laboratorio", manual: "/app/manual", protocolos: "/app/protocolos",
+    performance: "/app/performance", hidratacao: "/app/hidratacao", missoes: "/app/missoes",
+    ideias: "/app/ideias", sombra: "/app/sombra", evolucao: "/app/evolucao",
+    ooda: "/app/ooda", jarvis: "/app/jarvis", insights: "/app/insights", relatorios: "/app/relatorios",
+  };
 
   // Base QI from IA metrics (0-100 average)
   const baseQI = Math.round(Object.values(metrics).reduce((a, b) => a + b, 0) / Object.values(metrics).length);
@@ -146,6 +223,126 @@ function Dashboard() {
 
   return (
     <ModulePage code="// CORE 00" title="Núcleo Operacional" subtitle="Painel central de comando · QI Funcional Operacional ativo.">
+      {/* ==== SISTEMA NERVOSO CENTRAL ==== */}
+      <HudCard title="🎯 MISSÃO PRINCIPAL DO DIA · DEFINIDA PELO JARVIS">
+        <div className="flex flex-wrap items-center gap-3">
+          <Badge variant="outline" className={`font-mono text-xs ${mode.cls}`}>
+            <mode.icon className="size-3 mr-1 inline" /> MODO {mode.label}
+          </Badge>
+          <div className="flex-1 min-w-[200px]">
+            <div className="font-display text-base text-foreground hud-text-glow">{mainMission}</div>
+            <div className="text-[10px] font-mono text-muted-foreground mt-0.5">{mode.desc}</div>
+          </div>
+          {topChain && (
+            <Link to={mainSubtask ? (MODULE_PATHS[mainSubtask.module ?? ""] ?? "/app/cadeias") : "/app/cadeias"}>
+              <Button size="sm" className="font-mono text-[10px] tracking-widest">
+                EXECUTAR <ArrowRight className="size-3 ml-1" />
+              </Button>
+            </Link>
+          )}
+        </div>
+      </HudCard>
+
+      <div className="grid lg:grid-cols-2 gap-4">
+        <HudCard title="⚙ CHECK-IN DIÁRIO · CALIBRAÇÃO DO OPERADOR">
+          <div className="space-y-3">
+            {[
+              { label: "Sono", v: ciSleep, set: setCiSleep },
+              { label: "Energia", v: ciEnergy, set: setCiEnergy },
+              { label: "Foco", v: ciFocus, set: setCiFocus },
+              { label: "Humor", v: ciMood, set: setCiMood },
+              { label: "Estresse", v: ciStress, set: setCiStress },
+            ].map((it) => (
+              <div key={it.label}>
+                <div className="flex justify-between font-mono text-[10px] text-muted-foreground tracking-widest">
+                  <span>{it.label.toUpperCase()}</span><span className="text-primary">{it.v}/10</span>
+                </div>
+                <Slider min={0} max={10} step={1} value={[it.v]} onValueChange={(v) => it.set(v[0])} className="mt-1" />
+              </div>
+            ))}
+            <Input placeholder="Desconfortos físicos / observações" value={ciDiscomfort} onChange={(e) => setCiDiscomfort(e.target.value)} className="bg-input/40 font-mono text-xs" />
+            <Button onClick={saveCheckin} disabled={savingCheckin} className="w-full font-mono text-xs tracking-widest">
+              {savingCheckin ? "REGISTRANDO..." : checkin ? "ATUALIZAR CHECK-IN" : "REGISTRAR CHECK-IN"}
+            </Button>
+          </div>
+        </HudCard>
+
+        <HudCard title="⛓ CADEIAS ATIVAS">
+          {activeChains.length === 0 ? (
+            <div className="text-sm text-muted-foreground">
+              Nenhuma cadeia ativa. <Link to="/app/cadeias" className="text-primary hover:underline">Criar primeira cadeia →</Link>
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {activeChains.slice(0, 6).map((c) => {
+                const cs = chainSubs.filter((s) => s.chain_id === c.id).sort((a, b) => a.order_index - b.order_index);
+                const done = cs.filter((s) => s.status === "done").length;
+                const next = cs.find((s) => s.status !== "done");
+                const isTop = c.id === topChain?.id;
+                const target = next ? (MODULE_PATHS[next.module ?? ""] ?? "/app/cadeias") : "/app/cadeias";
+                return (
+                  <li key={c.id} className={`hud-panel p-2 hover:border-primary/60 transition ${isTop ? "border-primary/70 hud-glow" : ""}`}>
+                    <Link to={target} className="block">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] text-primary tracking-widest">CAD {c.code}</span>
+                        <span className="flex-1 text-sm truncate">{c.title}</span>
+                        <span className="font-mono text-[10px] text-muted-foreground">{done}/{cs.length}</span>
+                        {next && <span className="font-mono text-[10px] text-primary">→ {next.code}</span>}
+                      </div>
+                      <div className="h-0.5 bg-muted/40 rounded-full mt-1 overflow-hidden">
+                        <div className="h-full bg-primary" style={{ width: `${cs.length ? (done / cs.length) * 100 : 0}%` }} />
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+              <Link to="/app/cadeias" className="block text-center font-mono text-[10px] text-primary hover:underline tracking-widest pt-1">
+                GERENCIAR TODAS AS CADEIAS →
+              </Link>
+            </ul>
+          )}
+        </HudCard>
+      </div>
+
+      <HudCard title="↻ CADEIAS EM CONTINUIDADE">
+        {activeChains.length === 0 ? (
+          <div className="text-xs text-muted-foreground font-mono">Sem cadeias para continuar.</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs font-mono">
+              <thead>
+                <tr className="text-muted-foreground tracking-widest text-[10px] border-b border-border/40">
+                  <th className="text-left py-2 px-2">CADEIA</th>
+                  <th className="text-left py-2 px-2">ÚLTIMA</th>
+                  <th className="text-left py-2 px-2">PRÓXIMA</th>
+                  <th className="text-left py-2 px-2">MÓDULO</th>
+                  <th className="text-right py-2 px-2">AÇÃO</th>
+                </tr>
+              </thead>
+              <tbody>
+                {activeChains.slice(0, 10).map((c) => {
+                  const cs = chainSubs.filter((s) => s.chain_id === c.id).sort((a, b) => a.order_index - b.order_index);
+                  const lastDone = [...cs].reverse().find((s) => s.status === "done");
+                  const next = cs.find((s) => s.status !== "done");
+                  const target = next ? (MODULE_PATHS[next.module ?? ""] ?? "/app/cadeias") : "/app/cadeias";
+                  return (
+                    <tr key={c.id} className="border-b border-border/20 hover:bg-primary/5">
+                      <td className="py-2 px-2 text-primary">{c.code}</td>
+                      <td className="py-2 px-2 text-muted-foreground">{lastDone ? lastDone.code : "—"}</td>
+                      <td className="py-2 px-2 text-primary">{next ? next.code : "✓"}</td>
+                      <td className="py-2 px-2 text-foreground/80">{next?.module ?? c.primary_module ?? "—"}</td>
+                      <td className="py-2 px-2 text-right">
+                        <Link to={target} className="text-primary hover:underline tracking-widest">ABRIR →</Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </HudCard>
+
       <div className="grid lg:grid-cols-3 gap-4">
         <HudCard title="QI FUNCIONAL OPERACIONAL" className="lg:col-span-1">
           <div className="flex items-baseline gap-2">

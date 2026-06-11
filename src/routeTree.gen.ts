@@ -32,6 +32,7 @@ import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
 import { Route as AppFumRouteImport } from './routes/app.fum'
 import { Route as AppEvolucaoRouteImport } from './routes/app.evolucao'
 import { Route as AppConfigRouteImport } from './routes/app.config'
+import { Route as AppCadeiasRouteImport } from './routes/app.cadeias'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -148,11 +149,17 @@ const AppConfigRoute = AppConfigRouteImport.update({
   path: '/config',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCadeiasRoute = AppCadeiasRouteImport.update({
+  id: '/cadeias',
+  path: '/cadeias',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/app/cadeias': typeof AppCadeiasRoute
   '/app/config': typeof AppConfigRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/app/cadeias': typeof AppCadeiasRoute
   '/app/config': typeof AppConfigRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
@@ -203,6 +211,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/app/cadeias': typeof AppCadeiasRoute
   '/app/config': typeof AppConfigRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/app/cadeias'
     | '/app/config'
     | '/app/evolucao'
     | '/app/fum'
@@ -254,6 +264,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/app/cadeias'
     | '/app/config'
     | '/app/evolucao'
     | '/app/fum'
@@ -279,6 +290,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/app/cadeias'
     | '/app/config'
     | '/app/evolucao'
     | '/app/fum'
@@ -470,10 +482,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppConfigRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/cadeias': {
+      id: '/app/cadeias'
+      path: '/cadeias'
+      fullPath: '/app/cadeias'
+      preLoaderRoute: typeof AppCadeiasRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppCadeiasRoute: typeof AppCadeiasRoute
   AppConfigRoute: typeof AppConfigRoute
   AppEvolucaoRoute: typeof AppEvolucaoRoute
   AppFumRoute: typeof AppFumRoute
@@ -497,6 +517,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppCadeiasRoute: AppCadeiasRoute,
   AppConfigRoute: AppConfigRoute,
   AppEvolucaoRoute: AppEvolucaoRoute,
   AppFumRoute: AppFumRoute,
