@@ -174,13 +174,6 @@ function Dashboard() {
     ideias: "/app/ideias", sombra: "/app/sombra", evolucao: "/app/evolucao",
     ooda: "/app/ooda", jarvis: "/app/jarvis", insights: "/app/insights", relatorios: "/app/relatorios",
   };
-  const _unused1 = () => {
-        journalCount: journalCount ?? 0,
-        insightsAccepted: insightsAccepted ?? 0,
-        hydrationDays: hydDays,
-      });
-    })();
-  }, [user]);
 
   // Base QI from IA metrics (0-100 average)
   const baseQI = Math.round(Object.values(metrics).reduce((a, b) => a + b, 0) / Object.values(metrics).length);
