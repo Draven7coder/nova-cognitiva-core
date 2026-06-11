@@ -48,6 +48,16 @@ function Dashboard() {
   const [achievements, setAchievements] = useState({
     missionsDone: 0, totalXP: 0, oodaCount: 0, journalCount: 0, insightsAccepted: 0, hydrationDays: 0,
   });
+  const [chains, setChains] = useState<any[]>([]);
+  const [chainSubs, setChainSubs] = useState<any[]>([]);
+  const [checkin, setCheckin] = useState<any>(null);
+  const [ciSleep, setCiSleep] = useState(5);
+  const [ciEnergy, setCiEnergy] = useState(5);
+  const [ciFocus, setCiFocus] = useState(5);
+  const [ciMood, setCiMood] = useState(5);
+  const [ciStress, setCiStress] = useState(5);
+  const [ciDiscomfort, setCiDiscomfort] = useState("");
+  const [savingCheckin, setSavingCheckin] = useState(false);
 
   useEffect(() => {
     (async () => {
