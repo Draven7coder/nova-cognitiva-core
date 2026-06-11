@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Fingerprint, Crosshair, BookOpen, Settings2, Activity,
-  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles,
+  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
