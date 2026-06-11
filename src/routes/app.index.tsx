@@ -108,6 +108,77 @@ function Dashboard() {
         insightsAccepted: insightsAccepted ?? 0,
         hydrationDays: hydDays,
       });
+
+      // Load chains, subtasks and today's check-in
+      const today = new Date().toISOString().slice(0, 10);
+      const [{ data: ch }, { data: csb }, { data: ci }] = await Promise.all([
+        (supabase as any).from("operational_chains").select("*").order("priority", { ascending: false }),
+        (supabase as any).from("chain_subtasks").select("*").order("order_index", { ascending: true }),
+        (supabase as any).from("daily_checkins").select("*").eq("check_date", today).maybeSingle(),
+      ]);
+      setChains(ch ?? []);
+      setChainSubs(csb ?? []);
+      if (ci) {
+        setCheckin(ci);
+        setCiSleep(ci.sleep_quality ?? 5); setCiEnergy(ci.energy ?? 5);
+        setCiFocus(ci.focus ?? 5); setCiMood(ci.mood ?? 5); setCiStress(ci.stress ?? 5);
+        setCiDiscomfort(ci.discomfort ?? "");
+      }
+    })();
+  }, [user]);
+
+  // Operational mode auto-derivation
+  function deriveMode(s: number, e: number, f: number, m: number, st: number): { code: string; label: string; desc: string; icon: any; cls: string } {
+    const composite = (s + e + f + m + (10 - st)) / 5;
+    if (composite >= 8) return { code: "guerra", label: "⚔️ GUERRA", desc: "desempenho máximo · tarefas complexas · alta intensidade.", icon: Swords, cls: "text-rose-400 border-rose-400/60" };
+    if (composite >= 6) return { code: "estrategico", label: "🎯 ESTRATÉGICO", desc: "progresso consistente · equilíbrio execução/recuperação.", icon: Crosshair, cls: "text-primary border-primary/60" };
+    if (composite >= 4) return { code: "recuperacao", label: "🛡️ RECUPERAÇÃO", desc: "redução de intensidade · preservar continuidade.", icon: Shield, cls: "text-amber-400 border-amber-400/60" };
+    return { code: "sobrevivencia", label: "🌑 SOBREVIVÊNCIA", desc: "execução mínima para não quebrar hábitos.", icon: Skull, cls: "text-muted-foreground border-border" };
+  }
+  const mode = deriveMode(ciSleep, ciEnergy, ciFocus, ciMood, ciStress);
+
+  // Auto main mission: subtask of highest-priority active chain
+  const activeChains = chains.filter((c) => c.status === "ativa");
+  const topChain = activeChains[0];
+  const topChainSubs = topChain ? chainSubs.filter((s) => s.chain_id === topChain.id).sort((a, b) => a.order_index - b.order_index) : [];
+  const mainSubtask = topChainSubs.find((s) => s.status !== "done");
+  const mainMission = checkin?.main_mission ?? (topChain && mainSubtask
+    ? `Cadeia ${topChain.code} · ${mainSubtask.code} — ${mainSubtask.title}`
+    : topChain ? `Cadeia ${topChain.code} — ${topChain.title}` : "Defina sua primeira Cadeia Operacional.");
+
+  const saveCheckin = async () => {
+    setSavingCheckin(true);
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const m = deriveMode(ciSleep, ciEnergy, ciFocus, ciMood, ciStress);
+      const { error } = await (supabase as any).from("daily_checkins").upsert({
+        user_id: user!.id, check_date: today,
+        sleep_quality: ciSleep, energy: ciEnergy, focus: ciFocus, mood: ciMood, stress: ciStress,
+        discomfort: ciDiscomfort || null, operational_mode: m.code,
+        main_mission: topChain && mainSubtask
+          ? `Cadeia ${topChain.code} · ${mainSubtask.code} — ${mainSubtask.title}`
+          : null,
+      }, { onConflict: "user_id,check_date" });
+      if (error) throw error;
+      toast.success(`Check-in registrado · modo ${m.label}.`);
+      const { data: ci } = await (supabase as any).from("daily_checkins").select("*").eq("check_date", today).maybeSingle();
+      setCheckin(ci);
+    } catch (e: any) { toast.error(e.message); }
+    finally { setSavingCheckin(false); }
+  };
+
+  const MODULE_PATHS: Record<string, string> = {
+    identidade: "/app/identidade", proposito: "/app/proposito", intelecto: "/app/intelecto",
+    laboratorio: "/app/laboratorio", manual: "/app/manual", protocolos: "/app/protocolos",
+    performance: "/app/performance", hidratacao: "/app/hidratacao", missoes: "/app/missoes",
+    ideias: "/app/ideias", sombra: "/app/sombra", evolucao: "/app/evolucao",
+    ooda: "/app/ooda", jarvis: "/app/jarvis", insights: "/app/insights", relatorios: "/app/relatorios",
+  };
+  const _unused1 = () => {
+        journalCount: journalCount ?? 0,
+        insightsAccepted: insightsAccepted ?? 0,
+        hydrationDays: hydDays,
+      });
     })();
   }, [user]);
 
