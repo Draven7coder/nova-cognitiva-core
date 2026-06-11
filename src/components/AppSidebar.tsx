@@ -20,6 +20,7 @@ const modules = [
   { title: "Performance", url: "/app/performance", icon: Activity },
   { title: "Hidratação Operacional", url: "/app/hidratacao", icon: Droplet },
   { title: "Sistema de Missões", url: "/app/missoes", icon: Swords },
+  { title: "Cadeias Operacionais", url: "/app/cadeias", icon: Link2 },
   { title: "Banco de Ideias", url: "/app/ideias", icon: Lightbulb },
   { title: "Sombra", url: "/app/sombra", icon: Moon },
   { title: "Evolução", url: "/app/evolucao", icon: TrendingUp },
