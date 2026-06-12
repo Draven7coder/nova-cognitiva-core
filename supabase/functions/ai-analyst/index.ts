@@ -39,7 +39,35 @@ Profundidade Cognitiva, Execução, Consistência, Integração de Conhecimento,
 Controle Emocional, Velocidade de Evolução, Clareza Mental, Disciplina, Capacidade de Longo Prazo.
 Responda em português, tom cinematográfico, frio, preciso, estratégico. Markdown permitido.`;
 
-    const userPrompt = isEmergent
+    const userPrompt = isChains
+      ? `Analise os dados operacionais do usuário e sintetize CADEIAS OPERACIONAIS executáveis.
+
+Dados:
+${JSON.stringify(context, null, 2)}
+
+Regras:
+- Use APENAS as chaves de módulo listadas em "available_modules" (campo "key") nos campos primary_module e module das subtarefas.
+- Não duplique cadeias existentes ativas (campo "existing_chains").
+- Cada cadeia precisa ter um título conciso, prioridade 0-100 baseada em urgência real, e 3 a 6 subtarefas em sequência lógica.
+- Cada subtarefa deve apontar para o módulo mais adequado para executá-la.
+- Não invente dados; ancore tudo em evidência do que está no contexto.
+
+Responda APENAS com um bloco JSON entre <chains>...</chains> com a estrutura exata:
+{
+  "chains": [
+    {
+      "title": "string curta",
+      "description": "1-2 frases estratégicas",
+      "primary_module": "key do módulo principal",
+      "priority": 0-100,
+      "subtasks": [
+        { "title": "passo executável", "module": "key do módulo onde executar" }
+      ]
+    }
+  ]
+}
+Máximo 6 cadeias. Foque em qualidade estratégica, não quantidade.`
+      : isEmergent
       ? `Analise TODOS os dados operacionais do usuário abaixo e produza INSIGHTS EMERGENTES — padrões reais detectados a partir do comportamento dele.
 
 Dados:
@@ -123,6 +151,7 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     let metrics: Record<string, number> | null = null;
     let insights: any = null;
     let emergent: any = null;
+    let chains: any = null;
 
     const m = content.match(/<metrics>([\s\S]*?)<\/metrics>/);
     if (m) { try { metrics = JSON.parse(m[1].trim()); } catch { /* ignore */ } }
@@ -133,13 +162,17 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     const em = content.match(/<emergent>([\s\S]*?)<\/emergent>/);
     if (em) { try { emergent = JSON.parse(em[1].trim()); } catch { /* ignore */ } }
 
+    const ch = content.match(/<chains>([\s\S]*?)<\/chains>/);
+    if (ch) { try { chains = JSON.parse(ch[1].trim()); } catch { /* ignore */ } }
+
     const cleaned = content
       .replace(/<metrics>[\s\S]*?<\/metrics>/, "")
       .replace(/<insights>[\s\S]*?<\/insights>/, "")
       .replace(/<emergent>[\s\S]*?<\/emergent>/, "")
+      .replace(/<chains>[\s\S]*?<\/chains>/, "")
       .trim();
 
-    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent }), {
+    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

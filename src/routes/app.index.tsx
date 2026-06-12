@@ -235,8 +235,8 @@ function Dashboard() {
           </div>
           {topChain && (
             <Link to={mainSubtask ? (MODULE_PATHS[mainSubtask.module ?? ""] ?? "/app/cadeias") : "/app/cadeias"}>
-              <Button size="sm" className="font-mono text-[10px] tracking-widest">
-                EXECUTAR <ArrowRight className="size-3 ml-1" />
+              <Button size="sm" className="font-mono text-xs tracking-widest hud-glow animate-pulse-ring">
+                IR <ArrowRight className="size-3 ml-1" />
               </Button>
             </Link>
           )}
@@ -269,8 +269,8 @@ function Dashboard() {
 
         <HudCard title="⛓ CADEIAS ATIVAS">
           {activeChains.length === 0 ? (
-            <div className="text-sm text-muted-foreground">
-              Nenhuma cadeia ativa. <Link to="/app/cadeias" className="text-primary hover:underline">Criar primeira cadeia →</Link>
+            <div className="text-sm text-muted-foreground font-mono">
+              Nenhuma cadeia ativa. <Link to="/app/cadeias" className="text-primary hover:underline">Acionar JARVIS para gerar cadeias →</Link>
             </div>
           ) : (
             <ul className="space-y-2">
