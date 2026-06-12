@@ -69,16 +69,14 @@ function CadeiasPage() {
     setGenerating(true);
     try {
       const [
-        { data: ident }, { data: prop }, { data: miss },
-        { data: comps }, { data: journal }, { data: ooda }, { data: ideias }, { data: existing },
+        { data: ident }, { data: miss },
+        { data: comps }, { data: journal }, { data: ooda }, { data: existing },
       ] = await Promise.all([
         supabase.from("identity").select("*").maybeSingle(),
-        supabase.from("supreme_purpose").select("*").maybeSingle(),
         supabase.from("missions").select("title,status,type,xp,recurrence,created_at").limit(50),
         supabase.from("mission_completions").select("mission_id,completed_at").order("completed_at", { ascending: false }).limit(50),
         supabase.from("journal_entries").select("title,content,module,created_at").order("created_at", { ascending: false }).limit(30),
         supabase.from("ooda_entries").select("tag,observe,orient,decide,act,created_at").order("created_at", { ascending: false }).limit(15),
-        supabase.from("ideas").select("title,content,created_at").order("created_at", { ascending: false }).limit(20),
         (supabase as any).from("operational_chains").select("code,title,status").limit(50),
       ]);
 
@@ -86,8 +84,8 @@ function CadeiasPage() {
         body: {
           scope: "chains",
           context: {
-            identity: ident, purpose: prop, missions: miss, completions: comps,
-            journal, ooda, ideias, existing_chains: existing,
+            identity: ident, missions: miss, completions: comps,
+            journal, ooda, existing_chains: existing,
             available_modules: MODULES.map((m) => ({ key: m.key, label: m.label })),
             now: new Date().toISOString(),
           },
