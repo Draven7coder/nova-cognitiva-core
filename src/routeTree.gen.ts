@@ -14,6 +14,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppXadrezRouteImport } from './routes/app.xadrez'
+import { Route as AppWayneRouteImport } from './routes/app.wayne'
 import { Route as AppSombraRouteImport } from './routes/app.sombra'
 import { Route as AppRelatoriosRouteImport } from './routes/app.relatorios'
 import { Route as AppProtocolosRouteImport } from './routes/app.protocolos'
@@ -57,6 +58,11 @@ const AppIndexRoute = AppIndexRouteImport.update({
 const AppXadrezRoute = AppXadrezRouteImport.update({
   id: '/xadrez',
   path: '/xadrez',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppWayneRoute = AppWayneRouteImport.update({
+  id: '/wayne',
+  path: '/wayne',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSombraRoute = AppSombraRouteImport.update({
@@ -178,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
   '/app/sombra': typeof AppSombraRoute
+  '/app/wayne': typeof AppWayneRoute
   '/app/xadrez': typeof AppXadrezRoute
   '/app/': typeof AppIndexRoute
 }
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
   '/app/sombra': typeof AppSombraRoute
+  '/app/wayne': typeof AppWayneRoute
   '/app/xadrez': typeof AppXadrezRoute
   '/app': typeof AppIndexRoute
 }
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
   '/app/sombra': typeof AppSombraRoute
+  '/app/wayne': typeof AppWayneRoute
   '/app/xadrez': typeof AppXadrezRoute
   '/app/': typeof AppIndexRoute
 }
@@ -258,6 +267,7 @@ export interface FileRouteTypes {
     | '/app/protocolos'
     | '/app/relatorios'
     | '/app/sombra'
+    | '/app/wayne'
     | '/app/xadrez'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
@@ -283,6 +293,7 @@ export interface FileRouteTypes {
     | '/app/protocolos'
     | '/app/relatorios'
     | '/app/sombra'
+    | '/app/wayne'
     | '/app/xadrez'
     | '/app'
   id:
@@ -309,6 +320,7 @@ export interface FileRouteTypes {
     | '/app/protocolos'
     | '/app/relatorios'
     | '/app/sombra'
+    | '/app/wayne'
     | '/app/xadrez'
     | '/app/'
   fileRoutesById: FileRoutesById
@@ -354,6 +366,13 @@ declare module '@tanstack/react-router' {
       path: '/xadrez'
       fullPath: '/app/xadrez'
       preLoaderRoute: typeof AppXadrezRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/wayne': {
+      id: '/app/wayne'
+      path: '/wayne'
+      fullPath: '/app/wayne'
+      preLoaderRoute: typeof AppWayneRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/sombra': {
@@ -512,6 +531,7 @@ interface AppRouteChildren {
   AppProtocolosRoute: typeof AppProtocolosRoute
   AppRelatoriosRoute: typeof AppRelatoriosRoute
   AppSombraRoute: typeof AppSombraRoute
+  AppWayneRoute: typeof AppWayneRoute
   AppXadrezRoute: typeof AppXadrezRoute
   AppIndexRoute: typeof AppIndexRoute
 }
@@ -536,6 +556,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppProtocolosRoute: AppProtocolosRoute,
   AppRelatoriosRoute: AppRelatoriosRoute,
   AppSombraRoute: AppSombraRoute,
+  AppWayneRoute: AppWayneRoute,
   AppXadrezRoute: AppXadrezRoute,
   AppIndexRoute: AppIndexRoute,
 }

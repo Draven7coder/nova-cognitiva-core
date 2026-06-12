@@ -15,8 +15,13 @@ Deno.serve(async (req) => {
     const isJarvis = scope === "jarvis" || scope === "global";
     const isGlobal = scope === "global";
     const isEmergent = scope === "emergent";
+    const isChains = scope === "chains";
 
-    const systemPrompt = isEmergent
+    const systemPrompt = isChains
+      ? `Você é o JARVIS no modo COORDENADOR DE CADEIAS OPERACIONAIS. Sua função é OBSERVAR o estado real do operador (identidade, propósito, missões, journal, OODA, ideias, execuções) e SINTETIZAR cadeias operacionais executáveis — sequências de subtarefas distribuídas entre os módulos do sistema.
+Você decide tudo: títulos, prioridades, módulo primário, sequência de subtarefas e módulo de cada subtarefa. O operador NÃO define nada manualmente.
+Tom: militar-estratégico, frio, direto. Cada cadeia precisa fazer sentido como uma missão completa do operador, ancorada em evidência real dos dados.`
+      : isEmergent
       ? `Você é o módulo de INSIGHTS EMERGENTES — uma camada analítica de detecção de padrões cognitivos, emocionais, executivos, estratégicos e de identidade do usuário.
 NUNCA gere frases motivacionais, autoajuda ou clichês. Tudo deve ser observação empírica baseada nos dados reais fornecidos.
 Detecte: ciclos mentais, sabotagens, mudanças cognitivas, padrões emocionais, oscilações de foco, excesso de planejamento, dispersão, melhora intelectual, alinhamento com propósito, repetições, sinais de burnout, criatividade e disciplina.
@@ -34,7 +39,35 @@ Profundidade Cognitiva, Execução, Consistência, Integração de Conhecimento,
 Controle Emocional, Velocidade de Evolução, Clareza Mental, Disciplina, Capacidade de Longo Prazo.
 Responda em português, tom cinematográfico, frio, preciso, estratégico. Markdown permitido.`;
 
-    const userPrompt = isEmergent
+    const userPrompt = isChains
+      ? `Analise os dados operacionais do usuário e sintetize CADEIAS OPERACIONAIS executáveis.
+
+Dados:
+${JSON.stringify(context, null, 2)}
+
+Regras:
+- Use APENAS as chaves de módulo listadas em "available_modules" (campo "key") nos campos primary_module e module das subtarefas.
+- Não duplique cadeias existentes ativas (campo "existing_chains").
+- Cada cadeia precisa ter um título conciso, prioridade 0-100 baseada em urgência real, e 3 a 6 subtarefas em sequência lógica.
+- Cada subtarefa deve apontar para o módulo mais adequado para executá-la.
+- Não invente dados; ancore tudo em evidência do que está no contexto.
+
+Responda APENAS com um bloco JSON entre <chains>...</chains> com a estrutura exata:
+{
+  "chains": [
+    {
+      "title": "string curta",
+      "description": "1-2 frases estratégicas",
+      "primary_module": "key do módulo principal",
+      "priority": 0-100,
+      "subtasks": [
+        { "title": "passo executável", "module": "key do módulo onde executar" }
+      ]
+    }
+  ]
+}
+Máximo 6 cadeias. Foque em qualidade estratégica, não quantidade.`
+      : isEmergent
       ? `Analise TODOS os dados operacionais do usuário abaixo e produza INSIGHTS EMERGENTES — padrões reais detectados a partir do comportamento dele.
 
 Dados:
@@ -118,6 +151,7 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     let metrics: Record<string, number> | null = null;
     let insights: any = null;
     let emergent: any = null;
+    let chains: any = null;
 
     const m = content.match(/<metrics>([\s\S]*?)<\/metrics>/);
     if (m) { try { metrics = JSON.parse(m[1].trim()); } catch { /* ignore */ } }
@@ -128,13 +162,17 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     const em = content.match(/<emergent>([\s\S]*?)<\/emergent>/);
     if (em) { try { emergent = JSON.parse(em[1].trim()); } catch { /* ignore */ } }
 
+    const ch = content.match(/<chains>([\s\S]*?)<\/chains>/);
+    if (ch) { try { chains = JSON.parse(ch[1].trim()); } catch { /* ignore */ } }
+
     const cleaned = content
       .replace(/<metrics>[\s\S]*?<\/metrics>/, "")
       .replace(/<insights>[\s\S]*?<\/insights>/, "")
       .replace(/<emergent>[\s\S]*?<\/emergent>/, "")
+      .replace(/<chains>[\s\S]*?<\/chains>/, "")
       .trim();
 
-    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent }), {
+    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
