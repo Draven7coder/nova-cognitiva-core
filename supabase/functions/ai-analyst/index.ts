@@ -15,8 +15,13 @@ Deno.serve(async (req) => {
     const isJarvis = scope === "jarvis" || scope === "global";
     const isGlobal = scope === "global";
     const isEmergent = scope === "emergent";
+    const isChains = scope === "chains";
 
-    const systemPrompt = isEmergent
+    const systemPrompt = isChains
+      ? `Você é o JARVIS no modo COORDENADOR DE CADEIAS OPERACIONAIS. Sua função é OBSERVAR o estado real do operador (identidade, propósito, missões, journal, OODA, ideias, execuções) e SINTETIZAR cadeias operacionais executáveis — sequências de subtarefas distribuídas entre os módulos do sistema.
+Você decide tudo: títulos, prioridades, módulo primário, sequência de subtarefas e módulo de cada subtarefa. O operador NÃO define nada manualmente.
+Tom: militar-estratégico, frio, direto. Cada cadeia precisa fazer sentido como uma missão completa do operador, ancorada em evidência real dos dados.`
+      : isEmergent
       ? `Você é o módulo de INSIGHTS EMERGENTES — uma camada analítica de detecção de padrões cognitivos, emocionais, executivos, estratégicos e de identidade do usuário.
 NUNCA gere frases motivacionais, autoajuda ou clichês. Tudo deve ser observação empírica baseada nos dados reais fornecidos.
 Detecte: ciclos mentais, sabotagens, mudanças cognitivas, padrões emocionais, oscilações de foco, excesso de planejamento, dispersão, melhora intelectual, alinhamento com propósito, repetições, sinais de burnout, criatividade e disciplina.
