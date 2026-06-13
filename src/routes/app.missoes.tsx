@@ -90,11 +90,35 @@ function MissoesPage() {
     await supabase.from("mission_completions").insert({ user_id: user!.id, mission_id: m.id, quality: 5 } as any);
     if (m.recurrence && m.recurrence !== "once") {
       const within48h = m.last_completed_at && (Date.now() - new Date(m.last_completed_at).getTime()) < 1000 * 60 * 60 * 48;
+      const newStreak = (within48h ? (m.streak ?? 0) : 0) + 1;
       await supabase.from("missions").update({
         last_completed_at: new Date().toISOString(),
-        streak: (within48h ? (m.streak ?? 0) : 0) + 1,
+        streak: newStreak,
       } as any).eq("id", m.id);
-      toast.success("Execução registrada · streak preservado.");
+
+      const bonuses = [
+        { threshold: 7, xp: 50, title: "🔥 7 dias seguidos" },
+        { threshold: 30, xp: 250, title: "🔥 30 dias seguidos" },
+        { threshold: 100, xp: 500, title: "🔥 100 dias · Cronista do Amanhecer" },
+      ];
+      const hit = bonuses.find((b) => b.threshold === newStreak);
+      if (hit) {
+        const { data: bonusMission } = await supabase.from("missions").insert({
+          user_id: user!.id,
+          title: `${hit.title} · ${m.title}`,
+          type: m.type,
+          xp: hit.xp,
+          recurrence: "once",
+          status: "done",
+          completed_at: new Date().toISOString(),
+        } as any).select().single();
+        if (bonusMission) {
+          await supabase.from("mission_completions").insert({ user_id: user!.id, mission_id: bonusMission.id, quality: 5 } as any);
+        }
+        toast.success(`${hit.title} desbloqueado · +${hit.xp} XP bônus!`, { duration: 6000 });
+      } else {
+        toast.success(`Execução registrada · streak ${newStreak}.`);
+      }
     } else {
       await supabase.from("missions").update({ status: "done", completed_at: new Date().toISOString() }).eq("id", m.id);
       toast.success("Missão arquivada.");
