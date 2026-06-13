@@ -55,6 +55,7 @@ function CadeiasPage() {
   const [subs, setSubs] = useState<any[]>([]);
   const [openChain, setOpenChain] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   const load = async () => {
     const [{ data: c }, { data: s }] = await Promise.all([
@@ -64,7 +65,21 @@ function CadeiasPage() {
     setChains(c ?? []);
     setSubs(s ?? []);
   };
-  useEffect(() => { load(); }, [user]);
+  const runSync = async (silent = false) => {
+    if (!user) return;
+    setSyncing(true);
+    try {
+      const n = await syncChainProgress(user.id);
+      if (!silent) toast.success(n > 0 ? `${n} subtarefa(s) reconhecida(s) pela atividade de hoje.` : "Nenhuma nova atividade detectada hoje.");
+      if (n > 0) await load();
+    } finally { setSyncing(false); }
+  };
+  useEffect(() => {
+    (async () => {
+      await load();
+      if (user) { await syncChainProgress(user.id).catch(() => 0); await load(); }
+    })();
+  }, [user]);
 
   const generateChains = async () => {
     setGenerating(true);
