@@ -15,6 +15,7 @@ import { Link } from "@tanstack/react-router";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { syncChainProgress } from "@/lib/chain-sync";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
 
