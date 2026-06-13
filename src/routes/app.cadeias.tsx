@@ -5,8 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Pause, Play, Archive, Trash2, Link2, Sparkles, RefreshCw, ArrowRight } from "lucide-react";
+import { Check, Pause, Play, Archive, Trash2, Link2, Sparkles, RefreshCw, ArrowRight, Radar } from "lucide-react";
 import { toast } from "sonner";
+import { syncChainProgress } from "@/lib/chain-sync";
 
 export const Route = createFileRoute("/app/cadeias")({ component: CadeiasPage });
 
