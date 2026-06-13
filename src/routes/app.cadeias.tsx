@@ -5,8 +5,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Pause, Play, Archive, Trash2, Link2, Sparkles, RefreshCw, ArrowRight } from "lucide-react";
+import { Check, Pause, Play, Archive, Trash2, Link2, Sparkles, RefreshCw, ArrowRight, Radar } from "lucide-react";
 import { toast } from "sonner";
+import { syncChainProgress } from "@/lib/chain-sync";
 
 export const Route = createFileRoute("/app/cadeias")({ component: CadeiasPage });
 
@@ -54,6 +55,7 @@ function CadeiasPage() {
   const [subs, setSubs] = useState<any[]>([]);
   const [openChain, setOpenChain] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
   const load = async () => {
     const [{ data: c }, { data: s }] = await Promise.all([
@@ -63,7 +65,21 @@ function CadeiasPage() {
     setChains(c ?? []);
     setSubs(s ?? []);
   };
-  useEffect(() => { load(); }, [user]);
+  const runSync = async (silent = false) => {
+    if (!user) return;
+    setSyncing(true);
+    try {
+      const n = await syncChainProgress(user.id);
+      if (!silent) toast.success(n > 0 ? `${n} subtarefa(s) reconhecida(s) pela atividade de hoje.` : "Nenhuma nova atividade detectada hoje.");
+      if (n > 0) await load();
+    } finally { setSyncing(false); }
+  };
+  useEffect(() => {
+    (async () => {
+      await load();
+      if (user) { await syncChainProgress(user.id).catch(() => 0); await load(); }
+    })();
+  }, [user]);
 
   const generateChains = async () => {
     setGenerating(true);
@@ -172,9 +188,13 @@ function CadeiasPage() {
           <div className="flex-1 min-w-[220px]">
             <div className="font-display text-sm text-foreground">JARVIS coordena suas cadeias.</div>
             <div className="text-xs text-muted-foreground font-mono mt-1 leading-relaxed">
-              Você não define títulos, módulos ou XP — o sistema lê suas missões, journal, OODA, propósito e ideias, e organiza cadeias executáveis com subtarefas distribuídas entre os módulos certos.
+              Você não define títulos, módulos ou XP — o sistema lê suas missões, journal, OODA, propósito e ideias, e organiza cadeias executáveis. <span className="text-primary">SINCRONIZAR</span> reconhece o que você já fez hoje em cada módulo e marca as subtarefas automaticamente.
             </div>
           </div>
+          <Button onClick={() => runSync(false)} disabled={syncing} variant="outline" className="font-mono text-xs tracking-widest">
+            {syncing ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Radar className="size-3 mr-2" />}
+            {syncing ? "LENDO..." : "SINCRONIZAR HOJE"}
+          </Button>
           <Button onClick={generateChains} disabled={generating} className="font-mono text-xs tracking-widest">
             {generating ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Sparkles className="size-3 mr-2" />}
             {generating ? "GERANDO..." : "GERAR CADEIAS · JARVIS"}
