@@ -188,9 +188,13 @@ function CadeiasPage() {
           <div className="flex-1 min-w-[220px]">
             <div className="font-display text-sm text-foreground">JARVIS coordena suas cadeias.</div>
             <div className="text-xs text-muted-foreground font-mono mt-1 leading-relaxed">
-              Você não define títulos, módulos ou XP — o sistema lê suas missões, journal, OODA, propósito e ideias, e organiza cadeias executáveis com subtarefas distribuídas entre os módulos certos.
+              Você não define títulos, módulos ou XP — o sistema lê suas missões, journal, OODA, propósito e ideias, e organiza cadeias executáveis. <span className="text-primary">SINCRONIZAR</span> reconhece o que você já fez hoje em cada módulo e marca as subtarefas automaticamente.
             </div>
           </div>
+          <Button onClick={() => runSync(false)} disabled={syncing} variant="outline" className="font-mono text-xs tracking-widest">
+            {syncing ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Radar className="size-3 mr-2" />}
+            {syncing ? "LENDO..." : "SINCRONIZAR HOJE"}
+          </Button>
           <Button onClick={generateChains} disabled={generating} className="font-mono text-xs tracking-widest">
             {generating ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Sparkles className="size-3 mr-2" />}
             {generating ? "GERANDO..." : "GERAR CADEIAS · JARVIS"}
