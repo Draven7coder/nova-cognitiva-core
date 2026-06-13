@@ -111,7 +111,9 @@ function Dashboard() {
         hydrationDays: hydDays,
       });
 
-      // Load chains, subtasks and today's check-in
+      // Auto-sync chain subtasks based on TODAY's real activity in each module,
+      // then load chains/subtasks/check-in.
+      if (user) await syncChainProgress(user.id).catch(() => 0);
       const today = new Date().toISOString().slice(0, 10);
       const [{ data: ch }, { data: csb }, { data: ci }] = await Promise.all([
         (supabase as any).from("operational_chains").select("*").order("priority", { ascending: false }),
