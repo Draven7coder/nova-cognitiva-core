@@ -44,7 +44,66 @@ Profundidade Cognitiva, Execução, Consistência, Integração de Conhecimento,
 Controle Emocional, Velocidade de Evolução, Clareza Mental, Disciplina, Capacidade de Longo Prazo.
 Responda em português, tom cinematográfico, frio, preciso, estratégico. Markdown permitido.`;
 
-    const userPrompt = isChains
+    const userPrompt = isShadow
+      ? `Analise os dados reais do operador e produza HIPÓTESES PSICOLÓGICAS/COMPORTAMENTAIS para o Módulo Sombra Dinâmico.
+
+Dados:
+${JSON.stringify(context, null, 2)}
+
+Considere especialmente:
+- Diário matinal/noturno, journal, OODA (estado emocional, gatilhos, contradições);
+- Missões: intenção declarada vs execução real, abandonos, padrões de adiamento;
+- Cadeias operacionais ativas e bloqueios;
+- Hábitos (hidratação, check-ins): consistência vs ruptura;
+- Identidade desejada (campo identity) vs comportamento observado.
+
+Hipóteses existentes (NÃO duplicar; em vez disso, atualize confiança/evidência via "updates"):
+${JSON.stringify(context?.existing_hypotheses ?? [], null, 2)}
+
+Categorias permitidas (use exatamente uma dessas chaves no campo "category"):
+- "insegurancas"
+- "padroes_destrutivos"
+- "ego_defesa"
+- "impulsos_vicios"
+- "validacao"
+- "autossabotagem"
+- "padroes_recorrentes"
+
+Tendência ("trend"): "crescente" | "estavel" | "decrescente".
+
+Responda APENAS com um bloco JSON entre <shadow>...</shadow> com a estrutura:
+{
+  "new": [
+    {
+      "category": "...",
+      "name": "Nome curto da hipótese",
+      "description": "1-3 frases analíticas, sem moralismo, citando evidência observada",
+      "confidence": 0-100,
+      "trend": "crescente|estavel|decrescente",
+      "evidence_for": ["evidência 1 ancorada em dado real", "evidência 2"],
+      "evidence_against": ["sinal contrário, se houver"],
+      "triggers": ["gatilho observado, se houver"],
+      "related_modules": ["chave de módulo relevante"],
+      "related_protocols": ["nome curto do protocolo recomendado, se houver"]
+    }
+  ],
+  "updates": [
+    {
+      "id": "uuid de existing_hypotheses",
+      "confidence_delta": -20 a +20,
+      "trend": "crescente|estavel|decrescente",
+      "new_evidence_for": ["..."],
+      "new_evidence_against": ["..."]
+    }
+  ]
+}
+
+Regras:
+- Máximo 6 novas hipóteses por chamada. Foque em qualidade e distintividade.
+- NUNCA gere conclusões absolutas ("você É inseguro"). Sempre hipóteses com confiança ("padrão sugere tendência a...").
+- Toda evidência deve referenciar dado real do contexto (frequência, tag, missão, palavra, intervalo).
+- Se não houver evidência suficiente, retorne arrays vazios — silêncio é melhor que ruído.`
+      : isChains
       ? `Analise os dados operacionais do usuário e sintetize CADEIAS OPERACIONAIS executáveis.
 
 Dados:
