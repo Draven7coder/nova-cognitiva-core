@@ -53,17 +53,21 @@ function CadeiasPage() {
   const { user } = useAuth();
   const [chains, setChains] = useState<any[]>([]);
   const [subs, setSubs] = useState<any[]>([]);
+  const [hypotheses, setHypotheses] = useState<any[]>([]);
   const [openChain, setOpenChain] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
   const load = async () => {
-    const [{ data: c }, { data: s }] = await Promise.all([
+    const [{ data: c }, { data: s }, { data: h }] = await Promise.all([
       (supabase as any).from("operational_chains").select("*").order("priority", { ascending: false }).order("created_at", { ascending: false }),
       (supabase as any).from("chain_subtasks").select("*").order("order_index", { ascending: true }),
+      (supabase as any).from("shadow_hypotheses").select("id,name,category,confidence,trend,status,related_modules,triggers,related_protocols")
+        .in("status", ["suspeita", "ativa", "consolidada"]).order("confidence", { ascending: false }),
     ]);
     setChains(c ?? []);
     setSubs(s ?? []);
+    setHypotheses(h ?? []);
   };
   const runSync = async (silent = false) => {
     if (!user) return;
