@@ -588,6 +588,72 @@ export type Database = {
         }
         Relationships: []
       }
+      shadow_hypotheses: {
+        Row: {
+          appearances: number
+          category: string
+          confidence: number
+          created_at: string
+          description: string | null
+          evidence_against: Json
+          evidence_for: Json
+          first_seen_at: string
+          id: string
+          last_seen_at: string
+          name: string
+          related_modules: Json
+          related_protocols: Json
+          status: string
+          trend: string
+          triggers: Json
+          updated_at: string
+          user_id: string
+          user_note: string | null
+        }
+        Insert: {
+          appearances?: number
+          category: string
+          confidence?: number
+          created_at?: string
+          description?: string | null
+          evidence_against?: Json
+          evidence_for?: Json
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          name: string
+          related_modules?: Json
+          related_protocols?: Json
+          status?: string
+          trend?: string
+          triggers?: Json
+          updated_at?: string
+          user_id: string
+          user_note?: string | null
+        }
+        Update: {
+          appearances?: number
+          category?: string
+          confidence?: number
+          created_at?: string
+          description?: string | null
+          evidence_against?: Json
+          evidence_for?: Json
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          name?: string
+          related_modules?: Json
+          related_protocols?: Json
+          status?: string
+          trend?: string
+          triggers?: Json
+          updated_at?: string
+          user_id?: string
+          user_note?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

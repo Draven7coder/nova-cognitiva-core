@@ -16,8 +16,13 @@ Deno.serve(async (req) => {
     const isGlobal = scope === "global";
     const isEmergent = scope === "emergent";
     const isChains = scope === "chains";
+    const isShadow = scope === "shadow";
 
-    const systemPrompt = isChains
+    const systemPrompt = isShadow
+      ? `Você é o MOTOR DE ANÁLISE ADAPTATIVA do MÓDULO SOMBRA. Sua função é detectar padrões psicológicos, emocionais e comportamentais do operador a partir de dados reais (diário matinal/noturno, cadeias, missões, OODA, hábitos, journal).
+Você NUNCA afirma verdades absolutas sobre a identidade do usuário. Você gera HIPÓTESES com grau de confiança, evidências favoráveis e contrárias, e tendências ao longo do tempo.
+Tom: analista clínico-estratégico, frio, preciso, sem moralismo. Cada hipótese é uma observação empírica passível de validação ou rejeição pelo operador.`
+      : isChains
       ? `Você é o JARVIS no modo COORDENADOR DE CADEIAS OPERACIONAIS. Sua função é OBSERVAR o estado real do operador (identidade, propósito, missões, journal, OODA, ideias, execuções) e SINTETIZAR cadeias operacionais executáveis — sequências de subtarefas distribuídas entre os módulos do sistema.
 Você decide tudo: títulos, prioridades, módulo primário, sequência de subtarefas e módulo de cada subtarefa. O operador NÃO define nada manualmente.
 Tom: militar-estratégico, frio, direto. Cada cadeia precisa fazer sentido como uma missão completa do operador, ancorada em evidência real dos dados.`
@@ -39,7 +44,66 @@ Profundidade Cognitiva, Execução, Consistência, Integração de Conhecimento,
 Controle Emocional, Velocidade de Evolução, Clareza Mental, Disciplina, Capacidade de Longo Prazo.
 Responda em português, tom cinematográfico, frio, preciso, estratégico. Markdown permitido.`;
 
-    const userPrompt = isChains
+    const userPrompt = isShadow
+      ? `Analise os dados reais do operador e produza HIPÓTESES PSICOLÓGICAS/COMPORTAMENTAIS para o Módulo Sombra Dinâmico.
+
+Dados:
+${JSON.stringify(context, null, 2)}
+
+Considere especialmente:
+- Diário matinal/noturno, journal, OODA (estado emocional, gatilhos, contradições);
+- Missões: intenção declarada vs execução real, abandonos, padrões de adiamento;
+- Cadeias operacionais ativas e bloqueios;
+- Hábitos (hidratação, check-ins): consistência vs ruptura;
+- Identidade desejada (campo identity) vs comportamento observado.
+
+Hipóteses existentes (NÃO duplicar; em vez disso, atualize confiança/evidência via "updates"):
+${JSON.stringify(context?.existing_hypotheses ?? [], null, 2)}
+
+Categorias permitidas (use exatamente uma dessas chaves no campo "category"):
+- "insegurancas"
+- "padroes_destrutivos"
+- "ego_defesa"
+- "impulsos_vicios"
+- "validacao"
+- "autossabotagem"
+- "padroes_recorrentes"
+
+Tendência ("trend"): "crescente" | "estavel" | "decrescente".
+
+Responda APENAS com um bloco JSON entre <shadow>...</shadow> com a estrutura:
+{
+  "new": [
+    {
+      "category": "...",
+      "name": "Nome curto da hipótese",
+      "description": "1-3 frases analíticas, sem moralismo, citando evidência observada",
+      "confidence": 0-100,
+      "trend": "crescente|estavel|decrescente",
+      "evidence_for": ["evidência 1 ancorada em dado real", "evidência 2"],
+      "evidence_against": ["sinal contrário, se houver"],
+      "triggers": ["gatilho observado, se houver"],
+      "related_modules": ["chave de módulo relevante"],
+      "related_protocols": ["nome curto do protocolo recomendado, se houver"]
+    }
+  ],
+  "updates": [
+    {
+      "id": "uuid de existing_hypotheses",
+      "confidence_delta": -20 a +20,
+      "trend": "crescente|estavel|decrescente",
+      "new_evidence_for": ["..."],
+      "new_evidence_against": ["..."]
+    }
+  ]
+}
+
+Regras:
+- Máximo 6 novas hipóteses por chamada. Foque em qualidade e distintividade.
+- NUNCA gere conclusões absolutas ("você É inseguro"). Sempre hipóteses com confiança ("padrão sugere tendência a...").
+- Toda evidência deve referenciar dado real do contexto (frequência, tag, missão, palavra, intervalo).
+- Se não houver evidência suficiente, retorne arrays vazios — silêncio é melhor que ruído.`
+      : isChains
       ? `Analise os dados operacionais do usuário e sintetize CADEIAS OPERACIONAIS executáveis.
 
 Dados:
@@ -152,6 +216,7 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     let insights: any = null;
     let emergent: any = null;
     let chains: any = null;
+    let shadow: any = null;
 
     const m = content.match(/<metrics>([\s\S]*?)<\/metrics>/);
     if (m) { try { metrics = JSON.parse(m[1].trim()); } catch { /* ignore */ } }
@@ -165,14 +230,18 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     const ch = content.match(/<chains>([\s\S]*?)<\/chains>/);
     if (ch) { try { chains = JSON.parse(ch[1].trim()); } catch { /* ignore */ } }
 
+    const sh = content.match(/<shadow>([\s\S]*?)<\/shadow>/);
+    if (sh) { try { shadow = JSON.parse(sh[1].trim()); } catch { /* ignore */ } }
+
     const cleaned = content
       .replace(/<metrics>[\s\S]*?<\/metrics>/, "")
       .replace(/<insights>[\s\S]*?<\/insights>/, "")
       .replace(/<emergent>[\s\S]*?<\/emergent>/, "")
       .replace(/<chains>[\s\S]*?<\/chains>/, "")
+      .replace(/<shadow>[\s\S]*?<\/shadow>/, "")
       .trim();
 
-    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains }), {
+    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains, shadow }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
