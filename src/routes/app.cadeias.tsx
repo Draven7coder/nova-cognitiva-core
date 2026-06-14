@@ -261,29 +261,59 @@ function CadeiasPage() {
                   </div>
 
                   {isOpen && (
-                    <ul className="mt-3 space-y-1">
-                      {chainSubs.map((s) => {
-                        const isNext = next?.id === s.id;
-                        const sMod = MODULES.find((m) => m.key === s.module);
+                    <>
+                      {(() => {
+                        const chainModules = new Set<string>([c.primary_module, ...chainSubs.map((s: any) => s.module)].filter(Boolean));
+                        const related = hypotheses.filter((h: any) => {
+                          const mods = Array.isArray(h.related_modules) ? h.related_modules : [];
+                          return mods.some((m: string) => chainModules.has(m));
+                        }).slice(0, 4);
+                        if (related.length === 0) return null;
                         return (
-                          <li key={s.id} className={`flex items-center gap-2 p-2 rounded border transition ${
-                            s.status === "done" ? "border-emerald-400/30 opacity-60"
-                            : isNext ? "border-primary/70 hud-glow animate-pulse-ring"
-                            : "border-border/40"}`}>
-                            <span className={`font-mono text-[10px] tracking-widest shrink-0 ${isNext ? "text-primary" : "text-muted-foreground"}`}>{s.code}</span>
-                            <span className="flex-1 text-sm">{s.title}</span>
-                            {sMod && (
-                              <Link to={sMod.path} className="font-mono text-[10px] text-primary hover:underline flex items-center gap-1">
-                                <Link2 className="size-3" />{sMod.label}
-                              </Link>
-                            )}
-                            <Button size="icon" variant="ghost" disabled={s.status === "done"} onClick={() => completeSub(s)}>
-                              <Check className={`size-4 ${s.status === "done" ? "text-emerald-400" : "text-primary"}`} />
-                            </Button>
-                          </li>
+                          <div className="mt-3 p-2 border border-amber-300/30 bg-amber-300/5 rounded">
+                            <div className="font-mono text-[10px] tracking-widest text-amber-300 mb-1">🧠 HIPÓTESES DA SOMBRA RELACIONADAS</div>
+                            <ul className="space-y-1">
+                              {related.map((h: any) => (
+                                <li key={h.id} className="text-xs text-muted-foreground flex flex-wrap items-center gap-2">
+                                  <span className="font-mono text-[10px] text-primary">{h.confidence}%</span>
+                                  <span className="text-foreground">{h.name}</span>
+                                  {Array.isArray(h.triggers) && h.triggers.length > 0 && (
+                                    <span className="font-mono text-[10px]">· gatilhos: {h.triggers.slice(0, 2).join(", ")}</span>
+                                  )}
+                                  {Array.isArray(h.related_protocols) && h.related_protocols.length > 0 && (
+                                    <span className="font-mono text-[10px] text-cyan-300">· proto: {h.related_protocols.slice(0, 2).join(", ")}</span>
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                            <Link to="/app/sombra" className="font-mono text-[10px] text-primary hover:underline mt-1 inline-block">→ Ver Sombra completa</Link>
+                          </div>
                         );
-                      })}
-                    </ul>
+                      })()}
+                      <ul className="mt-3 space-y-1">
+                        {chainSubs.map((s) => {
+                          const isNext = next?.id === s.id;
+                          const sMod = MODULES.find((m) => m.key === s.module);
+                          return (
+                            <li key={s.id} className={`flex items-center gap-2 p-2 rounded border transition ${
+                              s.status === "done" ? "border-emerald-400/30 opacity-60"
+                              : isNext ? "border-primary/70 hud-glow animate-pulse-ring"
+                              : "border-border/40"}`}>
+                              <span className={`font-mono text-[10px] tracking-widest shrink-0 ${isNext ? "text-primary" : "text-muted-foreground"}`}>{s.code}</span>
+                              <span className="flex-1 text-sm">{s.title}</span>
+                              {sMod && (
+                                <Link to={sMod.path} className="font-mono text-[10px] text-primary hover:underline flex items-center gap-1">
+                                  <Link2 className="size-3" />{sMod.label}
+                                </Link>
+                              )}
+                              <Button size="icon" variant="ghost" disabled={s.status === "done"} onClick={() => completeSub(s)}>
+                                <Check className={`size-4 ${s.status === "done" ? "text-emerald-400" : "text-primary"}`} />
+                              </Button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </>
                   )}
                 </li>
               );
