@@ -263,6 +263,32 @@ function Dashboard() {
         </div>
       </HudCard>
 
+      {pending.length > 0 && (
+        <HudCard title="⚠ SUGESTÕES PENDENTES · JARVIS">
+          <ul className="space-y-2">
+            {pending.map((p) => {
+              const cls = p.severity === "critical" ? "border-destructive/60 text-destructive"
+                : p.severity === "warn" ? "border-amber-400/60 text-amber-400"
+                : "border-primary/40 text-primary";
+              return (
+                <li key={p.id} className={`hud-panel p-3 flex items-center gap-3 border ${cls}`}>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-mono text-xs tracking-widest">{p.title.toUpperCase()}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{p.reason}</div>
+                  </div>
+                  <Link to={p.action.to}>
+                    <Button size="sm" variant="outline" className="font-mono text-[10px] tracking-widest">
+                      {p.action.label} <ArrowRight className="size-3 ml-1" />
+                    </Button>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </HudCard>
+      )}
+
+
       <div className="grid lg:grid-cols-2 gap-4">
         <HudCard title="⚙ CHECK-IN DIÁRIO · CALIBRAÇÃO DO OPERADOR">
           <div className="space-y-3">
