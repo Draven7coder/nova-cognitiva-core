@@ -159,7 +159,7 @@ function Dashboard() {
   const saveCheckin = async () => {
     setSavingCheckin(true);
     try {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayLocal();
       const m = deriveMode(ciSleep, ciEnergy, ciFocus, ciMood, ciStress);
       const { error } = await (supabase as any).from("daily_checkins").upsert({
         user_id: user!.id, check_date: today,
