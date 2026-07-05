@@ -19,6 +19,12 @@ import { syncChainProgress } from "@/lib/chain-sync";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
 
+// Local-timezone YYYY-MM-DD (fixes BR UTC-3 off-by-one after ~21h).
+function todayLocal(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 const METRIC_LABELS: Record<string, string> = {
   profundidade: "Profundidade",
   execucao: "Execução",
@@ -114,7 +120,7 @@ function Dashboard() {
       // Auto-sync chain subtasks based on TODAY's real activity in each module,
       // then load chains/subtasks/check-in.
       if (user) await syncChainProgress(user.id).catch(() => 0);
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayLocal();
       const [{ data: ch }, { data: csb }, { data: ci }] = await Promise.all([
         (supabase as any).from("operational_chains").select("*").order("priority", { ascending: false }),
         (supabase as any).from("chain_subtasks").select("*").order("order_index", { ascending: true }),
@@ -153,7 +159,7 @@ function Dashboard() {
   const saveCheckin = async () => {
     setSavingCheckin(true);
     try {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayLocal();
       const m = deriveMode(ciSleep, ciEnergy, ciFocus, ciMood, ciStress);
       const { error } = await (supabase as any).from("daily_checkins").upsert({
         user_id: user!.id, check_date: today,
@@ -249,6 +255,13 @@ function Dashboard() {
       <div className="grid lg:grid-cols-2 gap-4">
         <HudCard title="⚙ CHECK-IN DIÁRIO · CALIBRAÇÃO DO OPERADOR">
           <div className="space-y-3">
+            {checkin && (
+              <div className="flex items-center gap-2 rounded border border-primary/40 bg-primary/5 px-2 py-1.5 font-mono text-[10px] tracking-widest text-primary">
+                <span className="size-1.5 rounded-full bg-primary animate-pulse-ring" />
+                <span>✓ REGISTRADO ÀS {new Date(checkin.updated_at ?? checkin.created_at ?? Date.now()).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span>
+                <span className="ml-auto text-muted-foreground">edite abaixo para atualizar</span>
+              </div>
+            )}
             {[
               { label: "Sono", v: ciSleep, set: setCiSleep },
               { label: "Energia", v: ciEnergy, set: setCiEnergy },
