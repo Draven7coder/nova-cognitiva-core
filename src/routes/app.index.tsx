@@ -527,17 +527,23 @@ function Dashboard() {
 
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <HudCard title="EVOLUÇÃO TEMPORAL · 14D" className="lg:col-span-2">
-          <div className="h-[200px]">
-            <ResponsiveContainer>
-              <LineChart data={evoData}>
-                <XAxis dataKey="d" tick={{ fill: "oklch(0.65 0.04 215)", fontSize: 10 }} stroke="oklch(0.32 0.06 215 / 0.3)" />
-                <YAxis tick={{ fill: "oklch(0.65 0.04 215)", fontSize: 10 }} stroke="oklch(0.32 0.06 215 / 0.3)" />
-                <Tooltip contentStyle={{ background: "oklch(0.18 0.03 235)", border: "1px solid oklch(0.78 0.18 210 / 0.4)", borderRadius: 6 }} />
-                <Line type="monotone" dataKey="qi" stroke="oklch(0.78 0.18 210)" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        <HudCard title="EVOLUÇÃO TEMPORAL · QI · 14D · REAL" className="lg:col-span-2">
+          {evoData.length === 0 || evoData.every((p) => p.qi === 0) ? (
+            <div className="h-[200px] flex items-center justify-center text-xs font-mono text-muted-foreground text-center px-6">
+              Sem check-ins nos últimos 14 dias. Registre o check-in diário — o QI real será desenhado aqui.
+            </div>
+          ) : (
+            <div className="h-[200px]">
+              <ResponsiveContainer>
+                <LineChart data={evoData}>
+                  <XAxis dataKey="date" tick={{ fill: "oklch(0.65 0.04 215)", fontSize: 10 }} stroke="oklch(0.32 0.06 215 / 0.3)" />
+                  <YAxis domain={[0, 100]} tick={{ fill: "oklch(0.65 0.04 215)", fontSize: 10 }} stroke="oklch(0.32 0.06 215 / 0.3)" />
+                  <Tooltip contentStyle={{ background: "oklch(0.18 0.03 235)", border: "1px solid oklch(0.78 0.18 210 / 0.4)", borderRadius: 6 }} />
+                  <Line type="monotone" dataKey="qi" stroke="oklch(0.78 0.18 210)" strokeWidth={2} dot={{ r: 2, fill: "oklch(0.78 0.18 210)" }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </HudCard>
 
         <HudCard title="ANÁLISE IA · NÚCLEO">
