@@ -137,6 +137,16 @@ function Dashboard() {
         setCiFocus(ci.focus ?? 5); setCiMood(ci.mood ?? 5); setCiStress(ci.stress ?? 5);
         setCiDiscomfort(ci.discomfort ?? "");
       }
+
+      // Real QI timeline + pending suggestions
+      if (user) {
+        const [tl, ps] = await Promise.all([
+          loadQiTimelineReal(user.id).catch(() => []),
+          loadPendingSuggestions(user.id).catch(() => []),
+        ]);
+        setQiTimeline(tl);
+        setPending(ps);
+      }
     })();
   }, [user]);
 
