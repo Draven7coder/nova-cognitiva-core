@@ -120,7 +120,7 @@ function Dashboard() {
       // Auto-sync chain subtasks based on TODAY's real activity in each module,
       // then load chains/subtasks/check-in.
       if (user) await syncChainProgress(user.id).catch(() => 0);
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayLocal();
       const [{ data: ch }, { data: csb }, { data: ci }] = await Promise.all([
         (supabase as any).from("operational_chains").select("*").order("priority", { ascending: false }),
         (supabase as any).from("chain_subtasks").select("*").order("order_index", { ascending: true }),
