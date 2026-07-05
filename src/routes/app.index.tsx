@@ -16,6 +16,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { syncChainProgress } from "@/lib/chain-sync";
+import { loadQiTimelineReal, loadPendingSuggestions, type QiDailyPoint, type PendingSuggestion } from "@/lib/metrics-real";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
 
@@ -66,6 +67,8 @@ function Dashboard() {
   const [ciStress, setCiStress] = useState(5);
   const [ciDiscomfort, setCiDiscomfort] = useState("");
   const [savingCheckin, setSavingCheckin] = useState(false);
+  const [qiTimeline, setQiTimeline] = useState<QiDailyPoint[]>([]);
+  const [pending, setPending] = useState<PendingSuggestion[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -133,6 +136,16 @@ function Dashboard() {
         setCiSleep(ci.sleep_quality ?? 5); setCiEnergy(ci.energy ?? 5);
         setCiFocus(ci.focus ?? 5); setCiMood(ci.mood ?? 5); setCiStress(ci.stress ?? 5);
         setCiDiscomfort(ci.discomfort ?? "");
+      }
+
+      // Real QI timeline + pending suggestions
+      if (user) {
+        const [tl, ps] = await Promise.all([
+          loadQiTimelineReal(user.id).catch(() => []),
+          loadPendingSuggestions(user.id).catch(() => []),
+        ]);
+        setQiTimeline(tl);
+        setPending(ps);
       }
     })();
   }, [user]);
@@ -226,9 +239,7 @@ function Dashboard() {
   };
 
   const radarData = Object.entries(metrics).map(([k, v]) => ({ metric: METRIC_LABELS[k] ?? k, value: v }));
-  const evoData = Array.from({ length: 14 }, (_, i) => ({
-    d: i + 1, qi: Math.round(overallQI - 10 + Math.sin(i / 2) * 8 + i * 0.6),
-  }));
+  const evoData = qiTimeline.length ? qiTimeline : [];
 
   return (
     <ModulePage code="// CORE 00" title="Núcleo Operacional" subtitle="Painel central de comando · QI Funcional Operacional ativo.">
@@ -251,6 +262,32 @@ function Dashboard() {
           )}
         </div>
       </HudCard>
+
+      {pending.length > 0 && (
+        <HudCard title="⚠ SUGESTÕES PENDENTES · JARVIS">
+          <ul className="space-y-2">
+            {pending.map((p) => {
+              const cls = p.severity === "critical" ? "border-destructive/60 text-destructive"
+                : p.severity === "warn" ? "border-amber-400/60 text-amber-400"
+                : "border-primary/40 text-primary";
+              return (
+                <li key={p.id} className={`hud-panel p-3 flex items-center gap-3 border ${cls}`}>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-mono text-xs tracking-widest">{p.title.toUpperCase()}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{p.reason}</div>
+                  </div>
+                  <Link to={p.action.to}>
+                    <Button size="sm" variant="outline" className="font-mono text-[10px] tracking-widest">
+                      {p.action.label} <ArrowRight className="size-3 ml-1" />
+                    </Button>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </HudCard>
+      )}
+
 
       <div className="grid lg:grid-cols-2 gap-4">
         <HudCard title="⚙ CHECK-IN DIÁRIO · CALIBRAÇÃO DO OPERADOR">
@@ -516,17 +553,23 @@ function Dashboard() {
 
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <HudCard title="EVOLUÇÃO TEMPORAL · 14D" className="lg:col-span-2">
-          <div className="h-[200px]">
-            <ResponsiveContainer>
-              <LineChart data={evoData}>
-                <XAxis dataKey="d" tick={{ fill: "oklch(0.65 0.04 215)", fontSize: 10 }} stroke="oklch(0.32 0.06 215 / 0.3)" />
-                <YAxis tick={{ fill: "oklch(0.65 0.04 215)", fontSize: 10 }} stroke="oklch(0.32 0.06 215 / 0.3)" />
-                <Tooltip contentStyle={{ background: "oklch(0.18 0.03 235)", border: "1px solid oklch(0.78 0.18 210 / 0.4)", borderRadius: 6 }} />
-                <Line type="monotone" dataKey="qi" stroke="oklch(0.78 0.18 210)" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        <HudCard title="EVOLUÇÃO TEMPORAL · QI · 14D · REAL" className="lg:col-span-2">
+          {evoData.length === 0 || evoData.every((p) => p.qi === 0) ? (
+            <div className="h-[200px] flex items-center justify-center text-xs font-mono text-muted-foreground text-center px-6">
+              Sem check-ins nos últimos 14 dias. Registre o check-in diário — o QI real será desenhado aqui.
+            </div>
+          ) : (
+            <div className="h-[200px]">
+              <ResponsiveContainer>
+                <LineChart data={evoData}>
+                  <XAxis dataKey="date" tick={{ fill: "oklch(0.65 0.04 215)", fontSize: 10 }} stroke="oklch(0.32 0.06 215 / 0.3)" />
+                  <YAxis domain={[0, 100]} tick={{ fill: "oklch(0.65 0.04 215)", fontSize: 10 }} stroke="oklch(0.32 0.06 215 / 0.3)" />
+                  <Tooltip contentStyle={{ background: "oklch(0.18 0.03 235)", border: "1px solid oklch(0.78 0.18 210 / 0.4)", borderRadius: 6 }} />
+                  <Line type="monotone" dataKey="qi" stroke="oklch(0.78 0.18 210)" strokeWidth={2} dot={{ r: 2, fill: "oklch(0.78 0.18 210)" }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </HudCard>
 
         <HudCard title="ANÁLISE IA · NÚCLEO">
