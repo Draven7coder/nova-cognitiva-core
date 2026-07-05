@@ -16,6 +16,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { syncChainProgress } from "@/lib/chain-sync";
+import { loadQiTimelineReal, loadPendingSuggestions, type QiDailyPoint, type PendingSuggestion } from "@/lib/metrics-real";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
 
@@ -66,6 +67,8 @@ function Dashboard() {
   const [ciStress, setCiStress] = useState(5);
   const [ciDiscomfort, setCiDiscomfort] = useState("");
   const [savingCheckin, setSavingCheckin] = useState(false);
+  const [qiTimeline, setQiTimeline] = useState<QiDailyPoint[]>([]);
+  const [pending, setPending] = useState<PendingSuggestion[]>([]);
 
   useEffect(() => {
     (async () => {
