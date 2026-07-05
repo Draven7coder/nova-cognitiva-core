@@ -239,9 +239,7 @@ function Dashboard() {
   };
 
   const radarData = Object.entries(metrics).map(([k, v]) => ({ metric: METRIC_LABELS[k] ?? k, value: v }));
-  const evoData = Array.from({ length: 14 }, (_, i) => ({
-    d: i + 1, qi: Math.round(overallQI - 10 + Math.sin(i / 2) * 8 + i * 0.6),
-  }));
+  const evoData = qiTimeline.length ? qiTimeline : [];
 
   return (
     <ModulePage code="// CORE 00" title="Núcleo Operacional" subtitle="Painel central de comando · QI Funcional Operacional ativo.">
