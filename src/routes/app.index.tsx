@@ -19,6 +19,12 @@ import { syncChainProgress } from "@/lib/chain-sync";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
 
+// Local-timezone YYYY-MM-DD (fixes BR UTC-3 off-by-one after ~21h).
+function todayLocal(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 const METRIC_LABELS: Record<string, string> = {
   profundidade: "Profundidade",
   execucao: "Execução",
