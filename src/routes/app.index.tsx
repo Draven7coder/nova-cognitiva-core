@@ -255,6 +255,13 @@ function Dashboard() {
       <div className="grid lg:grid-cols-2 gap-4">
         <HudCard title="⚙ CHECK-IN DIÁRIO · CALIBRAÇÃO DO OPERADOR">
           <div className="space-y-3">
+            {checkin && (
+              <div className="flex items-center gap-2 rounded border border-primary/40 bg-primary/5 px-2 py-1.5 font-mono text-[10px] tracking-widest text-primary">
+                <span className="size-1.5 rounded-full bg-primary animate-pulse-ring" />
+                <span>✓ REGISTRADO ÀS {new Date(checkin.updated_at ?? checkin.created_at ?? Date.now()).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</span>
+                <span className="ml-auto text-muted-foreground">edite abaixo para atualizar</span>
+              </div>
+            )}
             {[
               { label: "Sono", v: ciSleep, set: setCiSleep },
               { label: "Energia", v: ciEnergy, set: setCiEnergy },
