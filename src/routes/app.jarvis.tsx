@@ -38,12 +38,17 @@ const KIND_META = {
   alert: { label: "ALERTA COMPORTAMENTAL", icon: AlertTriangle, color: "text-amber-400" },
 } as const;
 
+type ChatMsg = { id: string; role: "user" | "assistant"; content: string; created_at: string };
+
 function JarvisPage() {
   const { user } = useAuth();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [report, setReport] = useState<string>("Aguardando primeira varredura. Execute uma análise para ativar o JARVIS.");
   const [analyzing, setAnalyzing] = useState(false);
   const [filter, setFilter] = useState<"all" | "weakness" | "evolution" | "alert">("all");
+  const [chat, setChat] = useState<ChatMsg[]>([]);
+  const [msg, setMsg] = useState("");
+  const [sending, setSending] = useState(false);
 
   const load = async () => {
     const [{ data: ins }, { data: rep }] = await Promise.all([
