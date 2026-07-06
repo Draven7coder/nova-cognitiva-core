@@ -17,6 +17,7 @@ Deno.serve(async (req) => {
     const isEmergent = scope === "emergent";
     const isChains = scope === "chains";
     const isShadow = scope === "shadow";
+    const isJarvisChat = scope === "jarvis_chat";
 
     const systemPrompt = isShadow
       ? `Você é o MOTOR DE ANÁLISE ADAPTATIVA do MÓDULO SOMBRA. Sua função é detectar padrões psicológicos, emocionais e comportamentais do operador a partir de dados reais (diário matinal/noturno, cadeias, missões, OODA, hábitos, journal).
