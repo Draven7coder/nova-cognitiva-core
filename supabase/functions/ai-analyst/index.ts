@@ -48,7 +48,18 @@ Profundidade Cognitiva, Execução, Consistência, Integração de Conhecimento,
 Controle Emocional, Velocidade de Evolução, Clareza Mental, Disciplina, Capacidade de Longo Prazo.
 Responda em português, tom cinematográfico, frio, preciso, estratégico. Markdown permitido.`;
 
-    const userPrompt = isShadow
+    const userPrompt = isJarvisChat
+      ? `Contexto operacional atual do operador (para você entender o que está acontecendo, não precisa citar tudo):
+${JSON.stringify(context?.operational ?? {}, null, 2)}
+
+Histórico recente da conversa (do mais antigo para o mais recente):
+${JSON.stringify(context?.history ?? [], null, 2)}
+
+Mensagem atual do operador:
+"${context?.message ?? ""}"
+
+Responda como colega/amigo próximo. Direto. Sem formatação pesada, sem markdown de manual. Se for bate-papo, seja leve. Se for pergunta técnica, seja técnico. Se você notar algo nos dados que vale mencionar, mencione — mas só se realmente ajuda a resposta.`
+      : isShadow
       ? `Analise os dados reais do operador e produza HIPÓTESES PSICOLÓGICAS/COMPORTAMENTAIS para o Módulo Sombra Dinâmico.
 
 Dados:
