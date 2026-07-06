@@ -5,9 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Bot, Sparkles, ShieldAlert, TrendingUp, AlertTriangle,
-  Activity, CheckCircle2, Trash2, RefreshCw,
+  Activity, CheckCircle2, Trash2, RefreshCw, Send, MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 
