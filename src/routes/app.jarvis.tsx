@@ -334,6 +334,63 @@ function JarvisPage() {
           </div>
         )}
       </div>
+
+      {/* Conversa com o JARVIS */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-mono text-[10px] tracking-[0.3em] text-primary/80 flex items-center gap-2">
+            <MessageSquare className="size-3" /> CONVERSA COM O JARVIS
+          </h3>
+          {chat.length > 0 && (
+            <Button size="sm" variant="ghost" onClick={clearChat} className="font-mono text-[10px] tracking-widest h-7">
+              <Trash2 className="size-3 mr-1" /> LIMPAR
+            </Button>
+          )}
+        </div>
+        <HudCard>
+          <div className="max-h-[400px] overflow-auto space-y-3 mb-3">
+            {chat.length === 0 ? (
+              <div className="text-xs font-mono text-muted-foreground py-4 text-center">
+                Fala comigo. Pergunta, desabafa, pede análise — eu leio o teu contexto operacional antes de responder.
+              </div>
+            ) : (
+              chat.map((m) => (
+                <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[85%] rounded px-3 py-2 text-sm whitespace-pre-wrap leading-relaxed ${
+                      m.role === "user"
+                        ? "bg-primary/15 border border-primary/30 text-foreground"
+                        : "bg-input/30 border border-border/40 text-foreground/90"
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                </div>
+              ))
+            )}
+            {sending && (
+              <div className="flex justify-start">
+                <div className="bg-input/30 border border-border/40 rounded px-3 py-2 text-xs font-mono text-muted-foreground">
+                  JARVIS digitando<span className="animate-pulse">...</span>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-2 items-end">
+            <Textarea
+              value={msg}
+              onChange={(e) => setMsg(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+              placeholder="Manda a mensagem..."
+              className="min-h-[52px] bg-input/40 font-mono text-xs resize-none"
+              disabled={sending}
+            />
+            <Button onClick={sendMessage} disabled={sending || !msg.trim()} className="font-mono text-[10px] tracking-widest">
+              <Send className="size-3 mr-1" /> ENVIAR
+            </Button>
+          </div>
+        </HudCard>
+      </div>
     </ModulePage>
   );
 }
