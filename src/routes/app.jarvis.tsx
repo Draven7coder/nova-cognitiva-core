@@ -51,15 +51,73 @@ function JarvisPage() {
   const [sending, setSending] = useState(false);
 
   const load = async () => {
-    const [{ data: ins }, { data: rep }] = await Promise.all([
+    const sb: any = supabase;
+    const [{ data: ins }, { data: rep }, { data: msgs }] = await Promise.all([
       supabase.from("jarvis_insights").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(60),
       supabase.from("ai_reports").select("content,created_at").eq("scope", "jarvis").order("created_at", { ascending: false }).limit(1),
+      sb.from("jarvis_messages").select("*").order("created_at", { ascending: true }).limit(80),
     ]);
     setInsights((ins ?? []) as Insight[]);
     if (rep?.[0]) setReport(rep[0].content);
+    setChat((msgs ?? []) as ChatMsg[]);
   };
 
   useEffect(() => { if (user) load(); }, [user]);
+
+  const sendMessage = async () => {
+    const text = msg.trim();
+    if (!text || !user || sending) return;
+    setSending(true);
+    const sb: any = supabase;
+    const optimistic: ChatMsg = {
+      id: `tmp-${Date.now()}`, role: "user", content: text, created_at: new Date().toISOString(),
+    };
+    setChat((c) => [...c, optimistic]);
+    setMsg("");
+    try {
+      await sb.from("jarvis_messages").insert({ user_id: user.id, role: "user", content: text });
+
+      const [{ data: missions }, { data: journal }, { data: ooda }, { data: chains }] = await Promise.all([
+        supabase.from("missions").select("title,status,type,streak").limit(30),
+        supabase.from("journal_entries").select("title,content,module,created_at").order("created_at", { ascending: false }).limit(15),
+        supabase.from("ooda_entries").select("tag,observe,orient,decide,act,created_at").order("created_at", { ascending: false }).limit(8),
+        supabase.from("operational_chains").select("title,status,priority").eq("status", "ativa").limit(10),
+      ]);
+
+      const history = [...chat, optimistic].slice(-12).map((m) => ({ role: m.role, content: m.content }));
+
+      const { data, error } = await supabase.functions.invoke("ai-analyst", {
+        body: {
+          scope: "jarvis_chat",
+          context: {
+            message: text,
+            history,
+            operational: {
+              missions, journal_recent: journal, ooda_recent: ooda, active_chains: chains,
+              now: new Date().toISOString(),
+            },
+          },
+        },
+      });
+      if (error) throw error;
+      if ((data as any).error) throw new Error((data as any).error);
+      const reply = ((data as any).content ?? "").trim() || "…";
+      await sb.from("jarvis_messages").insert({ user_id: user.id, role: "assistant", content: reply });
+      load();
+    } catch (e: any) {
+      toast.error(e.message ?? "Falha na conversa com o JARVIS");
+      setChat((c) => c.filter((m) => m.id !== optimistic.id));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const clearChat = async () => {
+    const sb: any = supabase;
+    if (!user) return;
+    await sb.from("jarvis_messages").delete().eq("user_id", user.id);
+    setChat([]);
+  };
 
   const runJarvis = async (mode: "jarvis" | "global" = "jarvis") => {
     setAnalyzing(true);
