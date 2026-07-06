@@ -5,9 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Bot, Sparkles, ShieldAlert, TrendingUp, AlertTriangle,
-  Activity, CheckCircle2, Trash2, RefreshCw,
+  Activity, CheckCircle2, Trash2, RefreshCw, Send, MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -37,23 +38,86 @@ const KIND_META = {
   alert: { label: "ALERTA COMPORTAMENTAL", icon: AlertTriangle, color: "text-amber-400" },
 } as const;
 
+type ChatMsg = { id: string; role: "user" | "assistant"; content: string; created_at: string };
+
 function JarvisPage() {
   const { user } = useAuth();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [report, setReport] = useState<string>("Aguardando primeira varredura. Execute uma análise para ativar o JARVIS.");
   const [analyzing, setAnalyzing] = useState(false);
   const [filter, setFilter] = useState<"all" | "weakness" | "evolution" | "alert">("all");
+  const [chat, setChat] = useState<ChatMsg[]>([]);
+  const [msg, setMsg] = useState("");
+  const [sending, setSending] = useState(false);
 
   const load = async () => {
-    const [{ data: ins }, { data: rep }] = await Promise.all([
+    const sb: any = supabase;
+    const [{ data: ins }, { data: rep }, { data: msgs }] = await Promise.all([
       supabase.from("jarvis_insights").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(60),
       supabase.from("ai_reports").select("content,created_at").eq("scope", "jarvis").order("created_at", { ascending: false }).limit(1),
+      sb.from("jarvis_messages").select("*").order("created_at", { ascending: true }).limit(80),
     ]);
     setInsights((ins ?? []) as Insight[]);
     if (rep?.[0]) setReport(rep[0].content);
+    setChat((msgs ?? []) as ChatMsg[]);
   };
 
   useEffect(() => { if (user) load(); }, [user]);
+
+  const sendMessage = async () => {
+    const text = msg.trim();
+    if (!text || !user || sending) return;
+    setSending(true);
+    const sb: any = supabase;
+    const optimistic: ChatMsg = {
+      id: `tmp-${Date.now()}`, role: "user", content: text, created_at: new Date().toISOString(),
+    };
+    setChat((c) => [...c, optimistic]);
+    setMsg("");
+    try {
+      await sb.from("jarvis_messages").insert({ user_id: user.id, role: "user", content: text });
+
+      const [{ data: missions }, { data: journal }, { data: ooda }, { data: chains }] = await Promise.all([
+        supabase.from("missions").select("title,status,type,streak").limit(30),
+        supabase.from("journal_entries").select("title,content,module,created_at").order("created_at", { ascending: false }).limit(15),
+        supabase.from("ooda_entries").select("tag,observe,orient,decide,act,created_at").order("created_at", { ascending: false }).limit(8),
+        supabase.from("operational_chains").select("title,status,priority").eq("status", "ativa").limit(10),
+      ]);
+
+      const history = [...chat, optimistic].slice(-12).map((m) => ({ role: m.role, content: m.content }));
+
+      const { data, error } = await supabase.functions.invoke("ai-analyst", {
+        body: {
+          scope: "jarvis_chat",
+          context: {
+            message: text,
+            history,
+            operational: {
+              missions, journal_recent: journal, ooda_recent: ooda, active_chains: chains,
+              now: new Date().toISOString(),
+            },
+          },
+        },
+      });
+      if (error) throw error;
+      if ((data as any).error) throw new Error((data as any).error);
+      const reply = ((data as any).content ?? "").trim() || "…";
+      await sb.from("jarvis_messages").insert({ user_id: user.id, role: "assistant", content: reply });
+      load();
+    } catch (e: any) {
+      toast.error(e.message ?? "Falha na conversa com o JARVIS");
+      setChat((c) => c.filter((m) => m.id !== optimistic.id));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const clearChat = async () => {
+    const sb: any = supabase;
+    if (!user) return;
+    await sb.from("jarvis_messages").delete().eq("user_id", user.id);
+    setChat([]);
+  };
 
   const runJarvis = async (mode: "jarvis" | "global" = "jarvis") => {
     setAnalyzing(true);
@@ -269,6 +333,63 @@ function JarvisPage() {
             })}
           </div>
         )}
+      </div>
+
+      {/* Conversa com o JARVIS */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-mono text-[10px] tracking-[0.3em] text-primary/80 flex items-center gap-2">
+            <MessageSquare className="size-3" /> CONVERSA COM O JARVIS
+          </h3>
+          {chat.length > 0 && (
+            <Button size="sm" variant="ghost" onClick={clearChat} className="font-mono text-[10px] tracking-widest h-7">
+              <Trash2 className="size-3 mr-1" /> LIMPAR
+            </Button>
+          )}
+        </div>
+        <HudCard>
+          <div className="max-h-[400px] overflow-auto space-y-3 mb-3">
+            {chat.length === 0 ? (
+              <div className="text-xs font-mono text-muted-foreground py-4 text-center">
+                Fala comigo. Pergunta, desabafa, pede análise — eu leio o teu contexto operacional antes de responder.
+              </div>
+            ) : (
+              chat.map((m) => (
+                <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[85%] rounded px-3 py-2 text-sm whitespace-pre-wrap leading-relaxed ${
+                      m.role === "user"
+                        ? "bg-primary/15 border border-primary/30 text-foreground"
+                        : "bg-input/30 border border-border/40 text-foreground/90"
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                </div>
+              ))
+            )}
+            {sending && (
+              <div className="flex justify-start">
+                <div className="bg-input/30 border border-border/40 rounded px-3 py-2 text-xs font-mono text-muted-foreground">
+                  JARVIS digitando<span className="animate-pulse">...</span>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex gap-2 items-end">
+            <Textarea
+              value={msg}
+              onChange={(e) => setMsg(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+              placeholder="Manda a mensagem..."
+              className="min-h-[52px] bg-input/40 font-mono text-xs resize-none"
+              disabled={sending}
+            />
+            <Button onClick={sendMessage} disabled={sending || !msg.trim()} className="font-mono text-[10px] tracking-widest">
+              <Send className="size-3 mr-1" /> ENVIAR
+            </Button>
+          </div>
+        </HudCard>
       </div>
     </ModulePage>
   );

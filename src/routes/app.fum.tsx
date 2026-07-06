@@ -4,10 +4,14 @@ import { ModulePage, HudCard } from "@/components/ModulePage";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import {
   ChevronRight, Atom, Scale, Sigma, Binary, Code2, PlayCircle,
   FlaskConical, GitBranch, Infinity as InfinityIcon, ArrowLeft, Brain,
+  Plus, Archive, CheckCircle2, FileText,
 } from "lucide-react";
 
 export const Route = createFileRoute("/app/fum")({
@@ -15,252 +19,254 @@ export const Route = createFileRoute("/app/fum")({
   head: () => ({
     meta: [
       { title: "FUM · Framework Universal de Modelagem — Núcleo Supremo" },
-      { name: "description", content: "Pipeline universal para transformar conhecimento em sistemas executáveis e simuláveis." },
+      { name: "description", content: "Metassistemas registrados como entidade — cada ritual/framework tem identidade própria, endereço e histórico." },
     ],
   }),
 });
 
 const STAGES = [
-  {
-    n: "01", icon: Atom, title: "Objeto Real",
-    question: "O que existe no mundo real ou abstrato que quero simular?",
-    desc: "Definir o fenômeno, conceito ou sistema que será modelado. Recortar o domínio.",
-    examples: ["Movimento de um pêndulo", "Decisão de um agente sob incerteza", "Propagação de uma ideia em rede"],
-    aplic: ["Física", "IA / Cognição", "Sociologia computacional"],
-  },
-  {
-    n: "02", icon: Scale, title: "Regras Fundamentais",
-    question: "Quais regras sempre precisam permanecer verdadeiras?",
-    desc: "Extrair leis, invariantes, axiomas e relações que não mudam com o cenário.",
-    examples: ["Conservação de energia", "Soma de probabilidades = 1", "Transitividade da preferência"],
-    aplic: ["Física", "Probabilidade", "Teoria da decisão"],
-  },
-  {
-    n: "03", icon: Sigma, title: "Modelo Matemático",
-    question: "Como expresso isso em variáveis, estados e equações?",
-    desc: "Converter o sistema em variáveis, funções, estados, equações e relações formais.",
-    examples: ["EDO do oscilador harmônico", "Cadeia de Markov", "Função de utilidade esperada"],
-    aplic: ["Matemática aplicada", "Engenharia", "Economia"],
-  },
-  {
-    n: "04", icon: Binary, title: "Lógica Formal",
-    question: "Quais condições, transições e validações garantem coerência?",
-    desc: "Definir condições, coerência, transições, regras de validação e consistência lógica.",
-    examples: ["Pré/pós-condições", "Invariantes de estado", "Tipagem dependente"],
-    aplic: ["Verificação formal", "Compiladores", "IA simbólica"],
-  },
-  {
-    n: "05", icon: Code2, title: "Código",
-    question: "Como traduzir o modelo em estruturas executáveis?",
-    desc: "Transformar o modelo em classes, funções, estruturas, algoritmos e simulações.",
-    highlight: "Não programar o problema, mas programar o modelo do problema.",
-    examples: ["class Pendulum { step(dt) }", "MarkovChain.transition(s)", "Agent.decide(state)"],
-    aplic: ["Engenharia de software", "Simulação", "Pesquisa científica"],
-  },
-  {
-    n: "06", icon: PlayCircle, title: "Simulação",
-    question: "Como o sistema se comporta sob diferentes cenários?",
-    desc: "Executar o modelo variando condições iniciais, parâmetros e ambientes.",
-    examples: ["Monte Carlo", "Rollouts em RL", "Sweep paramétrico"],
-    aplic: ["Risco", "IA", "Engenharia"],
-  },
-  {
-    n: "07", icon: FlaskConical, title: "Experimento",
-    question: "O que muda quando perturbo o sistema?",
-    desc: "Modificar parâmetros e observar comportamentos emergentes, rupturas e regimes.",
-    examples: ["Bifurcações", "Pontos críticos", "Sensibilidade a hiperparâmetros"],
-    aplic: ["Sistemas dinâmicos", "Deep learning", "Política pública"],
-  },
-  {
-    n: "08", icon: GitBranch, title: "Extração de Padrões",
-    question: "Que regularidades, falhas e surpresas aparecem?",
-    desc: "Detectar recorrências, falhas, comportamentos inesperados e generalizações latentes.",
-    examples: ["Leis de potência", "Atratores", "Modos de falha sistemáticos"],
-    aplic: ["Ciência de dados", "Epistemologia", "Engenharia"],
-  },
-  {
-    n: "09", icon: InfinityIcon, title: "Generalização",
-    question: "O que disso é reutilizável universalmente?",
-    desc: "Transformar o aprendizado em abstração transferível entre domínios.",
-    highlight: "Abstração transferível.",
-    examples: ["Padrão produtor/consumidor", "Otimização sob restrição", "Bayes como atualização universal"],
-    aplic: ["Meta-aprendizagem", "Transferência interdisciplinar", "Arquitetura cognitiva"],
-  },
+  { n: "01", icon: Atom, title: "Objeto Real", question: "O que existe no mundo real ou abstrato que quero simular?" },
+  { n: "02", icon: Scale, title: "Regras Fundamentais", question: "Quais regras sempre precisam permanecer verdadeiras?" },
+  { n: "03", icon: Sigma, title: "Modelo Matemático", question: "Como expresso isso em variáveis, estados e equações?" },
+  { n: "04", icon: Binary, title: "Lógica Formal", question: "Quais condições, transições e validações garantem coerência?" },
+  { n: "05", icon: Code2, title: "Código", question: "Como traduzir o modelo em estruturas executáveis?" },
+  { n: "06", icon: PlayCircle, title: "Simulação", question: "Como o sistema se comporta sob diferentes cenários?" },
+  { n: "07", icon: FlaskConical, title: "Experimento", question: "O que muda quando perturbo o sistema?" },
+  { n: "08", icon: GitBranch, title: "Extração de Padrões", question: "Que regularidades, falhas e surpresas aparecem?" },
+  { n: "09", icon: InfinityIcon, title: "Generalização", question: "O que disso é reutilizável universalmente?" },
 ] as const;
 
-const CASES = [
-  { area: "Matemática", title: "Frações", obj: "Razão entre partes e todo", model: "a/b com b≠0", code: "class Frac { add(o){...} }", pat: "Equivalência por simplificação", gen: "Estrutura de corpo ordenado" },
-  { area: "Física", title: "Movimento", obj: "Trajetória de um corpo", model: "x(t)=x₀+v₀t+½at²", code: "step(dt){ v+=a*dt; x+=v*dt }", pat: "Conservação", gen: "Leis de Newton como template" },
-  { area: "IA", title: "Tomada de Decisão", obj: "Agente em ambiente incerto", model: "MDP (S,A,P,R,γ)", code: "argmax_a Q(s,a)", pat: "Exploração vs explotação", gen: "Bellman como princípio universal" },
-  { area: "Probabilidade", title: "Inferência", obj: "Atualizar crença com evidência", model: "P(H|E) ∝ P(E|H)P(H)", code: "posterior = like*prior / Z", pat: "Convergência com dados", gen: "Bayes como atualização racional" },
-  { area: "Sistemas Dinâmicos", title: "Atratores", obj: "Evolução temporal não-linear", model: "ẋ = f(x,μ)", code: "rk4(f, x, dt)", pat: "Bifurcações", gen: "Estabilidade estrutural" },
-  { area: "Lógica Computacional", title: "Provas", obj: "Validade de proposições", model: "Γ ⊢ φ", code: "tactic.apply(goal)", pat: "Decomposição", gen: "Curry-Howard" },
-];
+type Metasystem = {
+  id: string;
+  user_id: string;
+  title: string;
+  problem_tag: string | null;
+  source_chain_id: string | null;
+  source_subtask_id: string | null;
+  status: string;
+  stages: Record<string, string>;
+  created_at: string;
+  updated_at: string;
+};
 
 function FumPage() {
   const { user } = useAuth();
-  const [open, setOpen] = useState<string | null>("01");
-  const [notes, setNotes] = useState<Record<string, string>>({});
-  const [saved, setSaved] = useState<any[]>([]);
+  const [list, setList] = useState<Metasystem[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [open, setOpen] = useState<string>("01");
+  const [draft, setDraft] = useState<string>("");
+  const [creating, setCreating] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newTag, setNewTag] = useState("");
+  const sb: any = supabase;
+
+  const active = list.find((m) => m.id === activeId) ?? null;
 
   const load = async () => {
-    const { data } = await supabase
-      .from("journal_entries")
-      .select("*")
-      .like("module", "fum:%")
-      .order("created_at", { ascending: false });
-    setSaved(data ?? []);
+    const { data } = await sb.from("metasystems")
+      .select("*").order("updated_at", { ascending: false });
+    const items: Metasystem[] = (data ?? []).map((m: any) => ({
+      ...m, stages: m.stages ?? {},
+    }));
+    setList(items);
   };
   useEffect(() => { if (user) load(); }, [user]);
 
-  const saveNote = async (stageN: string, stageTitle: string) => {
-    const content = notes[stageN]?.trim();
-    if (!content || !user) return;
-    await supabase.from("journal_entries").insert({
-      user_id: user.id, module: `fum:${stageN}`, title: `${stageN} · ${stageTitle}`, content,
-    });
-    setNotes((p) => ({ ...p, [stageN]: "" }));
+  useEffect(() => {
+    setDraft(active?.stages?.[open] ?? "");
+  }, [activeId, open, active?.stages]);
+
+  const createMetasystem = async () => {
+    if (!user || !newTitle.trim()) return;
+    const { data, error } = await sb.from("metasystems").insert({
+      user_id: user.id,
+      title: newTitle.trim(),
+      problem_tag: newTag.trim() || null,
+      status: "em_andamento",
+      stages: {},
+    }).select().single();
+    if (error) { toast.error("Falha ao criar metassistema"); return; }
+    setCreating(false); setNewTitle(""); setNewTag("");
+    await load();
+    setActiveId(data.id); setOpen("01");
+    toast.success("Metassistema criado.");
+  };
+
+  const saveStage = async () => {
+    if (!active) return;
+    const newStages = { ...active.stages, [open]: draft };
+    const { error } = await sb.from("metasystems")
+      .update({ stages: newStages, updated_at: new Date().toISOString() })
+      .eq("id", active.id);
+    if (error) { toast.error("Falha ao salvar etapa"); return; }
+    // Mirror on journal_entries so chain-sync / analyses still see the activity.
+    if (draft.trim() && user) {
+      await sb.from("journal_entries").insert({
+        user_id: user.id,
+        module: `fum:${open}`,
+        title: `${open} · ${STAGES.find((s) => s.n === open)?.title ?? ""}`,
+        content: draft.trim(),
+      });
+    }
+    await load();
+    toast.success(`Etapa ${open} salva.`);
+  };
+
+  const setStatus = async (status: string) => {
+    if (!active) return;
+    await sb.from("metasystems").update({ status }).eq("id", active.id);
     load();
   };
+
+  const stagesDone = (m: Metasystem) => Object.values(m.stages ?? {}).filter((v) => (v ?? "").toString().trim().length > 0).length;
 
   return (
     <ModulePage
       code="// META-SISTEMAS · FUM"
       title="Framework Universal de Modelagem"
-      subtitle="Transformar qualquer conhecimento em sistema executável, testável e simulável."
+      subtitle="Metassistemas com identidade — cada ritual/framework tem endereço, status e histórico."
     >
       <Link to="/app/intelecto" className="inline-flex items-center gap-2 font-mono text-[10px] tracking-widest text-muted-foreground hover:text-primary transition">
         <ArrowLeft className="size-3" /> VOLTAR · CENTRO INTELECTUAL
       </Link>
 
-      {/* Conceitual */}
-      <HudCard title="DEFINIÇÃO CONCEITUAL">
-        <p className="text-sm text-foreground/85 leading-relaxed">
-          O FUM é um <span className="text-primary">pipeline cognitivo universal</span> que converte qualquer área do conhecimento
-          — matemática, física, lógica, programação, IA, sistemas complexos, engenharia, tomada de decisão e modelagem da realidade —
-          em <span className="text-primary">modelos executáveis e simuláveis</span>. Sua premissa: toda compreensão profunda
-          pode ser destilada em uma estrutura formal, codificada, perturbada experimentalmente e generalizada como abstração transferível.
-        </p>
-        <div className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-2 font-mono text-[10px]">
-          {["MATEMÁTICA","FÍSICA","LÓGICA","CÓDIGO","IA","SISTEMAS","ENGENHARIA","DECISÃO","REALIDADE"].map(t=>(
-            <div key={t} className="border border-primary/20 px-2 py-1.5 text-center text-primary/80 tracking-widest">{t}</div>
-          ))}
+      {/* Lista de metassistemas */}
+      <HudCard title="MEUS METASSISTEMAS">
+        <div className="flex items-center justify-between mb-3">
+          <div className="text-xs text-muted-foreground font-mono">
+            {list.length} registrado{list.length === 1 ? "" : "s"} · clique para abrir
+          </div>
+          <Button size="sm" onClick={() => setCreating(true)} className="font-mono text-[10px] tracking-widest">
+            <Plus className="size-3 mr-1" /> NOVO METASSISTEMA
+          </Button>
         </div>
-      </HudCard>
 
-      {/* Pipeline visual */}
-      <HudCard title="PIPELINE · 9 ETAPAS">
-        <div className="flex items-center gap-1 overflow-x-auto pb-2">
-          {STAGES.map((s, i) => (
-            <div key={s.n} className="flex items-center shrink-0">
-              <button
-                onClick={() => setOpen(s.n)}
-                className={`flex flex-col items-center gap-1 px-3 py-2 rounded border transition min-w-[88px] ${
-                  open === s.n ? "border-primary bg-primary/10 hud-glow" : "border-border/50 hover:border-primary/40"
-                }`}
-              >
-                <s.icon className={`size-4 ${open === s.n ? "text-primary" : "text-muted-foreground"}`} />
-                <div className="font-mono text-[9px] tracking-widest text-primary/80">{s.n}</div>
-                <div className="font-mono text-[10px] text-foreground/90 leading-tight text-center">{s.title}</div>
-              </button>
-              {i < STAGES.length - 1 && <ChevronRight className="size-3 text-primary/40 mx-0.5 shrink-0" />}
-            </div>
-          ))}
-        </div>
-      </HudCard>
-
-      {/* Etapa expandida */}
-      {STAGES.filter((s) => s.n === open).map((s) => (
-        <HudCard key={s.n} title={`ETAPA ${s.n} · ${s.title.toUpperCase()}`}>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="md:col-span-2 space-y-3">
-              <div>
-                <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-1">PERGUNTA CENTRAL</div>
-                <p className="text-sm text-primary italic">"{s.question}"</p>
-              </div>
-              <div>
-                <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-1">DESCRIÇÃO</div>
-                <p className="text-sm text-foreground/85">{s.desc}</p>
-              </div>
-              {"highlight" in s && s.highlight && (
-                <div className="border-l-2 border-primary pl-3 py-1">
-                  <p className="text-sm text-primary font-display tracking-wide">{s.highlight}</p>
-                </div>
-              )}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-1">EXEMPLOS</div>
-                  <ul className="space-y-1">
-                    {s.examples.map((e) => <li key={e} className="text-xs text-foreground/80 font-mono">› {e}</li>)}
-                  </ul>
-                </div>
-                <div>
-                  <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-1">APLICAÇÕES</div>
-                  <ul className="space-y-1">
-                    {s.aplic.map((e) => <li key={e} className="text-xs text-foreground/80 font-mono">› {e}</li>)}
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="font-mono text-[10px] tracking-widest text-muted-foreground">OBSERVAÇÕES PESSOAIS</div>
-              <Textarea
-                value={notes[s.n] ?? ""}
-                onChange={(e) => setNotes((p) => ({ ...p, [s.n]: e.target.value }))}
-                placeholder="Notas, conexões, experimentos..."
-                className="min-h-[140px] bg-input/40 font-mono text-xs"
-              />
-              <Button onClick={() => saveNote(s.n, s.title)} className="w-full font-mono text-[10px] tracking-widest">
-                REGISTRAR
-              </Button>
-              <div className="space-y-1 max-h-40 overflow-auto pt-2 border-t border-border/40">
-                {saved.filter((x) => x.module === `fum:${s.n}`).map((x) => (
-                  <div key={x.id} className="text-[11px] font-mono text-foreground/80 border-l border-primary/30 pl-2">
-                    {x.content}
-                  </div>
-                ))}
-              </div>
+        {creating && (
+          <div className="mb-4 border border-primary/40 rounded p-3 space-y-2 bg-primary/5">
+            <Input
+              placeholder="Título · ex.: Loop de procrastinação matinal"
+              value={newTitle} onChange={(e) => setNewTitle(e.target.value)}
+              className="bg-input/40 font-mono text-xs"
+            />
+            <Input
+              placeholder="Tag do problema · opcional"
+              value={newTag} onChange={(e) => setNewTag(e.target.value)}
+              className="bg-input/40 font-mono text-xs"
+            />
+            <div className="flex gap-2">
+              <Button size="sm" onClick={createMetasystem} className="font-mono text-[10px] tracking-widest">CRIAR</Button>
+              <Button size="sm" variant="ghost" onClick={() => setCreating(false)} className="font-mono text-[10px] tracking-widest">CANCELAR</Button>
             </div>
           </div>
-        </HudCard>
-      ))}
+        )}
 
-      {/* Casos reais */}
-      <HudCard title="CASOS REAIS · APLICAÇÃO DO FRAMEWORK">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {CASES.map((c) => (
-            <div key={c.title} className="border border-border/50 hover:border-primary/40 transition p-3 rounded">
-              <div className="font-mono text-[9px] tracking-widest text-primary/70">{c.area.toUpperCase()}</div>
-              <div className="font-display text-sm text-foreground mt-0.5">{c.title}</div>
-              <div className="mt-2 space-y-1 text-[11px] font-mono text-foreground/75">
-                <div><span className="text-muted-foreground">obj › </span>{c.obj}</div>
-                <div><span className="text-muted-foreground">model › </span>{c.model}</div>
-                <div><span className="text-muted-foreground">code › </span><span className="text-primary/90">{c.code}</span></div>
-                <div><span className="text-muted-foreground">pat › </span>{c.pat}</div>
-                <div><span className="text-muted-foreground">gen › </span>{c.gen}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {list.length === 0 ? (
+          <div className="text-xs text-muted-foreground font-mono">Nenhum metassistema ainda. Crie o primeiro para começar.</div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-2">
+            {list.map((m) => {
+              const isActive = activeId === m.id;
+              const done = stagesDone(m);
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => setActiveId(m.id)}
+                  className={`text-left border rounded p-3 transition ${
+                    isActive ? "border-primary bg-primary/10 hud-glow" : "border-border/50 hover:border-primary/40"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="font-display text-sm text-foreground truncate">{m.title}</div>
+                    <Badge variant="outline" className="font-mono text-[9px] shrink-0">
+                      {m.status === "em_andamento" ? "ATIVO" : m.status === "concluido" ? "OK" : "ARQ"}
+                    </Badge>
+                  </div>
+                  {m.problem_tag && <div className="text-[10px] font-mono text-primary/70 mt-0.5">#{m.problem_tag}</div>}
+                  <div className="mt-2 font-mono text-[10px] text-muted-foreground">
+                    {done}/9 etapas · {new Date(m.updated_at).toLocaleDateString("pt-BR")}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </HudCard>
 
-      {/* IA */}
+      {/* Editor do metassistema ativo */}
+      {active && (
+        <>
+          <HudCard title={`METASSISTEMA · ${active.title.toUpperCase()}`}>
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="text-xs text-muted-foreground font-mono">
+                Criado em {new Date(active.created_at).toLocaleString("pt-BR")}
+                {active.source_chain_id && <> · origem: cadeia operacional</>}
+              </div>
+              <div className="flex gap-1">
+                <Button size="sm" variant="outline" onClick={() => setStatus("concluido")} className="font-mono text-[10px] tracking-widest">
+                  <CheckCircle2 className="size-3 mr-1" /> CONCLUIR
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setStatus("arquivado")} className="font-mono text-[10px] tracking-widest">
+                  <Archive className="size-3 mr-1" /> ARQUIVAR
+                </Button>
+              </div>
+            </div>
+          </HudCard>
+
+          <HudCard title="PIPELINE · 9 ETAPAS">
+            <div className="flex items-center gap-1 overflow-x-auto pb-2">
+              {STAGES.map((s, i) => {
+                const filled = ((active.stages?.[s.n] ?? "").trim().length > 0);
+                return (
+                  <div key={s.n} className="flex items-center shrink-0">
+                    <button
+                      onClick={() => setOpen(s.n)}
+                      className={`flex flex-col items-center gap-1 px-3 py-2 rounded border transition min-w-[88px] ${
+                        open === s.n ? "border-primary bg-primary/10 hud-glow"
+                          : filled ? "border-primary/40 bg-primary/5"
+                          : "border-border/50 hover:border-primary/40"
+                      }`}
+                    >
+                      <s.icon className={`size-4 ${open === s.n ? "text-primary" : filled ? "text-primary/80" : "text-muted-foreground"}`} />
+                      <div className="font-mono text-[9px] tracking-widest text-primary/80">{s.n}</div>
+                      <div className="font-mono text-[10px] text-foreground/90 leading-tight text-center">{s.title}</div>
+                    </button>
+                    {i < STAGES.length - 1 && <ChevronRight className="size-3 text-primary/40 mx-0.5 shrink-0" />}
+                  </div>
+                );
+              })}
+            </div>
+          </HudCard>
+
+          {STAGES.filter((s) => s.n === open).map((s) => (
+            <HudCard key={s.n} title={`ETAPA ${s.n} · ${s.title.toUpperCase()}`}>
+              <div className="space-y-2">
+                <div>
+                  <div className="font-mono text-[10px] tracking-widest text-muted-foreground mb-1">PERGUNTA CENTRAL</div>
+                  <p className="text-sm text-primary italic">"{s.question}"</p>
+                </div>
+                <Textarea
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  placeholder="Registre sua resposta / notas / experimentos para esta etapa..."
+                  className="min-h-[160px] bg-input/40 font-mono text-xs"
+                />
+                <Button onClick={saveStage} className="font-mono text-[10px] tracking-widest">
+                  <FileText className="size-3 mr-1" /> SALVAR ETAPA {s.n}
+                </Button>
+              </div>
+            </HudCard>
+          ))}
+        </>
+      )}
+
       <HudCard title="INTEGRAÇÃO COM IA">
         <div className="flex items-start gap-3">
           <Brain className="size-5 text-primary shrink-0 mt-0.5" />
           <div className="space-y-2 text-sm text-foreground/85">
-            <p>A IA do Núcleo monitora suas entradas no FUM para:</p>
-            <ul className="space-y-1 font-mono text-xs text-foreground/80">
-              <li>› detectar padrões de pensamento sistêmico</li>
-              <li>› identificar aumento de capacidade de abstração</li>
-              <li>› conectar áreas distintas automaticamente</li>
-              <li>› sugerir frameworks relacionados</li>
-              <li>› analisar profundidade conceitual</li>
-              <li>› gerar insights sobre evolução intelectual</li>
-            </ul>
-            <p className="text-primary italic text-xs pt-2 border-t border-border/40">
-              "Seu pensamento recente demonstra maior capacidade de generalização e integração interdisciplinar."
+            <p>
+              Cada metassistema é uma entidade indexada. O JARVIS pode referenciá-los por título/tag,
+              conectá-los a cadeias operacionais e sugerir revisão quando o mesmo problema reaparece —
+              em vez de pedir para você começar do zero.
             </p>
           </div>
         </div>

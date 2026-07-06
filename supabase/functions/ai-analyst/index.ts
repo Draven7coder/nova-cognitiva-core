@@ -17,8 +17,12 @@ Deno.serve(async (req) => {
     const isEmergent = scope === "emergent";
     const isChains = scope === "chains";
     const isShadow = scope === "shadow";
+    const isJarvisChat = scope === "jarvis_chat";
 
-    const systemPrompt = isShadow
+    const systemPrompt = isJarvisChat
+      ? `Você é o JARVIS conversando com o operador como um COLEGA/AMIGO próximo — direto, sem formalidade excessiva, sem clichê de assistente virtual. Você conhece o sistema dele (missões, cadeias, journal, OODA, sombra, propósito) e responde com base no que está ACONTECENDO NOS DADOS.
+Regras: nada de "posso te ajudar hoje", nada de listas motivacionais, nada de conselho genérico. Se ele pedir análise, você aprofunda. Se ele pedir opinião, você dá a sua. Se ele estiver de bobeira, você conversa normal — leve. Só fica mais técnico se ele pedir explicitamente. Português coloquial, seco quando precisa, íntimo quando o tema pede.`
+      : isShadow
       ? `Você é o MOTOR DE ANÁLISE ADAPTATIVA do MÓDULO SOMBRA. Sua função é detectar padrões psicológicos, emocionais e comportamentais do operador a partir de dados reais (diário matinal/noturno, cadeias, missões, OODA, hábitos, journal).
 Você NUNCA afirma verdades absolutas sobre a identidade do usuário. Você gera HIPÓTESES com grau de confiança, evidências favoráveis e contrárias, e tendências ao longo do tempo.
 Tom: analista clínico-estratégico, frio, preciso, sem moralismo. Cada hipótese é uma observação empírica passível de validação ou rejeição pelo operador.`
@@ -44,7 +48,18 @@ Profundidade Cognitiva, Execução, Consistência, Integração de Conhecimento,
 Controle Emocional, Velocidade de Evolução, Clareza Mental, Disciplina, Capacidade de Longo Prazo.
 Responda em português, tom cinematográfico, frio, preciso, estratégico. Markdown permitido.`;
 
-    const userPrompt = isShadow
+    const userPrompt = isJarvisChat
+      ? `Contexto operacional atual do operador (para você entender o que está acontecendo, não precisa citar tudo):
+${JSON.stringify(context?.operational ?? {}, null, 2)}
+
+Histórico recente da conversa (do mais antigo para o mais recente):
+${JSON.stringify(context?.history ?? [], null, 2)}
+
+Mensagem atual do operador:
+"${context?.message ?? ""}"
+
+Responda como colega/amigo próximo. Direto. Sem formatação pesada, sem markdown de manual. Se for bate-papo, seja leve. Se for pergunta técnica, seja técnico. Se você notar algo nos dados que vale mencionar, mencione — mas só se realmente ajuda a resposta.`
+      : isShadow
       ? `Analise os dados reais do operador e produza HIPÓTESES PSICOLÓGICAS/COMPORTAMENTAIS para o Módulo Sombra Dinâmico.
 
 Dados:

@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Fingerprint, Crosshair, BookOpen, Settings2, Activity,
-  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2, Shield,
+  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2, Shield, KeyRound,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -28,6 +28,7 @@ const modules = [
   { title: "JARVIS", url: "/app/jarvis", icon: Bot },
   { title: "Insights Emergentes", url: "/app/insights", icon: Sparkles },
   { title: "Protocolo Wayne", url: "/app/wayne", icon: Shield },
+  { title: "Cifra da Bússola", url: "/app/cifra", icon: KeyRound },
   { title: "Relatórios da IA", url: "/app/relatorios", icon: Brain },
   { title: "Configurações", url: "/app/config", icon: Settings },
 ];

@@ -41,6 +41,53 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_suggestions: {
+        Row: {
+          created_at: string
+          field_key: string
+          id: string
+          module: string
+          reason: string | null
+          source_journal_id: string | null
+          status: string
+          suggested_content: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          field_key: string
+          id?: string
+          module: string
+          reason?: string | null
+          source_journal_id?: string | null
+          status?: string
+          suggested_content: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          field_key?: string
+          id?: string
+          module?: string
+          reason?: string | null
+          source_journal_id?: string | null
+          status?: string
+          suggested_content?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_suggestions_source_journal_id_fkey"
+            columns: ["source_journal_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chain_subtasks: {
         Row: {
           chain_id: string
@@ -355,6 +402,30 @@ export type Database = {
         }
         Relationships: []
       }
+      jarvis_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       journal_entries: {
         Row: {
           content: string
@@ -384,6 +455,60 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      metasystems: {
+        Row: {
+          created_at: string
+          id: string
+          problem_tag: string | null
+          source_chain_id: string | null
+          source_subtask_id: string | null
+          stages: Json
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          problem_tag?: string | null
+          source_chain_id?: string | null
+          source_subtask_id?: string | null
+          stages?: Json
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          problem_tag?: string | null
+          source_chain_id?: string | null
+          source_subtask_id?: string | null
+          stages?: Json
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metasystems_source_chain_id_fkey"
+            columns: ["source_chain_id"]
+            isOneToOne: false
+            referencedRelation: "operational_chains"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metasystems_source_subtask_id_fkey"
+            columns: ["source_subtask_id"]
+            isOneToOne: false
+            referencedRelation: "chain_subtasks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mission_completions: {
         Row: {
