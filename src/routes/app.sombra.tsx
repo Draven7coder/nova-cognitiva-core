@@ -181,9 +181,10 @@ function SombraPage() {
   };
   useEffect(() => { load(); }, []);
 
-  const runAnalysis = async () => {
+  const runAnalysis = async (opts: { silent?: boolean } = {}) => {
     if (!user) return;
-    setAnalyzing(true);
+    const silent = !!opts.silent;
+    if (silent) setAutoAnalyzing(true); else setAnalyzing(true);
     try {
       const [
         { data: ident }, { data: miss }, { data: comps },
