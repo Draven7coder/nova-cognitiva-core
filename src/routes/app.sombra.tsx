@@ -154,10 +154,16 @@ function HypothesisCard({ h, onUpdate }: { h: Hypothesis; onUpdate: () => void }
   );
 }
 
+function todayLocal(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function SombraPage() {
   const { user } = useAuth();
   const [items, setItems] = useState<Hypothesis[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
+  const [autoAnalyzing, setAutoAnalyzing] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
@@ -175,9 +181,10 @@ function SombraPage() {
   };
   useEffect(() => { load(); }, []);
 
-  const runAnalysis = async () => {
+  const runAnalysis = async (opts: { silent?: boolean } = {}) => {
     if (!user) return;
-    setAnalyzing(true);
+    const silent = !!opts.silent;
+    if (silent) setAutoAnalyzing(true); else setAnalyzing(true);
     try {
       const [
         { data: ident }, { data: miss }, { data: comps },
@@ -261,12 +268,31 @@ function SombraPage() {
         updated++;
       }
 
-      toast.success(`Motor Adaptativo: ${rows.length} nova(s) hipótese(s), ${updated} atualizada(s).`);
+      if (!silent) {
+        toast.success(`Motor Adaptativo: ${rows.length} nova(s) hipótese(s), ${updated} atualizada(s).`);
+      } else if (rows.length || updated) {
+        toast.message(`Sombra atualizada em segundo plano: ${rows.length} nova(s), ${updated} atualizada(s).`);
+      }
       load();
     } catch (e: any) {
-      toast.error(e.message ?? "Falha no Motor Adaptativo");
-    } finally { setAnalyzing(false); }
+      if (!silent) toast.error(e.message ?? "Falha no Motor Adaptativo");
+      else console.warn("[sombra auto] falhou:", e?.message);
+    } finally {
+      if (silent) setAutoAnalyzing(false); else setAnalyzing(false);
+    }
   };
+
+  // Auto-run 1×/dia (por usuário) — silencioso, em background, ao abrir a página.
+  useEffect(() => {
+    if (!user) return;
+    const key = `nucleo:${user.id}:sombra:last_auto`;
+    const today = todayLocal();
+    if (localStorage.getItem(key) === today) return;
+    localStorage.setItem(key, today); // marca antes pra evitar disparo duplicado em StrictMode
+    const t = window.setTimeout(() => { runAnalysis({ silent: true }); }, 1200);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const byCategory = useMemo(() => {
     const map = new Map<string, Hypothesis[]>();
@@ -290,9 +316,9 @@ function SombraPage() {
               Hipóteses geradas <span className="text-primary">NÃO são verdades absolutas</span> — você pode ativar, consolidar, rejeitar ou arquivar cada uma. Evidências e tendências se acumulam ao longo do tempo.
             </div>
           </div>
-          <Button onClick={runAnalysis} disabled={analyzing} className="font-mono text-xs tracking-widest">
-            {analyzing ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Sparkles className="size-3 mr-2" />}
-            {analyzing ? "ANALISANDO..." : "GERAR HIPÓTESES"}
+          <Button onClick={() => runAnalysis()} disabled={analyzing || autoAnalyzing} className="font-mono text-xs tracking-widest">
+            {(analyzing || autoAnalyzing) ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Sparkles className="size-3 mr-2" />}
+            {analyzing ? "ANALISANDO..." : autoAnalyzing ? "ANÁLISE AUTOMÁTICA..." : "GERAR HIPÓTESES"}
           </Button>
         </div>
       </HudCard>
