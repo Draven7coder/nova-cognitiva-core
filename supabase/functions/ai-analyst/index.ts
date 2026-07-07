@@ -18,6 +18,7 @@ Deno.serve(async (req) => {
     const isChains = scope === "chains";
     const isShadow = scope === "shadow";
     const isJarvisChat = scope === "jarvis_chat";
+    const isProtocoloXp = scope === "protocolo_xp";
 
     const systemPrompt = isJarvisChat
       ? `Você é o JARVIS conversando com o operador como um COLEGA/AMIGO próximo — direto, sem formalidade excessiva, sem clichê de assistente virtual. Você conhece o sistema dele (missões, cadeias, journal, OODA, sombra, propósito) e responde com base no que está ACONTECENDO NOS DADOS.
