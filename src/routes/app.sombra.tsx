@@ -316,9 +316,9 @@ function SombraPage() {
               Hipóteses geradas <span className="text-primary">NÃO são verdades absolutas</span> — você pode ativar, consolidar, rejeitar ou arquivar cada uma. Evidências e tendências se acumulam ao longo do tempo.
             </div>
           </div>
-          <Button onClick={runAnalysis} disabled={analyzing} className="font-mono text-xs tracking-widest">
-            {analyzing ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Sparkles className="size-3 mr-2" />}
-            {analyzing ? "ANALISANDO..." : "GERAR HIPÓTESES"}
+          <Button onClick={() => runAnalysis()} disabled={analyzing || autoAnalyzing} className="font-mono text-xs tracking-widest">
+            {(analyzing || autoAnalyzing) ? <RefreshCw className="size-3 mr-2 animate-spin" /> : <Sparkles className="size-3 mr-2" />}
+            {analyzing ? "ANALISANDO..." : autoAnalyzing ? "ANÁLISE AUTOMÁTICA..." : "GERAR HIPÓTESES"}
           </Button>
         </div>
       </HudCard>
