@@ -243,6 +243,7 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     let emergent: any = null;
     let chains: any = null;
     let shadow: any = null;
+    let xpEstimates: any = null;
 
     const m = content.match(/<metrics>([\s\S]*?)<\/metrics>/);
     if (m) { try { metrics = JSON.parse(m[1].trim()); } catch { /* ignore */ } }
@@ -259,15 +260,19 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     const sh = content.match(/<shadow>([\s\S]*?)<\/shadow>/);
     if (sh) { try { shadow = JSON.parse(sh[1].trim()); } catch { /* ignore */ } }
 
+    const xp = content.match(/<xp_estimates>([\s\S]*?)<\/xp_estimates>/);
+    if (xp) { try { xpEstimates = JSON.parse(xp[1].trim()); } catch { /* ignore */ } }
+
     const cleaned = content
       .replace(/<metrics>[\s\S]*?<\/metrics>/, "")
       .replace(/<insights>[\s\S]*?<\/insights>/, "")
       .replace(/<emergent>[\s\S]*?<\/emergent>/, "")
       .replace(/<chains>[\s\S]*?<\/chains>/, "")
       .replace(/<shadow>[\s\S]*?<\/shadow>/, "")
+      .replace(/<xp_estimates>[\s\S]*?<\/xp_estimates>/, "")
       .trim();
 
-    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains, shadow }), {
+    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains, shadow, xpEstimates }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
