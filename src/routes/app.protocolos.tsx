@@ -138,6 +138,38 @@ function Protocolos() {
       camada5_identidade: { tornandome, comportamento, habito },
     };
     await saveSection("protocolo_matinal_alfa", payload, "Diário Matinal Cognitivo · Alfa");
+
+    // Fase 8 — cada prioridade não-vazia da Camada 4 vira missão do dia
+    const validas = prioridades.filter((p) => p.task.trim());
+    if (validas.length && user) {
+      let xps: number[] = [];
+      try {
+        const { data } = await supabase.functions.invoke("ai-analyst", {
+          body: { scope: "protocolo_xp", context: { prioridades: validas } },
+        });
+        const est = (data as any)?.xpEstimates;
+        if (Array.isArray(est)) {
+          xps = est.map((e: any) => {
+            const n = Number(e?.xp);
+            return Number.isFinite(n) ? Math.max(10, Math.min(100, Math.round(n))) : 15;
+          });
+        }
+      } catch { /* fallback abaixo */ }
+
+      const { error: missErr } = await supabase.from("missions").insert(
+        validas.map((p, i) => ({
+          user_id: user.id,
+          title: p.task,
+          description: `Protocolo Alfa · ${p.horario || "sem horário"} · ${p.tempo || "sem duração"}`,
+          type: "daily",
+          recurrence: "once",
+          xp: xps[i] ?? 15,
+        })),
+      );
+      if (missErr) console.warn("[protocolo_alfa] falha ao gerar missões:", missErr.message);
+      else toast.success(`${validas.length} missão(ões) do dia geradas a partir do Protocolo Alfa.`);
+    }
+
     await runAnalysis("matinal_alfa", payload);
   };
 
