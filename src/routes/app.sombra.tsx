@@ -268,12 +268,31 @@ function SombraPage() {
         updated++;
       }
 
-      toast.success(`Motor Adaptativo: ${rows.length} nova(s) hipótese(s), ${updated} atualizada(s).`);
+      if (!silent) {
+        toast.success(`Motor Adaptativo: ${rows.length} nova(s) hipótese(s), ${updated} atualizada(s).`);
+      } else if (rows.length || updated) {
+        toast.message(`Sombra atualizada em segundo plano: ${rows.length} nova(s), ${updated} atualizada(s).`);
+      }
       load();
     } catch (e: any) {
-      toast.error(e.message ?? "Falha no Motor Adaptativo");
-    } finally { setAnalyzing(false); }
+      if (!silent) toast.error(e.message ?? "Falha no Motor Adaptativo");
+      else console.warn("[sombra auto] falhou:", e?.message);
+    } finally {
+      if (silent) setAutoAnalyzing(false); else setAnalyzing(false);
+    }
   };
+
+  // Auto-run 1×/dia (por usuário) — silencioso, em background, ao abrir a página.
+  useEffect(() => {
+    if (!user) return;
+    const key = `nucleo:${user.id}:sombra:last_auto`;
+    const today = todayLocal();
+    if (localStorage.getItem(key) === today) return;
+    localStorage.setItem(key, today); // marca antes pra evitar disparo duplicado em StrictMode
+    const t = window.setTimeout(() => { runAnalysis({ silent: true }); }, 1200);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const byCategory = useMemo(() => {
     const map = new Map<string, Hypothesis[]>();
