@@ -1,14 +1,33 @@
 import { ReactNode } from "react";
+import { HelpCircle } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export function ModulePage({
-  code, title, subtitle, children,
-}: { code: string; title: string; subtitle?: string; children?: ReactNode }) {
+  code, title, subtitle, explanation, children,
+}: { code: string; title: string; subtitle?: string; explanation?: string; children?: ReactNode }) {
   return (
     <div className="animate-fade-in space-y-6">
       <header className="flex items-end justify-between border-b border-border/60 pb-4">
         <div>
           <div className="font-mono text-[10px] tracking-[0.4em] text-primary/80">{code}</div>
-          <h1 className="font-display text-3xl text-foreground hud-text-glow mt-1">{title}</h1>
+          <div className="flex items-center gap-2 mt-1">
+            <h1 className="font-display text-3xl text-foreground hud-text-glow">{title}</h1>
+            {explanation && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    aria-label="Como usar este módulo"
+                    className="text-muted-foreground hover:text-primary transition -translate-y-1"
+                  >
+                    <HelpCircle className="size-4" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent side="bottom" align="start" className="max-w-sm text-xs leading-relaxed font-mono">
+                  {explanation}
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
           {subtitle && <p className="text-muted-foreground text-sm mt-1 max-w-2xl">{subtitle}</p>}
         </div>
         <div className="hidden md:flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
