@@ -154,10 +154,16 @@ function HypothesisCard({ h, onUpdate }: { h: Hypothesis; onUpdate: () => void }
   );
 }
 
+function todayLocal(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function SombraPage() {
   const { user } = useAuth();
   const [items, setItems] = useState<Hypothesis[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
+  const [autoAnalyzing, setAutoAnalyzing] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = async () => {
