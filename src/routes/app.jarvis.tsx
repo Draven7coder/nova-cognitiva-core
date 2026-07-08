@@ -81,11 +81,18 @@ function JarvisPage() {
     try {
       await sb.from("jarvis_messages").insert({ user_id: user.id, role: "user", content: text });
 
-      const [{ data: missions }, { data: journal }, { data: ooda }, { data: chains }] = await Promise.all([
+      const [
+        { data: missions },
+        { data: journal },
+        { data: ooda },
+        { data: chains },
+        vocabState,
+      ] = await Promise.all([
         supabase.from("missions").select("title,status,type,streak").limit(30),
         supabase.from("journal_entries").select("title,content,module,created_at").order("created_at", { ascending: false }).limit(15),
         supabase.from("ooda_entries").select("tag,observe,orient,decide,act,created_at").order("created_at", { ascending: false }).limit(8),
         supabase.from("operational_chains").select("title,status,priority").eq("status", "ativa").limit(10),
+        loadVocabContext(user.id),
       ]);
 
       const history = [...chat, optimistic].slice(-12).map((m) => ({ role: m.role, content: m.content }));
@@ -100,6 +107,7 @@ function JarvisPage() {
               missions, journal_recent: journal, ooda_recent: ooda, active_chains: chains,
               now: new Date().toISOString(),
             },
+            vocabulary_context: vocabState.context,
           },
         },
       });
@@ -107,6 +115,8 @@ function JarvisPage() {
       if ((data as any).error) throw new Error((data as any).error);
       const reply = ((data as any).content ?? "").trim() || "…";
       await sb.from("jarvis_messages").insert({ user_id: user.id, role: "assistant", content: reply });
+      // aplica atualizações de vocabulário em background
+      try { await applyVocabResult(user.id, vocabState.rows, (data as any).vocab); } catch { /* silencioso */ }
       load();
     } catch (e: any) {
       toast.error(e.message ?? "Falha na conversa com o JARVIS");
