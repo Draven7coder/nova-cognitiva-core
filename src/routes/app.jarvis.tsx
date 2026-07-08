@@ -50,17 +50,20 @@ function JarvisPage() {
   const [chat, setChat] = useState<ChatMsg[]>([]);
   const [msg, setMsg] = useState("");
   const [sending, setSending] = useState(false);
+  const [vocab, setVocab] = useState<VocabRow[]>([]);
 
   const load = async () => {
     const sb: any = supabase;
-    const [{ data: ins }, { data: rep }, { data: msgs }] = await Promise.all([
+    const [{ data: ins }, { data: rep }, { data: msgs }, vocabState] = await Promise.all([
       supabase.from("jarvis_insights").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(60),
       supabase.from("ai_reports").select("content,created_at").eq("scope", "jarvis").order("created_at", { ascending: false }).limit(1),
       sb.from("jarvis_messages").select("*").order("created_at", { ascending: true }).limit(80),
+      user ? loadVocabContext(user.id) : Promise.resolve({ rows: [], context: null }),
     ]);
     setInsights((ins ?? []) as Insight[]);
     if (rep?.[0]) setReport(rep[0].content);
     setChat((msgs ?? []) as ChatMsg[]);
+    setVocab(vocabState.rows);
   };
 
   useEffect(() => { if (user) load(); }, [user]);
