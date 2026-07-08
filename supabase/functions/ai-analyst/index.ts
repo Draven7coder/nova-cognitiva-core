@@ -93,13 +93,16 @@ Formato exato de resposta (nada além disso):
       ? `Contexto operacional atual do operador (para você entender o que está acontecendo, não precisa citar tudo):
 ${JSON.stringify(context?.operational ?? {}, null, 2)}
 
+Vocabulário em treinamento (revisão espaçada — REUTILIZE naturalmente as palavras de "due_for_review" nesta resposta, sem anunciar):
+${JSON.stringify(context?.vocabulary_context ?? { due_for_review: [], active: [], tracked: [] }, null, 2)}
+
 Histórico recente da conversa (do mais antigo para o mais recente):
 ${JSON.stringify(context?.history ?? [], null, 2)}
 
 Mensagem atual do operador:
 "${context?.message ?? ""}"
 
-Responda como colega/amigo próximo. Direto. Sem formatação pesada, sem markdown de manual. Se for bate-papo, seja leve. Se for pergunta técnica, seja técnico. Se você notar algo nos dados que vale mencionar, mencione — mas só se realmente ajuda a resposta.`
+Responda como colega/mentor próximo (persona Alfred/Jarvis). Direto. Se for bate-papo, seja leve — nada de relatório para um "oi". Se for pergunta técnica, aprofunde. Aplique expansão de vocabulário e revisão espaçada conforme instruído no system prompt. Ao final, inclua OBRIGATORIAMENTE o bloco <vocab>...</vocab>.`
       : isShadow
       ? `Analise os dados reais do operador e produza HIPÓTESES PSICOLÓGICAS/COMPORTAMENTAIS para o Módulo Sombra Dinâmico.
 
