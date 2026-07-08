@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Bot, Sparkles, ShieldAlert, TrendingUp, AlertTriangle,
-  Activity, CheckCircle2, Trash2, RefreshCw, Send, MessageSquare,
+  Activity, CheckCircle2, Trash2, RefreshCw, Send, MessageSquare, BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
+import { loadVocabContext, applyVocabResult, LEVEL_LABEL, LEVEL_COLOR, type VocabRow } from "@/lib/vocab-sync";
 
 export const Route = createFileRoute("/app/jarvis")({ component: JarvisPage });
 
