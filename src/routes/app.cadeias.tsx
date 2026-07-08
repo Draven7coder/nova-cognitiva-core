@@ -242,10 +242,7 @@ function CadeiasPage() {
                     <Badge variant="outline" className={`font-mono text-[10px] ${STATUS_CLS[c.status]}`}>{STATUS_LABEL[c.status]}</Badge>
                     <div className="flex gap-1">
                       {next && nextMod && (
-                        <Link
-                          to={nextMod.path}
-                          search={next.module === "laboratorio" || next.module === "manual" ? { subtaskId: next.id, chainId: c.id } as any : undefined as any}
-                        >
+                        <Link to={nextMod.path}>
                           <Button size="sm" className="font-mono text-[10px] tracking-widest h-7">
                             {next.module === "laboratorio" ? "REVISAR / RESOLVER" : "IR"} <ArrowRight className="size-3 ml-1" />
                           </Button>
