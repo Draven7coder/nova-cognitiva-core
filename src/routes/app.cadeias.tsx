@@ -244,7 +244,7 @@ function CadeiasPage() {
                       {next && nextMod && (
                         <Link to={nextMod.path}>
                           <Button size="sm" className="font-mono text-[10px] tracking-widest h-7">
-                            IR <ArrowRight className="size-3 ml-1" />
+                            {next.module === "laboratorio" ? "REVISAR / RESOLVER" : "IR"} <ArrowRight className="size-3 ml-1" />
                           </Button>
                         </Link>
                       )}

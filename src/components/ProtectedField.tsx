@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useProtectedField } from "@/hooks/useProtectedField";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -9,7 +11,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { Lock, Unlock, History, Save, CheckCircle2, Circle, AlertCircle, RotateCcw } from "lucide-react";
+import { Lock, Unlock, History, Save, CheckCircle2, Circle, AlertCircle, RotateCcw, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
@@ -19,10 +21,51 @@ interface Props {
   minHeight?: number;
 }
 
+type Suggestion = {
+  id: string;
+  suggested_content: string;
+  reason: string | null;
+  created_at: string;
+};
+
 export function ProtectedField({ module, fieldKey, placeholder, minHeight = 100 }: Props) {
   const f = useProtectedField(module, fieldKey);
+  const { user } = useAuth();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingRestore, setPendingRestore] = useState<any>(null);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("ai_suggestions")
+        .select("id,suggested_content,reason,created_at")
+        .eq("user_id", user.id)
+        .eq("module", module)
+        .eq("field_key", fieldKey)
+        .eq("status", "pendente")
+        .order("created_at", { ascending: false });
+      if (!cancelled) setSuggestions((data ?? []) as Suggestion[]);
+    })();
+    return () => { cancelled = true; };
+  }, [user, module, fieldKey]);
+
+  const acceptSuggestion = async (s: Suggestion) => {
+    f.unlock();
+    f.setValue(s.suggested_content);
+    await f.saveNow();
+    await supabase.from("ai_suggestions").update({ status: "aceita" }).eq("id", s.id);
+    setSuggestions((list) => list.filter((x) => x.id !== s.id));
+    f.lock();
+    toast.success("Sugestão aceita e versionada.");
+  };
+
+  const rejectSuggestion = async (s: Suggestion) => {
+    await supabase.from("ai_suggestions").update({ status: "rejeitada" }).eq("id", s.id);
+    setSuggestions((list) => list.filter((x) => x.id !== s.id));
+  };
 
   const statusMeta = {
     idle:     { icon: Circle, txt: "sincronizado", color: "text-muted-foreground" },
@@ -42,6 +85,30 @@ export function ProtectedField({ module, fieldKey, placeholder, minHeight = 100 
 
   return (
     <div className="space-y-2">
+      {suggestions.length > 0 && (
+        <div className="space-y-2">
+          {suggestions.map((s) => (
+            <div key={s.id} className="hud-panel border border-primary/40 p-2 rounded">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <span className="font-mono text-[9px] tracking-widest text-primary flex items-center gap-1">
+                  <Sparkles className="size-3" /> SUGESTÃO DA IA
+                </span>
+                <div className="flex gap-1">
+                  <Button size="sm" variant="ghost" className="h-6 text-[10px] font-mono" onClick={() => acceptSuggestion(s)}>
+                    <CheckCircle2 className="size-3 mr-1" /> ACEITAR
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-6 text-[10px] font-mono" onClick={() => rejectSuggestion(s)}>
+                    <X className="size-3" />
+                  </Button>
+                </div>
+              </div>
+              {s.reason && <p className="text-[11px] text-muted-foreground italic mb-1">{s.reason}</p>}
+              <p className="text-xs font-mono text-foreground/80 whitespace-pre-wrap line-clamp-4">{s.suggested_content}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="relative">
         <Textarea
           placeholder={placeholder}

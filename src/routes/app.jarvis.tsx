@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Bot, Sparkles, ShieldAlert, TrendingUp, AlertTriangle,
-  Activity, CheckCircle2, Trash2, RefreshCw, Send, MessageSquare,
+  Activity, CheckCircle2, Trash2, RefreshCw, Send, MessageSquare, BookOpen,
 } from "lucide-react";
 import { toast } from "sonner";
+import { loadVocabContext, applyVocabResult, LEVEL_LABEL, LEVEL_COLOR, type VocabRow } from "@/lib/vocab-sync";
 
 export const Route = createFileRoute("/app/jarvis")({ component: JarvisPage });
 
@@ -49,17 +50,20 @@ function JarvisPage() {
   const [chat, setChat] = useState<ChatMsg[]>([]);
   const [msg, setMsg] = useState("");
   const [sending, setSending] = useState(false);
+  const [vocab, setVocab] = useState<VocabRow[]>([]);
 
   const load = async () => {
     const sb: any = supabase;
-    const [{ data: ins }, { data: rep }, { data: msgs }] = await Promise.all([
+    const [{ data: ins }, { data: rep }, { data: msgs }, vocabState] = await Promise.all([
       supabase.from("jarvis_insights").select("*").eq("status", "active").order("created_at", { ascending: false }).limit(60),
       supabase.from("ai_reports").select("content,created_at").eq("scope", "jarvis").order("created_at", { ascending: false }).limit(1),
       sb.from("jarvis_messages").select("*").order("created_at", { ascending: true }).limit(80),
+      user ? loadVocabContext(user.id) : Promise.resolve({ rows: [], context: null }),
     ]);
     setInsights((ins ?? []) as Insight[]);
     if (rep?.[0]) setReport(rep[0].content);
     setChat((msgs ?? []) as ChatMsg[]);
+    setVocab(vocabState.rows);
   };
 
   useEffect(() => { if (user) load(); }, [user]);
@@ -77,11 +81,18 @@ function JarvisPage() {
     try {
       await sb.from("jarvis_messages").insert({ user_id: user.id, role: "user", content: text });
 
-      const [{ data: missions }, { data: journal }, { data: ooda }, { data: chains }] = await Promise.all([
+      const [
+        { data: missions },
+        { data: journal },
+        { data: ooda },
+        { data: chains },
+        vocabState,
+      ] = await Promise.all([
         supabase.from("missions").select("title,status,type,streak").limit(30),
         supabase.from("journal_entries").select("title,content,module,created_at").order("created_at", { ascending: false }).limit(15),
         supabase.from("ooda_entries").select("tag,observe,orient,decide,act,created_at").order("created_at", { ascending: false }).limit(8),
         supabase.from("operational_chains").select("title,status,priority").eq("status", "ativa").limit(10),
+        loadVocabContext(user.id),
       ]);
 
       const history = [...chat, optimistic].slice(-12).map((m) => ({ role: m.role, content: m.content }));
@@ -96,6 +107,7 @@ function JarvisPage() {
               missions, journal_recent: journal, ooda_recent: ooda, active_chains: chains,
               now: new Date().toISOString(),
             },
+            vocabulary_context: vocabState.context,
           },
         },
       });
@@ -103,6 +115,8 @@ function JarvisPage() {
       if ((data as any).error) throw new Error((data as any).error);
       const reply = ((data as any).content ?? "").trim() || "…";
       await sb.from("jarvis_messages").insert({ user_id: user.id, role: "assistant", content: reply });
+      // aplica atualizações de vocabulário em background
+      try { await applyVocabResult(user.id, vocabState.rows, (data as any).vocab); } catch { /* silencioso */ }
       load();
     } catch (e: any) {
       toast.error(e.message ?? "Falha na conversa com o JARVIS");
@@ -389,6 +403,50 @@ function JarvisPage() {
               <Send className="size-3 mr-1" /> ENVIAR
             </Button>
           </div>
+        </HudCard>
+      </div>
+
+      {/* Vocabulário adaptativo — revisão espaçada invisível */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-mono text-[10px] tracking-[0.3em] text-primary/80 flex items-center gap-2">
+            <BookOpen className="size-3" /> VOCABULÁRIO EM CONSTRUÇÃO
+          </h3>
+          <span className="font-mono text-[10px] text-muted-foreground">
+            {vocab.length} palavra{vocab.length === 1 ? "" : "s"} · {vocab.filter((v) => v.level >= 3).length} ativa{vocab.filter((v) => v.level >= 3).length === 1 ? "" : "s"}
+          </span>
+        </div>
+        <HudCard>
+          {vocab.length === 0 ? (
+            <div className="text-xs font-mono text-muted-foreground py-2">
+              Conforme conversar com o Alfred/Jarvis, palavras novas serão introduzidas naturalmente e revisadas em intervalos crescentes. Nada de aula — só uso em contexto.
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[360px] overflow-auto">
+              {vocab
+                .slice()
+                .sort((a, b) => (b.level - a.level) || (b.exposures - a.exposures))
+                .map((v) => (
+                  <div key={v.id} className={`hud-panel p-2 border ${LEVEL_COLOR[v.level]}`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-display text-sm text-foreground">{v.word}</span>
+                      <Badge variant="outline" className={`font-mono text-[9px] ${LEVEL_COLOR[v.level]}`}>
+                        {LEVEL_LABEL[v.level].toUpperCase()}
+                      </Badge>
+                    </div>
+                    {v.meaning && (
+                      <p className="text-[11px] text-muted-foreground leading-snug mt-1 line-clamp-2">{v.meaning}</p>
+                    )}
+                    <div className="flex items-center justify-between mt-1 font-mono text-[9px] text-muted-foreground/70">
+                      <span>{v.exposures}x expostas · {v.active_uses}x ativas</span>
+                      {v.level < 4 && (
+                        <span>rev {new Date(v.next_review_at).toLocaleDateString("pt-BR")}</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
         </HudCard>
       </div>
     </ModulePage>

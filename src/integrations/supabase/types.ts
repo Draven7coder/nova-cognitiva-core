@@ -779,6 +779,54 @@ export type Database = {
         }
         Relationships: []
       }
+      vocabulary_entries: {
+        Row: {
+          active_uses: number
+          created_at: string
+          example: string | null
+          exposures: number
+          first_seen_at: string
+          id: string
+          last_exposed_at: string
+          level: number
+          meaning: string | null
+          next_review_at: string
+          updated_at: string
+          user_id: string
+          word: string
+        }
+        Insert: {
+          active_uses?: number
+          created_at?: string
+          example?: string | null
+          exposures?: number
+          first_seen_at?: string
+          id?: string
+          last_exposed_at?: string
+          level?: number
+          meaning?: string | null
+          next_review_at?: string
+          updated_at?: string
+          user_id: string
+          word: string
+        }
+        Update: {
+          active_uses?: number
+          created_at?: string
+          example?: string | null
+          exposures?: number
+          first_seen_at?: string
+          id?: string
+          last_exposed_at?: string
+          level?: number
+          meaning?: string | null
+          next_review_at?: string
+          updated_at?: string
+          user_id?: string
+          word?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
