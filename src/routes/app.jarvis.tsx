@@ -405,6 +405,50 @@ function JarvisPage() {
           </div>
         </HudCard>
       </div>
+
+      {/* Vocabulário adaptativo — revisão espaçada invisível */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="font-mono text-[10px] tracking-[0.3em] text-primary/80 flex items-center gap-2">
+            <BookOpen className="size-3" /> VOCABULÁRIO EM CONSTRUÇÃO
+          </h3>
+          <span className="font-mono text-[10px] text-muted-foreground">
+            {vocab.length} palavra{vocab.length === 1 ? "" : "s"} · {vocab.filter((v) => v.level >= 3).length} ativa{vocab.filter((v) => v.level >= 3).length === 1 ? "" : "s"}
+          </span>
+        </div>
+        <HudCard>
+          {vocab.length === 0 ? (
+            <div className="text-xs font-mono text-muted-foreground py-2">
+              Conforme conversar com o Alfred/Jarvis, palavras novas serão introduzidas naturalmente e revisadas em intervalos crescentes. Nada de aula — só uso em contexto.
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-[360px] overflow-auto">
+              {vocab
+                .slice()
+                .sort((a, b) => (b.level - a.level) || (b.exposures - a.exposures))
+                .map((v) => (
+                  <div key={v.id} className={`hud-panel p-2 border ${LEVEL_COLOR[v.level]}`}>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-display text-sm text-foreground">{v.word}</span>
+                      <Badge variant="outline" className={`font-mono text-[9px] ${LEVEL_COLOR[v.level]}`}>
+                        {LEVEL_LABEL[v.level].toUpperCase()}
+                      </Badge>
+                    </div>
+                    {v.meaning && (
+                      <p className="text-[11px] text-muted-foreground leading-snug mt-1 line-clamp-2">{v.meaning}</p>
+                    )}
+                    <div className="flex items-center justify-between mt-1 font-mono text-[9px] text-muted-foreground/70">
+                      <span>{v.exposures}x expostas · {v.active_uses}x ativas</span>
+                      {v.level < 4 && (
+                        <span>rev {new Date(v.next_review_at).toLocaleDateString("pt-BR")}</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+        </HudCard>
+      </div>
     </ModulePage>
   );
 }
