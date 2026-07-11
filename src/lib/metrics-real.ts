@@ -309,7 +309,7 @@ export async function loadEngagementIndexReal(_userId: string): Promise<Engageme
     sb.from("missions").select("id,xp"),
     sb.from("emergent_insights").select("*", { count: "exact", head: true }).gte("feedback_rating", 4),
   ]);
-  const xpMap = new Map((missAll ?? []).map((x: any) => [x.id, x.xp ?? 0]));
+  const xpMap = new Map<string, number>((missAll ?? []).map((x: any) => [x.id as string, (x.xp ?? 0) as number]));
   const totalXP = (comps ?? []).reduce((acc: number, c: any) => acc + (xpMap.get(c.mission_id) ?? 0), 0);
   const hydDays = new Set((hyd ?? []).map((h: any) => h.consumed_at?.slice(0, 10))).size;
   const raw =
