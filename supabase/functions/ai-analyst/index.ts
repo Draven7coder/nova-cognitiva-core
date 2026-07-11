@@ -242,7 +242,7 @@ Ao final, inclua um bloco JSON entre <insights>...</insights> com a estrutura ex
   "alerts": [{"title":"...", "description":"...", "severity":"low|medium|high|critical"}]
 }
 Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
-      : `Escopo do relatório: ${scope}.\n\nDados operacionais do usuário:\n${JSON.stringify(context, null, 2)}\n\nGere um relatório analítico profundo: padrões detectados, evolução, riscos, sabotagens, tendências cognitivas, recomendações estratégicas. Inclua ao final um bloco JSON entre <metrics>...</metrics> com 10 métricas (0-100) nas chaves: profundidade, execucao, consistencia, integracao, criatividade, emocional, evolucao, clareza, disciplina, longoPrazo.`;
+      : `Escopo do relatório: ${scope}.\n\nDados operacionais do usuário:\n${JSON.stringify(context, null, 2)}\n\nGere um relatório analítico profundo: padrões detectados, evolução, riscos, sabotagens, tendências cognitivas, recomendações estratégicas.\n\nMÉTRICAS — REGRA CRÍTICA:\nSe "context.current_metrics" existir, você DEVE ANCORAR as 10 métricas nesses valores e aplicar apenas AJUSTE INCREMENTAL de -8 a +8 pontos por métrica, baseado em EVIDÊNCIA REAL dos dados fornecidos nesta janela. Nunca "chute" métricas do zero. Se não houver evidência clara para uma métrica, mantenha o valor atual. Se não houver current_metrics, seja parcimonioso e produza valores conservadores (30-60) ancorados apenas em dados reais.\n\nInclua ao final um bloco JSON entre <metrics>...</metrics> com as 10 métricas (0-100) nas chaves: profundidade, execucao, consistencia, integracao, criatividade, emocional, evolucao, clareza, disciplina, longoPrazo.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

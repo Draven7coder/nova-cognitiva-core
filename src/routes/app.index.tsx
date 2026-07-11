@@ -16,7 +16,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { syncChainProgress } from "@/lib/chain-sync";
-import { loadQiTimelineReal, loadPendingSuggestions, type QiDailyPoint, type PendingSuggestion } from "@/lib/metrics-real";
+import { loadQiTimelineReal, loadPendingSuggestions, loadCognitiveIndexReal, loadEngagementIndexReal, type QiDailyPoint, type PendingSuggestion, type CognitiveIndex, type EngagementIndex } from "@/lib/metrics-real";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
 
@@ -48,7 +48,7 @@ const DEFAULT_METRICS = {
 function Dashboard() {
   const { user } = useAuth();
   const [metrics, setMetrics] = useState<Record<string, number>>(DEFAULT_METRICS);
-  const [insight, setInsight] = useState<string>("Aguardando primeira análise da IA. Execute uma sincronização para mapear seu QI Funcional Operacional.");
+  const [insight, setInsight] = useState<string>("Aguardando primeira análise da IA. Execute uma sincronização para calibrar seu Índice Cognitivo Funcional.");
   const [missions, setMissions] = useState<any[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [jarvis, setJarvis] = useState<{ weakness: number; evolution: number; alert: number; topAlert?: any }>({ weakness: 0, evolution: 0, alert: 0 });
@@ -69,6 +69,8 @@ function Dashboard() {
   const [savingCheckin, setSavingCheckin] = useState(false);
   const [qiTimeline, setQiTimeline] = useState<QiDailyPoint[]>([]);
   const [pending, setPending] = useState<PendingSuggestion[]>([]);
+  const [cogIdx, setCogIdx] = useState<CognitiveIndex | null>(null);
+  const [engIdx, setEngIdx] = useState<EngagementIndex | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -140,12 +142,16 @@ function Dashboard() {
 
       // Real QI timeline + pending suggestions
       if (user) {
-        const [tl, ps] = await Promise.all([
+        const [tl, ps, ci2, eg] = await Promise.all([
           loadQiTimelineReal(user.id).catch(() => []),
           loadPendingSuggestions(user.id).catch(() => []),
+          loadCognitiveIndexReal(user.id).catch(() => null),
+          loadEngagementIndexReal(user.id).catch(() => null),
         ]);
         setQiTimeline(tl);
         setPending(ps);
+        setCogIdx(ci2);
+        setEngIdx(eg);
       }
     })();
   }, [user]);
@@ -198,20 +204,10 @@ function Dashboard() {
     ooda: "/app/ooda", jarvis: "/app/jarvis", insights: "/app/insights", relatorios: "/app/relatorios",
   };
 
-  // Base QI from IA metrics (0-100 average)
-  const baseQI = Math.round(Object.values(metrics).reduce((a, b) => a + b, 0) / Object.values(metrics).length);
-  // Achievement bonus (0-400) — caps via diminishing returns to 500 total
+  // Kept for backward compat (used elsewhere): achievements handle for potential future readouts.
   const a = achievements;
-  const rawBonus =
-    a.missionsDone * 2.5 +
-    a.totalXP * 0.4 +
-    a.oodaCount * 6 +
-    a.journalCount * 1.5 +
-    a.insightsAccepted * 4 +
-    a.hydrationDays * 1.2;
-  const bonus = Math.min(400, Math.round(rawBonus));
-  const overallQI = Math.min(500, baseQI + bonus);
-  const qiPct = (overallQI / 500) * 100;
+  void a;
+
 
   const sync = async () => {
     setAnalyzing(true);
@@ -222,7 +218,7 @@ function Dashboard() {
         supabase.from("journal_entries").select("title,content,module,created_at").order("created_at", { ascending: false }).limit(20),
       ]);
       const { data, error } = await supabase.functions.invoke("ai-analyst", {
-        body: { scope: "diário", context: { identity: ident, missions: missAll, journal } },
+        body: { scope: "diário", context: { identity: ident, missions: missAll, journal, current_metrics: metrics } },
       });
       if (error) throw error;
       if ((data as any).error) throw new Error((data as any).error);
@@ -242,7 +238,7 @@ function Dashboard() {
   const evoData = qiTimeline.length ? qiTimeline : [];
 
   return (
-    <ModulePage code="// CORE 00" title="Núcleo Operacional" subtitle="Painel central de comando · QI Funcional Operacional ativo.">
+    <ModulePage code="// CORE 00" title="Núcleo Operacional" subtitle="Painel central de comando · Índice Cognitivo Funcional + Engajamento reais..">
       {/* ==== SISTEMA NERVOSO CENTRAL ==== */}
       <HudCard title="🎯 MISSÃO PRINCIPAL DO DIA · DEFINIDA PELO JARVIS">
         <div className="flex flex-wrap items-center gap-3">
@@ -397,24 +393,55 @@ function Dashboard() {
       </HudCard>
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <HudCard title="QI FUNCIONAL OPERACIONAL" className="lg:col-span-1">
+        <HudCard title="ÍNDICE COGNITIVO FUNCIONAL" className="lg:col-span-1">
           <div className="flex items-baseline gap-2">
-            <span className="font-display text-6xl text-primary hud-text-glow">{overallQI}</span>
-            <span className="font-mono text-xs text-muted-foreground">/ 500</span>
+            <span className="font-display text-6xl text-primary hud-text-glow">{cogIdx?.score ?? 0}</span>
+            <span className="font-mono text-xs text-muted-foreground">/ 100</span>
+            {cogIdx && cogIdx.monthDelta !== 0 && (
+              <span className={`font-mono text-[10px] ml-2 ${cogIdx.monthDelta > 0 ? "text-primary" : "text-rose-400"}`}>
+                {cogIdx.monthDelta > 0 ? "+" : ""}{cogIdx.monthDelta} vs mês anterior
+              </span>
+            )}
           </div>
-          <Progress value={qiPct} className="mt-3 h-1" />
-          <div className="mt-3 grid grid-cols-2 gap-1 text-[10px] font-mono text-muted-foreground">
-            <div>Base IA: <span className="text-primary">{baseQI}</span></div>
-            <div>Bônus feitos: <span className="text-primary">+{bonus}</span></div>
-            <div>Missões: <span className="text-primary">{a.missionsDone}</span></div>
-            <div>XP: <span className="text-primary">{a.totalXP}</span></div>
-            <div>OODA: <span className="text-primary">{a.oodaCount}</span></div>
-            <div>Journal: <span className="text-primary">{a.journalCount}</span></div>
-            <div>Insights ✓4★: <span className="text-primary">{a.insightsAccepted}</span></div>
-            <div>Hidrat. dias: <span className="text-primary">{a.hydrationDays}</span></div>
+          <Progress value={cogIdx?.score ?? 0} className="mt-3 h-1" />
+          {cogIdx && (
+            <div className="mt-3 grid grid-cols-2 gap-1 text-[10px] font-mono text-muted-foreground">
+              <div>Sono: <span className="text-primary">{cogIdx.components.sleep}</span></div>
+              <div>Foco: <span className="text-primary">{cogIdx.components.focus}</span></div>
+              <div>Estabilidade: <span className="text-primary">{cogIdx.components.stability}</span></div>
+              <div>Consistência: <span className="text-primary">{cogIdx.components.consistency}</span></div>
+              <div className="col-span-2">Retenção (vocab): <span className="text-primary">{cogIdx.components.retention}</span></div>
+            </div>
+          )}
+          {cogIdx?.drivers.length ? (
+            <div className="mt-3 text-[10px] text-muted-foreground leading-relaxed">
+              <span className="text-primary">▸ Drivers:</span> {cogIdx.drivers.join(" · ")}
+            </div>
+          ) : (
+            <div className="mt-3 text-[10px] text-muted-foreground leading-relaxed">
+              Métrica real de sono, foco, estabilidade emocional, consistência de check-ins e retenção de vocabulário.
+            </div>
+          )}
+        </HudCard>
+
+        <HudCard title="ÍNDICE DE ENGAJAMENTO" className="lg:col-span-1">
+          <div className="flex items-baseline gap-2">
+            <span className="font-display text-6xl text-primary hud-text-glow">{engIdx?.score ?? 0}</span>
+            <span className="font-mono text-xs text-muted-foreground">/ 100</span>
           </div>
+          <Progress value={engIdx?.score ?? 0} className="mt-3 h-1" />
+          {engIdx && (
+            <div className="mt-3 grid grid-cols-2 gap-1 text-[10px] font-mono text-muted-foreground">
+              <div>Missões: <span className="text-primary">{engIdx.parts.missions}</span></div>
+              <div>XP: <span className="text-primary">{engIdx.parts.totalXP}</span></div>
+              <div>OODA: <span className="text-primary">{engIdx.parts.ooda}</span></div>
+              <div>Journal: <span className="text-primary">{engIdx.parts.journal}</span></div>
+              <div>Insights ✓4★: <span className="text-primary">{engIdx.parts.insightsAccepted}</span></div>
+              <div>Hidrat. dias: <span className="text-primary">{engIdx.parts.hydDays}</span></div>
+            </div>
+          )}
           <div className="mt-3 text-[10px] text-muted-foreground leading-relaxed">
-            QI escala 0–500 · base cognitiva da IA + realizações reais no sistema.
+            Volume real de uso do sistema — não representa cognição, apenas consistência operacional.
           </div>
           <Button onClick={sync} disabled={analyzing} className="mt-4 w-full font-mono text-xs tracking-widest">
             <Sparkles className="size-3 mr-2" />
@@ -422,7 +449,7 @@ function Dashboard() {
           </Button>
         </HudCard>
 
-        <HudCard title="MAPEAMENTO COGNITIVO" className="lg:col-span-2">
+        <HudCard title="MAPEAMENTO COGNITIVO" className="lg:col-span-1">
           <div className="h-[280px]">
             <ResponsiveContainer>
               <RadarChart data={radarData}>
@@ -435,6 +462,7 @@ function Dashboard() {
           </div>
         </HudCard>
       </div>
+
 
       <div className="grid lg:grid-cols-3 gap-4">
         {Object.entries(metrics).slice(0, 6).map(([k, v]) => (
@@ -553,10 +581,10 @@ function Dashboard() {
 
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <HudCard title="EVOLUÇÃO TEMPORAL · QI · 14D · REAL" className="lg:col-span-2">
+        <HudCard title="PRONTIDÃO DIÁRIA · 14D · REAL" className="lg:col-span-2">
           {evoData.length === 0 || evoData.every((p) => p.qi === 0) ? (
             <div className="h-[200px] flex items-center justify-center text-xs font-mono text-muted-foreground text-center px-6">
-              Sem check-ins nos últimos 14 dias. Registre o check-in diário — o QI real será desenhado aqui.
+              Sem check-ins nos últimos 14 dias. Registre o check-in diário — a prontidão diária será desenhada aqui.
             </div>
           ) : (
             <div className="h-[200px]">
