@@ -27,7 +27,7 @@ const modules = [
   { title: "Loop OODA", url: "/app/ooda", icon: Compass },
   { title: "JARVIS", url: "/app/jarvis", icon: Bot },
   { title: "Insights Emergentes", url: "/app/insights", icon: Sparkles },
-  { title: "Protocolo Wayne", url: "/app/wayne", icon: Shield },
+  { title: "Sistema Trinarius", url: "/app/wayne", icon: Shield },
   { title: "Cifra da Bússola", url: "/app/cifra", icon: KeyRound },
   { title: "Relatórios da IA", url: "/app/relatorios", icon: Brain },
   { title: "Configurações", url: "/app/config", icon: Settings },
