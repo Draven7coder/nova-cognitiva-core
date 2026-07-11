@@ -403,24 +403,55 @@ function Dashboard() {
       </HudCard>
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <HudCard title="QI FUNCIONAL OPERACIONAL" className="lg:col-span-1">
+        <HudCard title="ÍNDICE COGNITIVO FUNCIONAL" className="lg:col-span-1">
           <div className="flex items-baseline gap-2">
-            <span className="font-display text-6xl text-primary hud-text-glow">{overallQI}</span>
-            <span className="font-mono text-xs text-muted-foreground">/ 500</span>
+            <span className="font-display text-6xl text-primary hud-text-glow">{cogIdx?.score ?? 0}</span>
+            <span className="font-mono text-xs text-muted-foreground">/ 100</span>
+            {cogIdx && cogIdx.monthDelta !== 0 && (
+              <span className={`font-mono text-[10px] ml-2 ${cogIdx.monthDelta > 0 ? "text-primary" : "text-rose-400"}`}>
+                {cogIdx.monthDelta > 0 ? "+" : ""}{cogIdx.monthDelta} vs mês anterior
+              </span>
+            )}
           </div>
-          <Progress value={qiPct} className="mt-3 h-1" />
-          <div className="mt-3 grid grid-cols-2 gap-1 text-[10px] font-mono text-muted-foreground">
-            <div>Base IA: <span className="text-primary">{baseQI}</span></div>
-            <div>Bônus feitos: <span className="text-primary">+{bonus}</span></div>
-            <div>Missões: <span className="text-primary">{a.missionsDone}</span></div>
-            <div>XP: <span className="text-primary">{a.totalXP}</span></div>
-            <div>OODA: <span className="text-primary">{a.oodaCount}</span></div>
-            <div>Journal: <span className="text-primary">{a.journalCount}</span></div>
-            <div>Insights ✓4★: <span className="text-primary">{a.insightsAccepted}</span></div>
-            <div>Hidrat. dias: <span className="text-primary">{a.hydrationDays}</span></div>
+          <Progress value={cogIdx?.score ?? 0} className="mt-3 h-1" />
+          {cogIdx && (
+            <div className="mt-3 grid grid-cols-2 gap-1 text-[10px] font-mono text-muted-foreground">
+              <div>Sono: <span className="text-primary">{cogIdx.components.sleep}</span></div>
+              <div>Foco: <span className="text-primary">{cogIdx.components.focus}</span></div>
+              <div>Estabilidade: <span className="text-primary">{cogIdx.components.stability}</span></div>
+              <div>Consistência: <span className="text-primary">{cogIdx.components.consistency}</span></div>
+              <div className="col-span-2">Retenção (vocab): <span className="text-primary">{cogIdx.components.retention}</span></div>
+            </div>
+          )}
+          {cogIdx?.drivers.length ? (
+            <div className="mt-3 text-[10px] text-muted-foreground leading-relaxed">
+              <span className="text-primary">▸ Drivers:</span> {cogIdx.drivers.join(" · ")}
+            </div>
+          ) : (
+            <div className="mt-3 text-[10px] text-muted-foreground leading-relaxed">
+              Métrica real de sono, foco, estabilidade emocional, consistência de check-ins e retenção de vocabulário.
+            </div>
+          )}
+        </HudCard>
+
+        <HudCard title="ÍNDICE DE ENGAJAMENTO" className="lg:col-span-1">
+          <div className="flex items-baseline gap-2">
+            <span className="font-display text-6xl text-primary hud-text-glow">{engIdx?.score ?? 0}</span>
+            <span className="font-mono text-xs text-muted-foreground">/ 100</span>
           </div>
+          <Progress value={engIdx?.score ?? 0} className="mt-3 h-1" />
+          {engIdx && (
+            <div className="mt-3 grid grid-cols-2 gap-1 text-[10px] font-mono text-muted-foreground">
+              <div>Missões: <span className="text-primary">{engIdx.parts.missions}</span></div>
+              <div>XP: <span className="text-primary">{engIdx.parts.totalXP}</span></div>
+              <div>OODA: <span className="text-primary">{engIdx.parts.ooda}</span></div>
+              <div>Journal: <span className="text-primary">{engIdx.parts.journal}</span></div>
+              <div>Insights ✓4★: <span className="text-primary">{engIdx.parts.insightsAccepted}</span></div>
+              <div>Hidrat. dias: <span className="text-primary">{engIdx.parts.hydDays}</span></div>
+            </div>
+          )}
           <div className="mt-3 text-[10px] text-muted-foreground leading-relaxed">
-            QI escala 0–500 · base cognitiva da IA + realizações reais no sistema.
+            Volume real de uso do sistema — não representa cognição, apenas consistência operacional.
           </div>
           <Button onClick={sync} disabled={analyzing} className="mt-4 w-full font-mono text-xs tracking-widest">
             <Sparkles className="size-3 mr-2" />
@@ -428,7 +459,7 @@ function Dashboard() {
           </Button>
         </HudCard>
 
-        <HudCard title="MAPEAMENTO COGNITIVO" className="lg:col-span-2">
+        <HudCard title="MAPEAMENTO COGNITIVO" className="lg:col-span-1">
           <div className="h-[280px]">
             <ResponsiveContainer>
               <RadarChart data={radarData}>
@@ -441,6 +472,7 @@ function Dashboard() {
           </div>
         </HudCard>
       </div>
+
 
       <div className="grid lg:grid-cols-3 gap-4">
         {Object.entries(metrics).slice(0, 6).map(([k, v]) => (
