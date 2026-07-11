@@ -16,7 +16,7 @@ import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { syncChainProgress } from "@/lib/chain-sync";
-import { loadQiTimelineReal, loadPendingSuggestions, type QiDailyPoint, type PendingSuggestion } from "@/lib/metrics-real";
+import { loadQiTimelineReal, loadPendingSuggestions, loadCognitiveIndexReal, loadEngagementIndexReal, type QiDailyPoint, type PendingSuggestion, type CognitiveIndex, type EngagementIndex } from "@/lib/metrics-real";
 
 export const Route = createFileRoute("/app/")({ component: Dashboard });
 
