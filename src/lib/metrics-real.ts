@@ -203,3 +203,134 @@ export async function loadPendingSuggestions(userId: string): Promise<PendingSug
   });
   return out;
 }
+
+// ============================================================
+// COGNITIVE INDEX (0-100) — proxy funcional real
+// ============================================================
+export type CognitiveIndex = {
+  score: number;
+  monthDelta: number;
+  drivers: string[];
+  components: { sleep: number; focus: number; stability: number; consistency: number; retention: number };
+};
+
+export async function loadCognitiveIndexReal(_userId: string): Promise<CognitiveIndex> {
+  const d60 = daysAgoDate(60);
+  const d30 = daysAgoDate(30);
+  const d14 = daysAgoDate(14);
+  const { data: rows0 } = await sb
+    .from("daily_checkins")
+    .select("sleep_quality,focus,stress,check_date")
+    .gte("check_date", d60)
+    .order("check_date", { ascending: true });
+  const rows = rows0 ?? [];
+  const in30 = rows.filter((r: any) => r.check_date >= d30);
+  const prev30 = rows.filter((r: any) => r.check_date < d30);
+  const in14 = rows.filter((r: any) => r.check_date >= d14);
+
+  const sleepNow = avg(in30.map((r: any) => r.sleep_quality ?? 0));
+  const focusNow = avg(in30.map((r: any) => r.focus ?? 0));
+  const stressArr = in30.map((r: any) => r.stress ?? 0);
+  const meanS = avg(stressArr);
+  const varS = stressArr.length ? avg(stressArr.map((s: number) => (s - meanS) ** 2)) : 0;
+  const stability = clamp(100 - varS * 12);
+
+  const seen = new Set(in14.map((r: any) => r.check_date));
+  const consistency = clamp((seen.size / 14) * 100);
+
+  const sleep = clamp(sleepNow * 10);
+  const focus = clamp(focusNow * 10);
+
+  let retention = 50;
+  try {
+    const { data: vocab } = await sb
+      .from("vocabulary_entries")
+      .select("status,correct_count,review_count");
+    if (vocab && vocab.length) {
+      const totalR = vocab.reduce((a: number, v: any) => a + (v.review_count ?? 0), 0);
+      const correctR = vocab.reduce((a: number, v: any) => a + (v.correct_count ?? 0), 0);
+      if (totalR > 0) retention = clamp((correctR / totalR) * 100);
+      else retention = clamp(vocab.filter((v: any) => ["active", "mastered", "learned"].includes(v.status)).length * 4);
+    }
+  } catch { /* table shape may differ */ }
+
+  const score = clamp(
+    sleep * 0.2 + focus * 0.25 + stability * 0.2 + consistency * 0.2 + retention * 0.15,
+  );
+
+  // previous 30d for delta
+  const sleepPrev = clamp(avg(prev30.map((r: any) => r.sleep_quality ?? 0)) * 10);
+  const focusPrev = clamp(avg(prev30.map((r: any) => r.focus ?? 0)) * 10);
+  const stressPrev = prev30.map((r: any) => r.stress ?? 0);
+  const meanP = avg(stressPrev);
+  const varP = stressPrev.length ? avg(stressPrev.map((s: number) => (s - meanP) ** 2)) : 0;
+  const stabPrev = clamp(100 - varP * 12);
+  const prevScore = clamp(
+    sleepPrev * 0.2 + focusPrev * 0.25 + stabPrev * 0.2 + consistency * 0.2 + retention * 0.15,
+  );
+  const monthDelta = Math.round(score - prevScore);
+
+  const drivers: string[] = [];
+  if (sleep - sleepPrev >= 5) drivers.push("sono mais consistente");
+  else if (sleepPrev - sleep >= 5) drivers.push("sono em queda");
+  if (focus - focusPrev >= 5) drivers.push("foco em alta");
+  else if (focusPrev - focus >= 5) drivers.push("foco reduzido");
+  if (stability - stabPrev >= 5) drivers.push("menor variância de stress");
+  else if (stabPrev - stability >= 5) drivers.push("maior instabilidade emocional");
+  if (consistency < 60) drivers.push("check-ins irregulares reduzem a confiabilidade");
+  if (retention >= 70) drivers.push("retenção alta em revisão espaçada");
+
+  return { score, monthDelta, drivers, components: { sleep, focus, stability, consistency, retention } };
+}
+
+// ============================================================
+// ENGAGEMENT INDEX (0-100) — consistência de uso, NÃO cognição
+// ============================================================
+export type EngagementIndex = {
+  score: number;
+  parts: { missions: number; totalXP: number; ooda: number; journal: number; insightsAccepted: number; hydDays: number };
+};
+
+export async function loadEngagementIndexReal(_userId: string): Promise<EngagementIndex> {
+  const [
+    { count: missionsDone },
+    { count: oodaCount },
+    { count: journalCount },
+    { data: hyd },
+    { data: comps },
+    { data: missAll },
+    { count: insightsAccepted },
+  ] = await Promise.all([
+    sb.from("mission_completions").select("*", { count: "exact", head: true }),
+    sb.from("ooda_entries").select("*", { count: "exact", head: true }),
+    sb.from("journal_entries").select("*", { count: "exact", head: true }),
+    sb.from("hydration_logs").select("consumed_at").order("consumed_at", { ascending: false }).limit(500),
+    sb.from("mission_completions").select("mission_id"),
+    sb.from("missions").select("id,xp"),
+    sb.from("emergent_insights").select("*", { count: "exact", head: true }).gte("feedback_rating", 4),
+  ]);
+  const xpMap = new Map((missAll ?? []).map((x: any) => [x.id, x.xp ?? 0]));
+  const totalXP = (comps ?? []).reduce((acc: number, c: any) => acc + (xpMap.get(c.mission_id) ?? 0), 0);
+  const hydDays = new Set((hyd ?? []).map((h: any) => h.consumed_at?.slice(0, 10))).size;
+  const raw =
+    (missionsDone ?? 0) * 2.5 +
+    totalXP * 0.4 +
+    (oodaCount ?? 0) * 6 +
+    (journalCount ?? 0) * 1.5 +
+    (insightsAccepted ?? 0) * 4 +
+    hydDays * 1.2;
+  // rescale 0-400 → 0-100
+  const score = clamp(raw / 4);
+  return {
+    score,
+    parts: {
+      missions: missionsDone ?? 0,
+      totalXP,
+      ooda: oodaCount ?? 0,
+      journal: journalCount ?? 0,
+      insightsAccepted: insightsAccepted ?? 0,
+      hydDays,
+    },
+  };
+}
+
