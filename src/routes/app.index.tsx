@@ -69,6 +69,8 @@ function Dashboard() {
   const [savingCheckin, setSavingCheckin] = useState(false);
   const [qiTimeline, setQiTimeline] = useState<QiDailyPoint[]>([]);
   const [pending, setPending] = useState<PendingSuggestion[]>([]);
+  const [cogIdx, setCogIdx] = useState<CognitiveIndex | null>(null);
+  const [engIdx, setEngIdx] = useState<EngagementIndex | null>(null);
 
   useEffect(() => {
     (async () => {
