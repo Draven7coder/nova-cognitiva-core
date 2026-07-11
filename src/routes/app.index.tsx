@@ -218,7 +218,7 @@ function Dashboard() {
         supabase.from("journal_entries").select("title,content,module,created_at").order("created_at", { ascending: false }).limit(20),
       ]);
       const { data, error } = await supabase.functions.invoke("ai-analyst", {
-        body: { scope: "diário", context: { identity: ident, missions: missAll, journal } },
+        body: { scope: "diário", context: { identity: ident, missions: missAll, journal, current_metrics: metrics } },
       });
       if (error) throw error;
       if ((data as any).error) throw new Error((data as any).error);
