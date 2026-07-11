@@ -204,20 +204,10 @@ function Dashboard() {
     ooda: "/app/ooda", jarvis: "/app/jarvis", insights: "/app/insights", relatorios: "/app/relatorios",
   };
 
-  // Base QI from IA metrics (0-100 average)
-  const baseQI = Math.round(Object.values(metrics).reduce((a, b) => a + b, 0) / Object.values(metrics).length);
-  // Achievement bonus (0-400) — caps via diminishing returns to 500 total
+  // Kept for backward compat (used elsewhere): achievements handle for potential future readouts.
   const a = achievements;
-  const rawBonus =
-    a.missionsDone * 2.5 +
-    a.totalXP * 0.4 +
-    a.oodaCount * 6 +
-    a.journalCount * 1.5 +
-    a.insightsAccepted * 4 +
-    a.hydrationDays * 1.2;
-  const bonus = Math.min(400, Math.round(rawBonus));
-  const overallQI = Math.min(500, baseQI + bonus);
-  const qiPct = (overallQI / 500) * 100;
+  void a;
+
 
   const sync = async () => {
     setAnalyzing(true);
