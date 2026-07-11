@@ -142,12 +142,16 @@ function Dashboard() {
 
       // Real QI timeline + pending suggestions
       if (user) {
-        const [tl, ps] = await Promise.all([
+        const [tl, ps, ci2, eg] = await Promise.all([
           loadQiTimelineReal(user.id).catch(() => []),
           loadPendingSuggestions(user.id).catch(() => []),
+          loadCognitiveIndexReal(user.id).catch(() => null),
+          loadEngagementIndexReal(user.id).catch(() => null),
         ]);
         setQiTimeline(tl);
         setPending(ps);
+        setCogIdx(ci2);
+        setEngIdx(eg);
       }
     })();
   }, [user]);
