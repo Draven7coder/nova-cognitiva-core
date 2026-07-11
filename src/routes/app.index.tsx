@@ -48,7 +48,7 @@ const DEFAULT_METRICS = {
 function Dashboard() {
   const { user } = useAuth();
   const [metrics, setMetrics] = useState<Record<string, number>>(DEFAULT_METRICS);
-  const [insight, setInsight] = useState<string>("Aguardando primeira análise da IA. Execute uma sincronização para mapear seu QI Funcional Operacional.");
+  const [insight, setInsight] = useState<string>("Aguardando primeira análise da IA. Execute uma sincronização para calibrar seu Índice Cognitivo Funcional.");
   const [missions, setMissions] = useState<any[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [jarvis, setJarvis] = useState<{ weakness: number; evolution: number; alert: number; topAlert?: any }>({ weakness: 0, evolution: 0, alert: 0 });
@@ -238,7 +238,7 @@ function Dashboard() {
   const evoData = qiTimeline.length ? qiTimeline : [];
 
   return (
-    <ModulePage code="// CORE 00" title="Núcleo Operacional" subtitle="Painel central de comando · QI Funcional Operacional ativo.">
+    <ModulePage code="// CORE 00" title="Núcleo Operacional" subtitle="Painel central de comando · Índice Cognitivo Funcional + Engajamento reais..">
       {/* ==== SISTEMA NERVOSO CENTRAL ==== */}
       <HudCard title="🎯 MISSÃO PRINCIPAL DO DIA · DEFINIDA PELO JARVIS">
         <div className="flex flex-wrap items-center gap-3">
@@ -581,10 +581,10 @@ function Dashboard() {
 
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <HudCard title="EVOLUÇÃO TEMPORAL · QI · 14D · REAL" className="lg:col-span-2">
+        <HudCard title="PRONTIDÃO DIÁRIA · 14D · REAL" className="lg:col-span-2">
           {evoData.length === 0 || evoData.every((p) => p.qi === 0) ? (
             <div className="h-[200px] flex items-center justify-center text-xs font-mono text-muted-foreground text-center px-6">
-              Sem check-ins nos últimos 14 dias. Registre o check-in diário — o QI real será desenhado aqui.
+              Sem check-ins nos últimos 14 dias. Registre o check-in diário — a prontidão diária será desenhada aqui.
             </div>
           ) : (
             <div className="h-[200px]">
