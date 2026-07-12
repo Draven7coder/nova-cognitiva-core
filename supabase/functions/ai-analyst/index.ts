@@ -113,6 +113,14 @@ Mensagem atual:
 
 Responda aplicando o Ciclo Raça quando fizer sentido. Se for bate-papo curto, seja leve e direto — não force os 5 passos toda hora. Termine sempre com uma micro-missão prática e o lembrete de fábrica.`
       : isProtocoloXp
+      ? `Estime XP para cada prioridade cognitiva do Protocolo Alfa matinal abaixo. Retorne UM inteiro por prioridade, na MESMA ordem em que foram fornecidas, dentro de um bloco <xp_estimates>...</xp_estimates>.
+
+Prioridades:
+${JSON.stringify(context?.prioridades ?? [], null, 2)}
+
+Formato exato de resposta (nada além disso):
+<xp_estimates>[{"xp": 15}, {"xp": 40}, {"xp": 25}]</xp_estimates>`
+      : isJarvisChat
       ? `Contexto operacional atual do operador (para você entender o que está acontecendo, não precisa citar tudo):
 ${JSON.stringify(context?.operational ?? {}, null, 2)}
 
