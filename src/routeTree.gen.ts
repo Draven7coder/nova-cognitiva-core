@@ -33,6 +33,7 @@ import { Route as AppIdeiasRouteImport } from './routes/app.ideias'
 import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
 import { Route as AppFumRouteImport } from './routes/app.fum'
 import { Route as AppEvolucaoRouteImport } from './routes/app.evolucao'
+import { Route as AppCorpoDeFerroRouteImport } from './routes/app.corpo-de-ferro'
 import { Route as AppConfigRouteImport } from './routes/app.config'
 import { Route as AppCifraRouteImport } from './routes/app.cifra'
 import { Route as AppCadeiasRouteImport } from './routes/app.cadeias'
@@ -157,6 +158,11 @@ const AppEvolucaoRoute = AppEvolucaoRouteImport.update({
   path: '/evolucao',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCorpoDeFerroRoute = AppCorpoDeFerroRouteImport.update({
+  id: '/corpo-de-ferro',
+  path: '/corpo-de-ferro',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppConfigRoute = AppConfigRouteImport.update({
   id: '/config',
   path: '/config',
@@ -180,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
+  '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -208,6 +215,7 @@ export interface FileRoutesByTo {
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
+  '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -238,6 +246,7 @@ export interface FileRoutesById {
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
+  '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -269,6 +278,7 @@ export interface FileRouteTypes {
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
+    | '/app/corpo-de-ferro'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
+    | '/app/corpo-de-ferro'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -326,6 +337,7 @@ export interface FileRouteTypes {
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
+    | '/app/corpo-de-ferro'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -525,6 +537,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEvolucaoRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/corpo-de-ferro': {
+      id: '/app/corpo-de-ferro'
+      path: '/corpo-de-ferro'
+      fullPath: '/app/corpo-de-ferro'
+      preLoaderRoute: typeof AppCorpoDeFerroRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/config': {
       id: '/app/config'
       path: '/config'
@@ -553,6 +572,7 @@ interface AppRouteChildren {
   AppCadeiasRoute: typeof AppCadeiasRoute
   AppCifraRoute: typeof AppCifraRoute
   AppConfigRoute: typeof AppConfigRoute
+  AppCorpoDeFerroRoute: typeof AppCorpoDeFerroRoute
   AppEvolucaoRoute: typeof AppEvolucaoRoute
   AppFumRoute: typeof AppFumRoute
   AppHidratacaoRoute: typeof AppHidratacaoRoute
@@ -580,6 +600,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCadeiasRoute: AppCadeiasRoute,
   AppCifraRoute: AppCifraRoute,
   AppConfigRoute: AppConfigRoute,
+  AppCorpoDeFerroRoute: AppCorpoDeFerroRoute,
   AppEvolucaoRoute: AppEvolucaoRoute,
   AppFumRoute: AppFumRoute,
   AppHidratacaoRoute: AppHidratacaoRoute,
