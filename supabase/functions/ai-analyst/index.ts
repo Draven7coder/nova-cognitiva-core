@@ -339,6 +339,10 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     const vb = content.match(/<vocab>([\s\S]*?)<\/vocab>/);
     if (vb) { try { vocab = JSON.parse(vb[1].trim()); } catch { /* ignore */ } }
 
+    let trinariusImport: any = null;
+    const ti = content.match(/<trinarius_import>([\s\S]*?)<\/trinarius_import>/);
+    if (ti) { try { trinariusImport = JSON.parse(ti[1].trim()); } catch { /* ignore */ } }
+
     const cleaned = content
       .replace(/<metrics>[\s\S]*?<\/metrics>/, "")
       .replace(/<insights>[\s\S]*?<\/insights>/, "")
@@ -347,9 +351,10 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
       .replace(/<shadow>[\s\S]*?<\/shadow>/, "")
       .replace(/<xp_estimates>[\s\S]*?<\/xp_estimates>/, "")
       .replace(/<vocab>[\s\S]*?<\/vocab>/, "")
+      .replace(/<trinarius_import>[\s\S]*?<\/trinarius_import>/, "")
       .trim();
 
-    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains, shadow, xpEstimates, vocab }), {
+    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains, shadow, xpEstimates, vocab, trinariusImport }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
