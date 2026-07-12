@@ -285,7 +285,15 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
+          isTrinariusImport && context?.image_url
+            ? {
+                role: "user",
+                content: [
+                  { type: "text", text: userPrompt },
+                  { type: "image_url", image_url: { url: context.image_url } },
+                ],
+              }
+            : { role: "user", content: userPrompt },
         ],
       }),
     });
