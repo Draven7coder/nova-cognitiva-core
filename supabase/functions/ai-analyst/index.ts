@@ -19,6 +19,8 @@ Deno.serve(async (req) => {
     const isShadow = scope === "shadow";
     const isJarvisChat = scope === "jarvis_chat";
     const isProtocoloXp = scope === "protocolo_xp";
+    const isTrinariusImport = scope === "trinarius_import";
+    const isOficina = scope === "oficina_chat";
 
     const systemPrompt = isProtocoloXp
       ? `Você estima XP (inteiro entre 10 e 100) para prioridades cognitivas de um protocolo matinal, calibrado à mesma escala do sistema: missão padrão = 10 XP; missões cognitivas complexas = 15-50 XP; execuções de altíssimo esforço/impacto podem chegar a 100. Considere esforço mental, duração declarada e impacto estratégico. Seja parcimonioso — não seja generoso por padrão.`
