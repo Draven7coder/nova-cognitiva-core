@@ -87,15 +87,32 @@ Profundidade Cognitiva, Execução, Consistência, Integração de Conhecimento,
 Controle Emocional, Velocidade de Evolução, Clareza Mental, Disciplina, Capacidade de Longo Prazo.
 Responda em português, tom cinematográfico, frio, preciso, estratégico. Markdown permitido.`;
 
-    const userPrompt = isProtocoloXp
-      ? `Estime XP para cada prioridade cognitiva do Protocolo Alfa matinal abaixo. Retorne UM inteiro por prioridade, na MESMA ordem em que foram fornecidas, dentro de um bloco <xp_estimates>...</xp_estimates>.
+    const userPrompt = isTrinariusImport
+      ? `MODO: ${context?.mode ?? "?"}
 
-Prioridades:
-${JSON.stringify(context?.prioridades ?? [], null, 2)}
+PERGUNTAS (index → texto):
+${JSON.stringify(context?.questions ?? [], null, 2)}
 
-Formato exato de resposta (nada além disso):
-<xp_estimates>[{"xp": 15}, {"xp": 40}, {"xp": 25}]</xp_estimates>`
-      : isJarvisChat
+TEXTO BRUTO DO OPERADOR:
+"""
+${context?.raw_text ?? ""}
+"""
+
+Retorne APENAS um bloco <trinarius_import>...</trinarius_import> com JSON:
+{ "answers": [ { "index": 0, "answer": "trecho consolidado que responde à pergunta 0" } ] }
+Só inclua respostas com conteúdo real. Não invente.`
+      : isOficina
+      ? `Histórico da conversa (do mais antigo ao mais recente):
+${JSON.stringify(context?.history ?? [], null, 2)}
+
+Contexto operacional recente do operador (para você entender o terreno, sem citar tudo):
+${JSON.stringify(context?.operational ?? {}, null, 2)}
+
+Mensagem atual:
+"${context?.message ?? ""}"
+
+Responda aplicando o Ciclo Raça quando fizer sentido. Se for bate-papo curto, seja leve e direto — não force os 5 passos toda hora. Termine sempre com uma micro-missão prática e o lembrete de fábrica.`
+      : isProtocoloXp
       ? `Contexto operacional atual do operador (para você entender o que está acontecendo, não precisa citar tudo):
 ${JSON.stringify(context?.operational ?? {}, null, 2)}
 
