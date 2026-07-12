@@ -596,6 +596,30 @@ export type Database = {
         }
         Relationships: []
       }
+      oficina_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ooda_entries: {
         Row: {
           act: string
@@ -689,6 +713,57 @@ export type Database = {
         }
         Relationships: []
       }
+      physical_training_logs: {
+        Row: {
+          check_date: string
+          cold_shower: boolean
+          created_at: string
+          duration_minutes: number | null
+          exercises_done: Json
+          id: string
+          intensity: number | null
+          joint_pain: boolean
+          notes: string | null
+          pain_notes: string | null
+          stretching_done: boolean
+          updated_at: string
+          user_id: string
+          workout_type: string
+        }
+        Insert: {
+          check_date?: string
+          cold_shower?: boolean
+          created_at?: string
+          duration_minutes?: number | null
+          exercises_done?: Json
+          id?: string
+          intensity?: number | null
+          joint_pain?: boolean
+          notes?: string | null
+          pain_notes?: string | null
+          stretching_done?: boolean
+          updated_at?: string
+          user_id: string
+          workout_type: string
+        }
+        Update: {
+          check_date?: string
+          cold_shower?: boolean
+          created_at?: string
+          duration_minutes?: number | null
+          exercises_done?: Json
+          id?: string
+          intensity?: number | null
+          joint_pain?: boolean
+          notes?: string | null
+          pain_notes?: string | null
+          stretching_done?: boolean
+          updated_at?: string
+          user_id?: string
+          workout_type?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           central_phrase: string | null
@@ -776,6 +851,42 @@ export type Database = {
           updated_at?: string
           user_id?: string
           user_note?: string | null
+        }
+        Relationships: []
+      }
+      trinarius_reflections: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          mode: string
+          question_index: number
+          question_text: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer?: string
+          created_at?: string
+          id?: string
+          mode: string
+          question_index: number
+          question_text: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          mode?: string
+          question_index?: number
+          question_text?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
