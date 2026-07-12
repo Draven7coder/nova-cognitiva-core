@@ -21,6 +21,7 @@ import { Route as AppProtocolosRouteImport } from './routes/app.protocolos'
 import { Route as AppPropositoRouteImport } from './routes/app.proposito'
 import { Route as AppPerformanceRouteImport } from './routes/app.performance'
 import { Route as AppOodaRouteImport } from './routes/app.ooda'
+import { Route as AppOficinaRouteImport } from './routes/app.oficina'
 import { Route as AppMissoesRouteImport } from './routes/app.missoes'
 import { Route as AppManualRouteImport } from './routes/app.manual'
 import { Route as AppLaboratorioRouteImport } from './routes/app.laboratorio'
@@ -94,6 +95,11 @@ const AppPerformanceRoute = AppPerformanceRouteImport.update({
 const AppOodaRoute = AppOodaRouteImport.update({
   id: '/ooda',
   path: '/ooda',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOficinaRoute = AppOficinaRouteImport.update({
+  id: '/oficina',
+  path: '/oficina',
   getParentRoute: () => AppRoute,
 } as any)
 const AppMissoesRoute = AppMissoesRouteImport.update({
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
+  '/app/oficina': typeof AppOficinaRoute
   '/app/ooda': typeof AppOodaRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
+  '/app/oficina': typeof AppOficinaRoute
   '/app/ooda': typeof AppOodaRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
+  '/app/oficina': typeof AppOficinaRoute
   '/app/ooda': typeof AppOodaRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
+    | '/app/oficina'
     | '/app/ooda'
     | '/app/performance'
     | '/app/proposito'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
+    | '/app/oficina'
     | '/app/ooda'
     | '/app/performance'
     | '/app/proposito'
@@ -326,6 +337,7 @@ export interface FileRouteTypes {
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
+    | '/app/oficina'
     | '/app/ooda'
     | '/app/performance'
     | '/app/proposito'
@@ -427,6 +439,13 @@ declare module '@tanstack/react-router' {
       path: '/ooda'
       fullPath: '/app/ooda'
       preLoaderRoute: typeof AppOodaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/oficina': {
+      id: '/app/oficina'
+      path: '/oficina'
+      fullPath: '/app/oficina'
+      preLoaderRoute: typeof AppOficinaRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/missoes': {
@@ -545,6 +564,7 @@ interface AppRouteChildren {
   AppLaboratorioRoute: typeof AppLaboratorioRoute
   AppManualRoute: typeof AppManualRoute
   AppMissoesRoute: typeof AppMissoesRoute
+  AppOficinaRoute: typeof AppOficinaRoute
   AppOodaRoute: typeof AppOodaRoute
   AppPerformanceRoute: typeof AppPerformanceRoute
   AppPropositoRoute: typeof AppPropositoRoute
@@ -571,6 +591,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppLaboratorioRoute: AppLaboratorioRoute,
   AppManualRoute: AppManualRoute,
   AppMissoesRoute: AppMissoesRoute,
+  AppOficinaRoute: AppOficinaRoute,
   AppOodaRoute: AppOodaRoute,
   AppPerformanceRoute: AppPerformanceRoute,
   AppPropositoRoute: AppPropositoRoute,
