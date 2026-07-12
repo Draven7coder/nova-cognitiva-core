@@ -21,6 +21,7 @@ import { Route as AppProtocolosRouteImport } from './routes/app.protocolos'
 import { Route as AppPropositoRouteImport } from './routes/app.proposito'
 import { Route as AppPerformanceRouteImport } from './routes/app.performance'
 import { Route as AppOodaRouteImport } from './routes/app.ooda'
+import { Route as AppOficinaRouteImport } from './routes/app.oficina'
 import { Route as AppMissoesRouteImport } from './routes/app.missoes'
 import { Route as AppManualRouteImport } from './routes/app.manual'
 import { Route as AppLaboratorioRouteImport } from './routes/app.laboratorio'
@@ -32,6 +33,7 @@ import { Route as AppIdeiasRouteImport } from './routes/app.ideias'
 import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
 import { Route as AppFumRouteImport } from './routes/app.fum'
 import { Route as AppEvolucaoRouteImport } from './routes/app.evolucao'
+import { Route as AppCorpoDeFerroRouteImport } from './routes/app.corpo-de-ferro'
 import { Route as AppConfigRouteImport } from './routes/app.config'
 import { Route as AppCifraRouteImport } from './routes/app.cifra'
 import { Route as AppCadeiasRouteImport } from './routes/app.cadeias'
@@ -96,6 +98,11 @@ const AppOodaRoute = AppOodaRouteImport.update({
   path: '/ooda',
   getParentRoute: () => AppRoute,
 } as any)
+const AppOficinaRoute = AppOficinaRouteImport.update({
+  id: '/oficina',
+  path: '/oficina',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMissoesRoute = AppMissoesRouteImport.update({
   id: '/missoes',
   path: '/missoes',
@@ -151,6 +158,11 @@ const AppEvolucaoRoute = AppEvolucaoRouteImport.update({
   path: '/evolucao',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCorpoDeFerroRoute = AppCorpoDeFerroRouteImport.update({
+  id: '/corpo-de-ferro',
+  path: '/corpo-de-ferro',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppConfigRoute = AppConfigRouteImport.update({
   id: '/config',
   path: '/config',
@@ -174,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
+  '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -185,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
+  '/app/oficina': typeof AppOficinaRoute
   '/app/ooda': typeof AppOodaRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
@@ -201,6 +215,7 @@ export interface FileRoutesByTo {
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
+  '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -212,6 +227,7 @@ export interface FileRoutesByTo {
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
+  '/app/oficina': typeof AppOficinaRoute
   '/app/ooda': typeof AppOodaRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
@@ -230,6 +246,7 @@ export interface FileRoutesById {
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
+  '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -241,6 +258,7 @@ export interface FileRoutesById {
   '/app/laboratorio': typeof AppLaboratorioRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
+  '/app/oficina': typeof AppOficinaRoute
   '/app/ooda': typeof AppOodaRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
@@ -260,6 +278,7 @@ export interface FileRouteTypes {
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
+    | '/app/corpo-de-ferro'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -271,6 +290,7 @@ export interface FileRouteTypes {
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
+    | '/app/oficina'
     | '/app/ooda'
     | '/app/performance'
     | '/app/proposito'
@@ -287,6 +307,7 @@ export interface FileRouteTypes {
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
+    | '/app/corpo-de-ferro'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -298,6 +319,7 @@ export interface FileRouteTypes {
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
+    | '/app/oficina'
     | '/app/ooda'
     | '/app/performance'
     | '/app/proposito'
@@ -315,6 +337,7 @@ export interface FileRouteTypes {
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
+    | '/app/corpo-de-ferro'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -326,6 +349,7 @@ export interface FileRouteTypes {
     | '/app/laboratorio'
     | '/app/manual'
     | '/app/missoes'
+    | '/app/oficina'
     | '/app/ooda'
     | '/app/performance'
     | '/app/proposito'
@@ -429,6 +453,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOodaRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/oficina': {
+      id: '/app/oficina'
+      path: '/oficina'
+      fullPath: '/app/oficina'
+      preLoaderRoute: typeof AppOficinaRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/missoes': {
       id: '/app/missoes'
       path: '/missoes'
@@ -506,6 +537,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEvolucaoRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/corpo-de-ferro': {
+      id: '/app/corpo-de-ferro'
+      path: '/corpo-de-ferro'
+      fullPath: '/app/corpo-de-ferro'
+      preLoaderRoute: typeof AppCorpoDeFerroRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/config': {
       id: '/app/config'
       path: '/config'
@@ -534,6 +572,7 @@ interface AppRouteChildren {
   AppCadeiasRoute: typeof AppCadeiasRoute
   AppCifraRoute: typeof AppCifraRoute
   AppConfigRoute: typeof AppConfigRoute
+  AppCorpoDeFerroRoute: typeof AppCorpoDeFerroRoute
   AppEvolucaoRoute: typeof AppEvolucaoRoute
   AppFumRoute: typeof AppFumRoute
   AppHidratacaoRoute: typeof AppHidratacaoRoute
@@ -545,6 +584,7 @@ interface AppRouteChildren {
   AppLaboratorioRoute: typeof AppLaboratorioRoute
   AppManualRoute: typeof AppManualRoute
   AppMissoesRoute: typeof AppMissoesRoute
+  AppOficinaRoute: typeof AppOficinaRoute
   AppOodaRoute: typeof AppOodaRoute
   AppPerformanceRoute: typeof AppPerformanceRoute
   AppPropositoRoute: typeof AppPropositoRoute
@@ -560,6 +600,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCadeiasRoute: AppCadeiasRoute,
   AppCifraRoute: AppCifraRoute,
   AppConfigRoute: AppConfigRoute,
+  AppCorpoDeFerroRoute: AppCorpoDeFerroRoute,
   AppEvolucaoRoute: AppEvolucaoRoute,
   AppFumRoute: AppFumRoute,
   AppHidratacaoRoute: AppHidratacaoRoute,
@@ -571,6 +612,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppLaboratorioRoute: AppLaboratorioRoute,
   AppManualRoute: AppManualRoute,
   AppMissoesRoute: AppMissoesRoute,
+  AppOficinaRoute: AppOficinaRoute,
   AppOodaRoute: AppOodaRoute,
   AppPerformanceRoute: AppPerformanceRoute,
   AppPropositoRoute: AppPropositoRoute,

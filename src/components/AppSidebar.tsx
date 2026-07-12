@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Fingerprint, Crosshair, BookOpen, Settings2, Activity,
-  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2, Shield, KeyRound,
+  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2, Shield, KeyRound, Hammer, Dumbbell,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -19,6 +19,7 @@ const modules = [
   { title: "Protocolos Operacionais", url: "/app/protocolos", icon: Cog },
   { title: "Performance", url: "/app/performance", icon: Activity },
   { title: "Hidratação Operacional", url: "/app/hidratacao", icon: Droplet },
+  { title: "Corpo de Ferro", url: "/app/corpo-de-ferro", icon: Dumbbell },
   { title: "Sistema de Missões", url: "/app/missoes", icon: Swords },
   { title: "Cadeias Operacionais", url: "/app/cadeias", icon: Link2 },
   { title: "Banco de Ideias", url: "/app/ideias", icon: Lightbulb },
@@ -26,6 +27,7 @@ const modules = [
   { title: "Evolução", url: "/app/evolucao", icon: TrendingUp },
   { title: "Loop OODA", url: "/app/ooda", icon: Compass },
   { title: "JARVIS", url: "/app/jarvis", icon: Bot },
+  { title: "Oficina do Eu", url: "/app/oficina", icon: Hammer },
   { title: "Insights Emergentes", url: "/app/insights", icon: Sparkles },
   { title: "Sistema Trinarius", url: "/app/wayne", icon: Shield },
   { title: "Cifra da Bússola", url: "/app/cifra", icon: KeyRound },

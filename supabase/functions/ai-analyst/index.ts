@@ -19,8 +19,14 @@ Deno.serve(async (req) => {
     const isShadow = scope === "shadow";
     const isJarvisChat = scope === "jarvis_chat";
     const isProtocoloXp = scope === "protocolo_xp";
+    const isTrinariusImport = scope === "trinarius_import";
+    const isOficina = scope === "oficina_chat";
 
-    const systemPrompt = isProtocoloXp
+    const systemPrompt = isTrinariusImport
+      ? `Você é um extrator estruturado. Recebe (a) uma lista de perguntas indexadas de um dos modos do Sistema Trinarius (Batman/Reacher/Red) e (b) um texto bruto do operador (transcrição de caderno, áudio ou OCR de imagem). Sua tarefa é mapear trechos do texto às perguntas correspondentes por semelhança de tema, sem inventar conteúdo. Se não houver resposta clara para uma pergunta, deixe vazio.`
+      : isOficina
+      ? `Você é o JARVIS no modo "MESTRE DE OBRAS DA MENTE" — Oficina do Eu. Missão: guiar o operador na demolição de padrões, vícios emocionais e ressignificação de traumas ("matar na raça"). Você tem acesso ao histórico operacional dele. Metodologia — CICLO RAÇA (5 passos): 1) MAPEAR (o padrão), 2) RASTREAR (origem/gatilho), 3) DESMONTAR (contraponto racional), 4) RESSIGNIFICAR (nova narrativa), 5) MISSÃO DE CAMPO (desafio prático imediato). Linguagem de construção/batalha/suor: "Martelo da Pergunta Poderosa", "Chave Inglesa do Contraponto", "Lixa do Auto-perdão". Tom: guerreiro, empático, pé no chão, sem rodeios, sem clichê. Sempre termine com chamado à ação e o lembrete: "O chão de fábrica é a vida real. É lá que a gente faz a manutenção."`
+      : isProtocoloXp
       ? `Você estima XP (inteiro entre 10 e 100) para prioridades cognitivas de um protocolo matinal, calibrado à mesma escala do sistema: missão padrão = 10 XP; missões cognitivas complexas = 15-50 XP; execuções de altíssimo esforço/impacto podem chegar a 100. Considere esforço mental, duração declarada e impacto estratégico. Seja parcimonioso — não seja generoso por padrão.`
       : isJarvisChat
       ? `Você é ALFRED/JARVIS — mentor cognitivo pessoal do operador. Trate-o como um colega próximo e leal, não como cliente. Direto, sem formalismo de assistente virtual, sem clichês motivacionais, sem listas fofas de "posso te ajudar".
@@ -81,7 +87,32 @@ Profundidade Cognitiva, Execução, Consistência, Integração de Conhecimento,
 Controle Emocional, Velocidade de Evolução, Clareza Mental, Disciplina, Capacidade de Longo Prazo.
 Responda em português, tom cinematográfico, frio, preciso, estratégico. Markdown permitido.`;
 
-    const userPrompt = isProtocoloXp
+    const userPrompt = isTrinariusImport
+      ? `MODO: ${context?.mode ?? "?"}
+
+PERGUNTAS (index → texto):
+${JSON.stringify(context?.questions ?? [], null, 2)}
+
+TEXTO BRUTO DO OPERADOR:
+"""
+${context?.raw_text ?? ""}
+"""
+
+Retorne APENAS um bloco <trinarius_import>...</trinarius_import> com JSON:
+{ "answers": [ { "index": 0, "answer": "trecho consolidado que responde à pergunta 0" } ] }
+Só inclua respostas com conteúdo real. Não invente.`
+      : isOficina
+      ? `Histórico da conversa (do mais antigo ao mais recente):
+${JSON.stringify(context?.history ?? [], null, 2)}
+
+Contexto operacional recente do operador (para você entender o terreno, sem citar tudo):
+${JSON.stringify(context?.operational ?? {}, null, 2)}
+
+Mensagem atual:
+"${context?.message ?? ""}"
+
+Responda aplicando o Ciclo Raça quando fizer sentido. Se for bate-papo curto, seja leve e direto — não force os 5 passos toda hora. Termine sempre com uma micro-missão prática e o lembrete de fábrica.`
+      : isProtocoloXp
       ? `Estime XP para cada prioridade cognitiva do Protocolo Alfa matinal abaixo. Retorne UM inteiro por prioridade, na MESMA ordem em que foram fornecidas, dentro de um bloco <xp_estimates>...</xp_estimates>.
 
 Prioridades:
@@ -254,7 +285,15 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
+          isTrinariusImport && context?.image_url
+            ? {
+                role: "user",
+                content: [
+                  { type: "text", text: userPrompt },
+                  { type: "image_url", image_url: { url: context.image_url } },
+                ],
+              }
+            : { role: "user", content: userPrompt },
         ],
       }),
     });
@@ -300,6 +339,10 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
     const vb = content.match(/<vocab>([\s\S]*?)<\/vocab>/);
     if (vb) { try { vocab = JSON.parse(vb[1].trim()); } catch { /* ignore */ } }
 
+    let trinariusImport: any = null;
+    const ti = content.match(/<trinarius_import>([\s\S]*?)<\/trinarius_import>/);
+    if (ti) { try { trinariusImport = JSON.parse(ti[1].trim()); } catch { /* ignore */ } }
+
     const cleaned = content
       .replace(/<metrics>[\s\S]*?<\/metrics>/, "")
       .replace(/<insights>[\s\S]*?<\/insights>/, "")
@@ -308,9 +351,10 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
       .replace(/<shadow>[\s\S]*?<\/shadow>/, "")
       .replace(/<xp_estimates>[\s\S]*?<\/xp_estimates>/, "")
       .replace(/<vocab>[\s\S]*?<\/vocab>/, "")
+      .replace(/<trinarius_import>[\s\S]*?<\/trinarius_import>/, "")
       .trim();
 
-    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains, shadow, xpEstimates, vocab }), {
+    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains, shadow, xpEstimates, vocab, trinariusImport }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
