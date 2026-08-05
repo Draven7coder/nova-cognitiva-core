@@ -1,4 +1,7 @@
+import { useEffect } from "react";
+import { registerServiceWorker } from "@/lib/pwa";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import {
   Outlet,
   Link,
