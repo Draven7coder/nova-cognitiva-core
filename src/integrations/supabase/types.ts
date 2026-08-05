@@ -890,6 +890,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_data: {
+        Row: {
+          app_version: string | null
+          created_at: string
+          data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          app_version?: string | null
+          created_at?: string
+          data?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          app_version?: string | null
+          created_at?: string
+          data?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       vocabulary_entries: {
         Row: {
           active_uses: number
