@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Fingerprint, Crosshair, BookOpen, Settings2, Activity,
-  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2, Shield, KeyRound, Hammer, Dumbbell,
+  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2, Shield, KeyRound, Hammer, Dumbbell, DownloadCloud,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -32,7 +32,9 @@ const modules = [
   { title: "Sistema Trinarius", url: "/app/wayne", icon: Shield },
   { title: "Cifra da Bússola", url: "/app/cifra", icon: KeyRound },
   { title: "Relatórios da IA", url: "/app/relatorios", icon: Brain },
+  { title: "Atualizações e Backup", url: "/app/atualizacoes", icon: DownloadCloud },
   { title: "Configurações", url: "/app/config", icon: Settings },
+
 ];
 
 export function AppSidebar() {

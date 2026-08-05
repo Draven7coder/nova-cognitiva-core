@@ -37,6 +37,7 @@ import { Route as AppCorpoDeFerroRouteImport } from './routes/app.corpo-de-ferro
 import { Route as AppConfigRouteImport } from './routes/app.config'
 import { Route as AppCifraRouteImport } from './routes/app.cifra'
 import { Route as AppCadeiasRouteImport } from './routes/app.cadeias'
+import { Route as AppAtualizacoesRouteImport } from './routes/app.atualizacoes'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -178,11 +179,17 @@ const AppCadeiasRoute = AppCadeiasRouteImport.update({
   path: '/cadeias',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAtualizacoesRoute = AppAtualizacoesRouteImport.update({
+  id: '/atualizacoes',
+  path: '/atualizacoes',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/app/atualizacoes': typeof AppAtualizacoesRoute
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/app/atualizacoes': typeof AppAtualizacoesRoute
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
@@ -243,6 +251,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
+  '/app/atualizacoes': typeof AppAtualizacoesRoute
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/app/atualizacoes'
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/app/atualizacoes'
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/auth'
+    | '/app/atualizacoes'
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
@@ -565,10 +577,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCadeiasRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/atualizacoes': {
+      id: '/app/atualizacoes'
+      path: '/atualizacoes'
+      fullPath: '/app/atualizacoes'
+      preLoaderRoute: typeof AppAtualizacoesRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppAtualizacoesRoute: typeof AppAtualizacoesRoute
   AppCadeiasRoute: typeof AppCadeiasRoute
   AppCifraRoute: typeof AppCifraRoute
   AppConfigRoute: typeof AppConfigRoute
@@ -597,6 +617,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAtualizacoesRoute: AppAtualizacoesRoute,
   AppCadeiasRoute: AppCadeiasRoute,
   AppCifraRoute: AppCifraRoute,
   AppConfigRoute: AppConfigRoute,
@@ -634,13 +655,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
