@@ -144,6 +144,48 @@ export type Database = {
           },
         ]
       }
+      classroom_sessions: {
+        Row: {
+          archetype: string
+          board_notes: string | null
+          comprehension: number
+          created_at: string
+          id: string
+          status: string
+          topic: string
+          transcript: Json
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          archetype: string
+          board_notes?: string | null
+          comprehension?: number
+          created_at?: string
+          id?: string
+          status?: string
+          topic: string
+          transcript?: Json
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          archetype?: string
+          board_notes?: string | null
+          comprehension?: number
+          created_at?: string
+          id?: string
+          status?: string
+          topic?: string
+          transcript?: Json
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
       daily_checkins: {
         Row: {
           ai_summary: string | null
@@ -452,6 +494,48 @@ export type Database = {
           module?: string
           tags?: string[] | null
           title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      memory_loci: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          image_cue: string | null
+          lat: number | null
+          lng: number | null
+          locus_name: string
+          order_index: number
+          palace: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_cue?: string | null
+          lat?: number | null
+          lng?: number | null
+          locus_name: string
+          order_index?: number
+          palace?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          image_cue?: string | null
+          lat?: number | null
+          lng?: number | null
+          locus_name?: string
+          order_index?: number
+          palace?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -785,6 +869,143 @@ export type Database = {
           display_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      reading_blocks: {
+        Row: {
+          ai_triangulation: string | null
+          applied_layer: string | null
+          book_id: string
+          created_at: string
+          critical_layer: string | null
+          id: string
+          literal_layer: string | null
+          page_end: number
+          page_start: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_triangulation?: string | null
+          applied_layer?: string | null
+          book_id: string
+          created_at?: string
+          critical_layer?: string | null
+          id?: string
+          literal_layer?: string | null
+          page_end: number
+          page_start: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_triangulation?: string | null
+          applied_layer?: string | null
+          book_id?: string
+          created_at?: string
+          critical_layer?: string | null
+          id?: string
+          literal_layer?: string | null
+          page_end?: number
+          page_start?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_blocks_book_id_fkey"
+            columns: ["book_id"]
+            isOneToOne: false
+            referencedRelation: "reading_books"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reading_books: {
+        Row: {
+          author: string | null
+          category: string | null
+          created_at: string
+          current_page: number
+          id: string
+          status: string
+          title: string
+          total_pages: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author?: string | null
+          category?: string | null
+          created_at?: string
+          current_page?: number
+          id?: string
+          status?: string
+          title: string
+          total_pages?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author?: string | null
+          category?: string | null
+          created_at?: string
+          current_page?: number
+          id?: string
+          status?: string
+          title?: string
+          total_pages?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      review_cards: {
+        Row: {
+          back: string
+          created_at: string
+          deck: string
+          due_at: string
+          ease: number
+          front: string
+          id: string
+          interval_days: number
+          lapses: number
+          reps: number
+          source: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          back: string
+          created_at?: string
+          deck?: string
+          due_at?: string
+          ease?: number
+          front: string
+          id?: string
+          interval_days?: number
+          lapses?: number
+          reps?: number
+          source?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          back?: string
+          created_at?: string
+          deck?: string
+          due_at?: string
+          ease?: number
+          front?: string
+          id?: string
+          interval_days?: number
+          lapses?: number
+          reps?: number
+          source?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
