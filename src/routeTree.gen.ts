@@ -17,14 +17,17 @@ import { Route as AppXadrezRouteImport } from './routes/app.xadrez'
 import { Route as AppWayneRouteImport } from './routes/app.wayne'
 import { Route as AppSombraRouteImport } from './routes/app.sombra'
 import { Route as AppSalaRouteImport } from './routes/app.sala'
+import { Route as AppRevisaoRouteImport } from './routes/app.revisao'
 import { Route as AppRelatoriosRouteImport } from './routes/app.relatorios'
 import { Route as AppProtocolosRouteImport } from './routes/app.protocolos'
 import { Route as AppPropositoRouteImport } from './routes/app.proposito'
 import { Route as AppPerformanceRouteImport } from './routes/app.performance'
+import { Route as AppPalacioRouteImport } from './routes/app.palacio'
 import { Route as AppOodaRouteImport } from './routes/app.ooda'
 import { Route as AppOficinaRouteImport } from './routes/app.oficina'
 import { Route as AppMissoesRouteImport } from './routes/app.missoes'
 import { Route as AppManualRouteImport } from './routes/app.manual'
+import { Route as AppLeituraRouteImport } from './routes/app.leitura'
 import { Route as AppLaboratorioRouteImport } from './routes/app.laboratorio'
 import { Route as AppJarvisRouteImport } from './routes/app.jarvis'
 import { Route as AppIntelectoRouteImport } from './routes/app.intelecto'
@@ -80,6 +83,11 @@ const AppSalaRoute = AppSalaRouteImport.update({
   path: '/sala',
   getParentRoute: () => AppRoute,
 } as any)
+const AppRevisaoRoute = AppRevisaoRouteImport.update({
+  id: '/revisao',
+  path: '/revisao',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppRelatoriosRoute = AppRelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
@@ -100,6 +108,11 @@ const AppPerformanceRoute = AppPerformanceRouteImport.update({
   path: '/performance',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPalacioRoute = AppPalacioRouteImport.update({
+  id: '/palacio',
+  path: '/palacio',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppOodaRoute = AppOodaRouteImport.update({
   id: '/ooda',
   path: '/ooda',
@@ -118,6 +131,11 @@ const AppMissoesRoute = AppMissoesRouteImport.update({
 const AppManualRoute = AppManualRouteImport.update({
   id: '/manual',
   path: '/manual',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLeituraRoute = AppLeituraRouteImport.update({
+  id: '/leitura',
+  path: '/leitura',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLaboratorioRoute = AppLaboratorioRouteImport.update({
@@ -209,14 +227,17 @@ export interface FileRoutesByFullPath {
   '/app/intelecto': typeof AppIntelectoRoute
   '/app/jarvis': typeof AppJarvisRoute
   '/app/laboratorio': typeof AppLaboratorioRoute
+  '/app/leitura': typeof AppLeituraRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
   '/app/oficina': typeof AppOficinaRoute
   '/app/ooda': typeof AppOodaRoute
+  '/app/palacio': typeof AppPalacioRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/revisao': typeof AppRevisaoRoute
   '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
   '/app/wayne': typeof AppWayneRoute
@@ -240,14 +261,17 @@ export interface FileRoutesByTo {
   '/app/intelecto': typeof AppIntelectoRoute
   '/app/jarvis': typeof AppJarvisRoute
   '/app/laboratorio': typeof AppLaboratorioRoute
+  '/app/leitura': typeof AppLeituraRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
   '/app/oficina': typeof AppOficinaRoute
   '/app/ooda': typeof AppOodaRoute
+  '/app/palacio': typeof AppPalacioRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/revisao': typeof AppRevisaoRoute
   '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
   '/app/wayne': typeof AppWayneRoute
@@ -273,14 +297,17 @@ export interface FileRoutesById {
   '/app/intelecto': typeof AppIntelectoRoute
   '/app/jarvis': typeof AppJarvisRoute
   '/app/laboratorio': typeof AppLaboratorioRoute
+  '/app/leitura': typeof AppLeituraRoute
   '/app/manual': typeof AppManualRoute
   '/app/missoes': typeof AppMissoesRoute
   '/app/oficina': typeof AppOficinaRoute
   '/app/ooda': typeof AppOodaRoute
+  '/app/palacio': typeof AppPalacioRoute
   '/app/performance': typeof AppPerformanceRoute
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/revisao': typeof AppRevisaoRoute
   '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
   '/app/wayne': typeof AppWayneRoute
@@ -307,14 +334,17 @@ export interface FileRouteTypes {
     | '/app/intelecto'
     | '/app/jarvis'
     | '/app/laboratorio'
+    | '/app/leitura'
     | '/app/manual'
     | '/app/missoes'
     | '/app/oficina'
     | '/app/ooda'
+    | '/app/palacio'
     | '/app/performance'
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/revisao'
     | '/app/sala'
     | '/app/sombra'
     | '/app/wayne'
@@ -338,14 +368,17 @@ export interface FileRouteTypes {
     | '/app/intelecto'
     | '/app/jarvis'
     | '/app/laboratorio'
+    | '/app/leitura'
     | '/app/manual'
     | '/app/missoes'
     | '/app/oficina'
     | '/app/ooda'
+    | '/app/palacio'
     | '/app/performance'
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/revisao'
     | '/app/sala'
     | '/app/sombra'
     | '/app/wayne'
@@ -370,14 +403,17 @@ export interface FileRouteTypes {
     | '/app/intelecto'
     | '/app/jarvis'
     | '/app/laboratorio'
+    | '/app/leitura'
     | '/app/manual'
     | '/app/missoes'
     | '/app/oficina'
     | '/app/ooda'
+    | '/app/palacio'
     | '/app/performance'
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/revisao'
     | '/app/sala'
     | '/app/sombra'
     | '/app/wayne'
@@ -449,6 +485,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSalaRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/revisao': {
+      id: '/app/revisao'
+      path: '/revisao'
+      fullPath: '/app/revisao'
+      preLoaderRoute: typeof AppRevisaoRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/relatorios': {
       id: '/app/relatorios'
       path: '/relatorios'
@@ -477,6 +520,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPerformanceRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/palacio': {
+      id: '/app/palacio'
+      path: '/palacio'
+      fullPath: '/app/palacio'
+      preLoaderRoute: typeof AppPalacioRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/ooda': {
       id: '/app/ooda'
       path: '/ooda'
@@ -503,6 +553,13 @@ declare module '@tanstack/react-router' {
       path: '/manual'
       fullPath: '/app/manual'
       preLoaderRoute: typeof AppManualRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/leitura': {
+      id: '/app/leitura'
+      path: '/leitura'
+      fullPath: '/app/leitura'
+      preLoaderRoute: typeof AppLeituraRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/laboratorio': {
@@ -621,14 +678,17 @@ interface AppRouteChildren {
   AppIntelectoRoute: typeof AppIntelectoRoute
   AppJarvisRoute: typeof AppJarvisRoute
   AppLaboratorioRoute: typeof AppLaboratorioRoute
+  AppLeituraRoute: typeof AppLeituraRoute
   AppManualRoute: typeof AppManualRoute
   AppMissoesRoute: typeof AppMissoesRoute
   AppOficinaRoute: typeof AppOficinaRoute
   AppOodaRoute: typeof AppOodaRoute
+  AppPalacioRoute: typeof AppPalacioRoute
   AppPerformanceRoute: typeof AppPerformanceRoute
   AppPropositoRoute: typeof AppPropositoRoute
   AppProtocolosRoute: typeof AppProtocolosRoute
   AppRelatoriosRoute: typeof AppRelatoriosRoute
+  AppRevisaoRoute: typeof AppRevisaoRoute
   AppSalaRoute: typeof AppSalaRoute
   AppSombraRoute: typeof AppSombraRoute
   AppWayneRoute: typeof AppWayneRoute
@@ -651,14 +711,17 @@ const AppRouteChildren: AppRouteChildren = {
   AppIntelectoRoute: AppIntelectoRoute,
   AppJarvisRoute: AppJarvisRoute,
   AppLaboratorioRoute: AppLaboratorioRoute,
+  AppLeituraRoute: AppLeituraRoute,
   AppManualRoute: AppManualRoute,
   AppMissoesRoute: AppMissoesRoute,
   AppOficinaRoute: AppOficinaRoute,
   AppOodaRoute: AppOodaRoute,
+  AppPalacioRoute: AppPalacioRoute,
   AppPerformanceRoute: AppPerformanceRoute,
   AppPropositoRoute: AppPropositoRoute,
   AppProtocolosRoute: AppProtocolosRoute,
   AppRelatoriosRoute: AppRelatoriosRoute,
+  AppRevisaoRoute: AppRevisaoRoute,
   AppSalaRoute: AppSalaRoute,
   AppSombraRoute: AppSombraRoute,
   AppWayneRoute: AppWayneRoute,
