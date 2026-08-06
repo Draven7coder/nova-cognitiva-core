@@ -16,6 +16,7 @@ import { Route as AppIndexRouteImport } from './routes/app.index'
 import { Route as AppXadrezRouteImport } from './routes/app.xadrez'
 import { Route as AppWayneRouteImport } from './routes/app.wayne'
 import { Route as AppSombraRouteImport } from './routes/app.sombra'
+import { Route as AppSalaRouteImport } from './routes/app.sala'
 import { Route as AppRelatoriosRouteImport } from './routes/app.relatorios'
 import { Route as AppProtocolosRouteImport } from './routes/app.protocolos'
 import { Route as AppPropositoRouteImport } from './routes/app.proposito'
@@ -72,6 +73,11 @@ const AppWayneRoute = AppWayneRouteImport.update({
 const AppSombraRoute = AppSombraRouteImport.update({
   id: '/sombra',
   path: '/sombra',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSalaRoute = AppSalaRouteImport.update({
+  id: '/sala',
+  path: '/sala',
   getParentRoute: () => AppRoute,
 } as any)
 const AppRelatoriosRoute = AppRelatoriosRouteImport.update({
@@ -211,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
   '/app/wayne': typeof AppWayneRoute
   '/app/xadrez': typeof AppXadrezRoute
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
   '/app/wayne': typeof AppWayneRoute
   '/app/xadrez': typeof AppXadrezRoute
@@ -273,6 +281,7 @@ export interface FileRoutesById {
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
   '/app/wayne': typeof AppWayneRoute
   '/app/xadrez': typeof AppXadrezRoute
@@ -306,6 +315,7 @@ export interface FileRouteTypes {
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/sala'
     | '/app/sombra'
     | '/app/wayne'
     | '/app/xadrez'
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/sala'
     | '/app/sombra'
     | '/app/wayne'
     | '/app/xadrez'
@@ -367,6 +378,7 @@ export interface FileRouteTypes {
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/sala'
     | '/app/sombra'
     | '/app/wayne'
     | '/app/xadrez'
@@ -428,6 +440,13 @@ declare module '@tanstack/react-router' {
       path: '/sombra'
       fullPath: '/app/sombra'
       preLoaderRoute: typeof AppSombraRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/sala': {
+      id: '/app/sala'
+      path: '/sala'
+      fullPath: '/app/sala'
+      preLoaderRoute: typeof AppSalaRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/relatorios': {
@@ -610,6 +629,7 @@ interface AppRouteChildren {
   AppPropositoRoute: typeof AppPropositoRoute
   AppProtocolosRoute: typeof AppProtocolosRoute
   AppRelatoriosRoute: typeof AppRelatoriosRoute
+  AppSalaRoute: typeof AppSalaRoute
   AppSombraRoute: typeof AppSombraRoute
   AppWayneRoute: typeof AppWayneRoute
   AppXadrezRoute: typeof AppXadrezRoute
@@ -639,6 +659,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPropositoRoute: AppPropositoRoute,
   AppProtocolosRoute: AppProtocolosRoute,
   AppRelatoriosRoute: AppRelatoriosRoute,
+  AppSalaRoute: AppSalaRoute,
   AppSombraRoute: AppSombraRoute,
   AppWayneRoute: AppWayneRoute,
   AppXadrezRoute: AppXadrezRoute,
@@ -655,13 +676,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
