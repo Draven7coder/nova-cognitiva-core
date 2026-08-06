@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Fingerprint, Crosshair, BookOpen, Settings2, Activity,
-  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2, Shield, KeyRound, Hammer, Dumbbell, DownloadCloud,
+  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2, Shield, KeyRound, Hammer, Dumbbell, DownloadCloud, GraduationCap, BookMarked, Layers, Landmark,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -14,7 +14,12 @@ const modules = [
   { title: "Identidade", url: "/app/identidade", icon: Fingerprint },
   { title: "Propósito Supremo", url: "/app/proposito", icon: Crosshair },
   { title: "Centro Intelectual", url: "/app/intelecto", icon: BookOpen },
+  { title: "Sala de Aula", url: "/app/sala", icon: GraduationCap },
+  { title: "Protocolo de Leitura", url: "/app/leitura", icon: BookMarked },
+  { title: "Revisão Espaçada", url: "/app/revisao", icon: Layers },
+  { title: "Palácio da Memória", url: "/app/palacio", icon: Landmark },
   { title: "Laboratório Estratégico", url: "/app/laboratorio", icon: FlaskConical },
+
   { title: "Manual Operacional", url: "/app/manual", icon: Settings2 },
   { title: "Protocolos Operacionais", url: "/app/protocolos", icon: Cog },
   { title: "Performance", url: "/app/performance", icon: Activity },
