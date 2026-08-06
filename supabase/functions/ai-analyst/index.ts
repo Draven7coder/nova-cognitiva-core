@@ -98,7 +98,24 @@ Profundidade Cognitiva, Execução, Consistência, Integração de Conhecimento,
 Controle Emocional, Velocidade de Evolução, Clareza Mental, Disciplina, Capacidade de Longo Prazo.
 Responda em português, tom cinematográfico, frio, preciso, estratégico. Markdown permitido.`;
 
-    const userPrompt = isTrinariusImport
+    const userPrompt = isClassroom
+      ? `Arquétipo do mentor: ${context?.archetype ?? "Mentor Roxo"}
+Tema da aula: ${context?.topic ?? ""}
+Anotações da lousa do aluno:
+"""${context?.board_notes ?? ""}"""
+Histórico da aula:
+${JSON.stringify(context?.history ?? [], null, 2)}
+Mensagem atual do aluno: "${context?.message ?? ""}"`
+      : isReading
+      ? `Livro: ${context?.book ?? ""} (páginas ${context?.page_start ?? "?"}–${context?.page_end ?? "?"})
+Camada literal: """${context?.literal ?? ""}"""
+Camada crítica: """${context?.critical ?? ""}"""
+Camada aplicada: """${context?.applied ?? ""}"""`
+      : isCards
+      ? `Material:
+"""${context?.material ?? ""}"""
+Deck sugerido: ${context?.deck ?? "geral"}. Gere de 4 a 8 cartões.`
+      : isTrinariusImport
       ? `MODO: ${context?.mode ?? "?"}
 
 PERGUNTAS (index → texto):
