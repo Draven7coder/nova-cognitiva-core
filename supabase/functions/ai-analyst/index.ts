@@ -380,9 +380,19 @@ Máximo 5 itens por categoria. Severity reflete intensidade do padrão.`
       .replace(/<xp_estimates>[\s\S]*?<\/xp_estimates>/, "")
       .replace(/<vocab>[\s\S]*?<\/vocab>/, "")
       .replace(/<trinarius_import>[\s\S]*?<\/trinarius_import>/, "")
+      .replace(/<cards>[\s\S]*?<\/cards>/, "")
+      .replace(/<comprehension>[\s\S]*?<\/comprehension>/, "")
       .trim();
 
-    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains, shadow, xpEstimates, vocab, trinariusImport }), {
+    let cards: any = null;
+    const cd = content.match(/<cards>([\s\S]*?)<\/cards>/);
+    if (cd) { try { cards = JSON.parse(cd[1].trim()); } catch { /* ignore */ } }
+
+    let comprehension: any = null;
+    const cp = content.match(/<comprehension>([\s\S]*?)<\/comprehension>/);
+    if (cp) { try { comprehension = JSON.parse(cp[1].trim()); } catch { /* ignore */ } }
+
+    return new Response(JSON.stringify({ content: cleaned, metrics, insights, emergent, chains, shadow, xpEstimates, vocab, trinariusImport, cards, comprehension }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
