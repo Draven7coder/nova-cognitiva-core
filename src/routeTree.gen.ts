@@ -37,6 +37,7 @@ import { Route as AppIdeiasRouteImport } from './routes/app.ideias'
 import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
 import { Route as AppFumRouteImport } from './routes/app.fum'
 import { Route as AppEvolucaoRouteImport } from './routes/app.evolucao'
+import { Route as AppDojoRouteImport } from './routes/app.dojo'
 import { Route as AppCorpoDeFerroRouteImport } from './routes/app.corpo-de-ferro'
 import { Route as AppConfigRouteImport } from './routes/app.config'
 import { Route as AppCifraRouteImport } from './routes/app.cifra'
@@ -183,6 +184,11 @@ const AppEvolucaoRoute = AppEvolucaoRouteImport.update({
   path: '/evolucao',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDojoRoute = AppDojoRouteImport.update({
+  id: '/dojo',
+  path: '/dojo',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCorpoDeFerroRoute = AppCorpoDeFerroRouteImport.update({
   id: '/corpo-de-ferro',
   path: '/corpo-de-ferro',
@@ -218,6 +224,7 @@ export interface FileRoutesByFullPath {
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
   '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
+  '/app/dojo': typeof AppDojoRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -252,6 +259,7 @@ export interface FileRoutesByTo {
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
   '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
+  '/app/dojo': typeof AppDojoRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -288,6 +296,7 @@ export interface FileRoutesById {
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
   '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
+  '/app/dojo': typeof AppDojoRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -325,6 +334,7 @@ export interface FileRouteTypes {
     | '/app/cifra'
     | '/app/config'
     | '/app/corpo-de-ferro'
+    | '/app/dojo'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/app/cifra'
     | '/app/config'
     | '/app/corpo-de-ferro'
+    | '/app/dojo'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/app/cifra'
     | '/app/config'
     | '/app/corpo-de-ferro'
+    | '/app/dojo'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -625,6 +637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEvolucaoRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/dojo': {
+      id: '/app/dojo'
+      path: '/dojo'
+      fullPath: '/app/dojo'
+      preLoaderRoute: typeof AppDojoRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/corpo-de-ferro': {
       id: '/app/corpo-de-ferro'
       path: '/corpo-de-ferro'
@@ -669,6 +688,7 @@ interface AppRouteChildren {
   AppCifraRoute: typeof AppCifraRoute
   AppConfigRoute: typeof AppConfigRoute
   AppCorpoDeFerroRoute: typeof AppCorpoDeFerroRoute
+  AppDojoRoute: typeof AppDojoRoute
   AppEvolucaoRoute: typeof AppEvolucaoRoute
   AppFumRoute: typeof AppFumRoute
   AppHidratacaoRoute: typeof AppHidratacaoRoute
@@ -702,6 +722,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCifraRoute: AppCifraRoute,
   AppConfigRoute: AppConfigRoute,
   AppCorpoDeFerroRoute: AppCorpoDeFerroRoute,
+  AppDojoRoute: AppDojoRoute,
   AppEvolucaoRoute: AppEvolucaoRoute,
   AppFumRoute: AppFumRoute,
   AppHidratacaoRoute: AppHidratacaoRoute,
@@ -739,13 +760,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
