@@ -40,6 +40,7 @@ const modules = [
   { title: "Sistema Trinarius", url: "/app/wayne", icon: Shield },
   { title: "Cifra da Bússola", url: "/app/cifra", icon: KeyRound },
   { title: "Relatórios da IA", url: "/app/relatorios", icon: Brain },
+  { title: "Auditoria NOX", url: "/app/auditoria", icon: ShieldCheck },
   { title: "Atualizações e Backup", url: "/app/atualizacoes", icon: DownloadCloud },
   { title: "Configurações", url: "/app/config", icon: Settings },
 
