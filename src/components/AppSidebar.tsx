@@ -25,6 +25,7 @@ const modules = [
   { title: "Performance", url: "/app/performance", icon: Activity },
   { title: "Hidratação Operacional", url: "/app/hidratacao", icon: Droplet },
   { title: "Corpo de Ferro", url: "/app/corpo-de-ferro", icon: Dumbbell },
+  { title: "Dojo da Vontade", url: "/app/dojo", icon: Flame },
   { title: "Sistema de Missões", url: "/app/missoes", icon: Swords },
   { title: "Cadeias Operacionais", url: "/app/cadeias", icon: Link2 },
   { title: "Banco de Ideias", url: "/app/ideias", icon: Lightbulb },
