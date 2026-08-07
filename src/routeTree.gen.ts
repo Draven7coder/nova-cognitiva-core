@@ -38,6 +38,7 @@ import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
 import { Route as AppFumRouteImport } from './routes/app.fum'
 import { Route as AppEvolucaoRouteImport } from './routes/app.evolucao'
 import { Route as AppDojoRouteImport } from './routes/app.dojo'
+import { Route as AppCorteRouteImport } from './routes/app.corte'
 import { Route as AppCorpoDeFerroRouteImport } from './routes/app.corpo-de-ferro'
 import { Route as AppConfigRouteImport } from './routes/app.config'
 import { Route as AppCifraRouteImport } from './routes/app.cifra'
@@ -189,6 +190,11 @@ const AppDojoRoute = AppDojoRouteImport.update({
   path: '/dojo',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCorteRoute = AppCorteRouteImport.update({
+  id: '/corte',
+  path: '/corte',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCorpoDeFerroRoute = AppCorpoDeFerroRouteImport.update({
   id: '/corpo-de-ferro',
   path: '/corpo-de-ferro',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
   '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
+  '/app/corte': typeof AppCorteRoute
   '/app/dojo': typeof AppDojoRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
@@ -259,6 +266,7 @@ export interface FileRoutesByTo {
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
   '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
+  '/app/corte': typeof AppCorteRoute
   '/app/dojo': typeof AppDojoRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
@@ -296,6 +304,7 @@ export interface FileRoutesById {
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
   '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
+  '/app/corte': typeof AppCorteRoute
   '/app/dojo': typeof AppDojoRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
@@ -334,6 +343,7 @@ export interface FileRouteTypes {
     | '/app/cifra'
     | '/app/config'
     | '/app/corpo-de-ferro'
+    | '/app/corte'
     | '/app/dojo'
     | '/app/evolucao'
     | '/app/fum'
@@ -369,6 +379,7 @@ export interface FileRouteTypes {
     | '/app/cifra'
     | '/app/config'
     | '/app/corpo-de-ferro'
+    | '/app/corte'
     | '/app/dojo'
     | '/app/evolucao'
     | '/app/fum'
@@ -405,6 +416,7 @@ export interface FileRouteTypes {
     | '/app/cifra'
     | '/app/config'
     | '/app/corpo-de-ferro'
+    | '/app/corte'
     | '/app/dojo'
     | '/app/evolucao'
     | '/app/fum'
@@ -644,6 +656,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDojoRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/corte': {
+      id: '/app/corte'
+      path: '/corte'
+      fullPath: '/app/corte'
+      preLoaderRoute: typeof AppCorteRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/corpo-de-ferro': {
       id: '/app/corpo-de-ferro'
       path: '/corpo-de-ferro'
@@ -688,6 +707,7 @@ interface AppRouteChildren {
   AppCifraRoute: typeof AppCifraRoute
   AppConfigRoute: typeof AppConfigRoute
   AppCorpoDeFerroRoute: typeof AppCorpoDeFerroRoute
+  AppCorteRoute: typeof AppCorteRoute
   AppDojoRoute: typeof AppDojoRoute
   AppEvolucaoRoute: typeof AppEvolucaoRoute
   AppFumRoute: typeof AppFumRoute
@@ -722,6 +742,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCifraRoute: AppCifraRoute,
   AppConfigRoute: AppConfigRoute,
   AppCorpoDeFerroRoute: AppCorpoDeFerroRoute,
+  AppCorteRoute: AppCorteRoute,
   AppDojoRoute: AppDojoRoute,
   AppEvolucaoRoute: AppEvolucaoRoute,
   AppFumRoute: AppFumRoute,
