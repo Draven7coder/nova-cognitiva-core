@@ -18,6 +18,7 @@ import { Route as AppWayneRouteImport } from './routes/app.wayne'
 import { Route as AppSombraRouteImport } from './routes/app.sombra'
 import { Route as AppSalaRouteImport } from './routes/app.sala'
 import { Route as AppRevisaoRouteImport } from './routes/app.revisao'
+import { Route as AppRendasRouteImport } from './routes/app.rendas'
 import { Route as AppRelatoriosRouteImport } from './routes/app.relatorios'
 import { Route as AppProtocolosRouteImport } from './routes/app.protocolos'
 import { Route as AppPropositoRouteImport } from './routes/app.proposito'
@@ -88,6 +89,11 @@ const AppSalaRoute = AppSalaRouteImport.update({
 const AppRevisaoRoute = AppRevisaoRouteImport.update({
   id: '/revisao',
   path: '/revisao',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRendasRoute = AppRendasRouteImport.update({
+  id: '/rendas',
+  path: '/rendas',
   getParentRoute: () => AppRoute,
 } as any)
 const AppRelatoriosRoute = AppRelatoriosRouteImport.update({
@@ -251,6 +257,7 @@ export interface FileRoutesByFullPath {
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/rendas': typeof AppRendasRoute
   '/app/revisao': typeof AppRevisaoRoute
   '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByTo {
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/rendas': typeof AppRendasRoute
   '/app/revisao': typeof AppRevisaoRoute
   '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
@@ -325,6 +333,7 @@ export interface FileRoutesById {
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/rendas': typeof AppRendasRoute
   '/app/revisao': typeof AppRevisaoRoute
   '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
@@ -364,6 +373,7 @@ export interface FileRouteTypes {
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/rendas'
     | '/app/revisao'
     | '/app/sala'
     | '/app/sombra'
@@ -400,6 +410,7 @@ export interface FileRouteTypes {
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/rendas'
     | '/app/revisao'
     | '/app/sala'
     | '/app/sombra'
@@ -437,6 +448,7 @@ export interface FileRouteTypes {
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/rendas'
     | '/app/revisao'
     | '/app/sala'
     | '/app/sombra'
@@ -514,6 +526,13 @@ declare module '@tanstack/react-router' {
       path: '/revisao'
       fullPath: '/app/revisao'
       preLoaderRoute: typeof AppRevisaoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/rendas': {
+      id: '/app/rendas'
+      path: '/rendas'
+      fullPath: '/app/rendas'
+      preLoaderRoute: typeof AppRendasRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/relatorios': {
@@ -728,6 +747,7 @@ interface AppRouteChildren {
   AppPropositoRoute: typeof AppPropositoRoute
   AppProtocolosRoute: typeof AppProtocolosRoute
   AppRelatoriosRoute: typeof AppRelatoriosRoute
+  AppRendasRoute: typeof AppRendasRoute
   AppRevisaoRoute: typeof AppRevisaoRoute
   AppSalaRoute: typeof AppSalaRoute
   AppSombraRoute: typeof AppSombraRoute
@@ -763,6 +783,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPropositoRoute: AppPropositoRoute,
   AppProtocolosRoute: AppProtocolosRoute,
   AppRelatoriosRoute: AppRelatoriosRoute,
+  AppRendasRoute: AppRendasRoute,
   AppRevisaoRoute: AppRevisaoRoute,
   AppSalaRoute: AppSalaRoute,
   AppSombraRoute: AppSombraRoute,
