@@ -30,6 +30,8 @@ const modules = [
   { title: "Cadeias Operacionais", url: "/app/cadeias", icon: Link2 },
   { title: "Banco de Ideias", url: "/app/ideias", icon: Lightbulb },
   { title: "Sombra", url: "/app/sombra", icon: Moon },
+  { title: "Ritual de Corte", url: "/app/corte", icon: Scissors },
+  { title: "Sistema das 6 Rendas", url: "/app/rendas", icon: Coins },
   { title: "Evolução", url: "/app/evolucao", icon: TrendingUp },
   { title: "Loop OODA", url: "/app/ooda", icon: Compass },
   { title: "JARVIS", url: "/app/jarvis", icon: Bot },
