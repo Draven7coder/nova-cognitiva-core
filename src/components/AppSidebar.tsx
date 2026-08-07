@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Fingerprint, Crosshair, BookOpen, Settings2, Activity,
-  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2, Shield, KeyRound, Hammer, Dumbbell, DownloadCloud, GraduationCap, BookMarked, Layers, Landmark,
+  Swords, Lightbulb, Moon, TrendingUp, Brain, Settings, LogOut, Cog, FlaskConical, Droplet, Bot, Compass, Sparkles, Link2, Shield, KeyRound, Hammer, Dumbbell, DownloadCloud, GraduationCap, BookMarked, Layers, Landmark, Flame, Scissors, Coins, ShieldCheck,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel,
@@ -25,10 +25,13 @@ const modules = [
   { title: "Performance", url: "/app/performance", icon: Activity },
   { title: "Hidratação Operacional", url: "/app/hidratacao", icon: Droplet },
   { title: "Corpo de Ferro", url: "/app/corpo-de-ferro", icon: Dumbbell },
+  { title: "Dojo da Vontade", url: "/app/dojo", icon: Flame },
   { title: "Sistema de Missões", url: "/app/missoes", icon: Swords },
   { title: "Cadeias Operacionais", url: "/app/cadeias", icon: Link2 },
   { title: "Banco de Ideias", url: "/app/ideias", icon: Lightbulb },
   { title: "Sombra", url: "/app/sombra", icon: Moon },
+  { title: "Ritual de Corte", url: "/app/corte", icon: Scissors },
+  { title: "Sistema das 6 Rendas", url: "/app/rendas", icon: Coins },
   { title: "Evolução", url: "/app/evolucao", icon: TrendingUp },
   { title: "Loop OODA", url: "/app/ooda", icon: Compass },
   { title: "JARVIS", url: "/app/jarvis", icon: Bot },
@@ -37,6 +40,7 @@ const modules = [
   { title: "Sistema Trinarius", url: "/app/wayne", icon: Shield },
   { title: "Cifra da Bússola", url: "/app/cifra", icon: KeyRound },
   { title: "Relatórios da IA", url: "/app/relatorios", icon: Brain },
+  { title: "Auditoria NOX", url: "/app/auditoria", icon: ShieldCheck },
   { title: "Atualizações e Backup", url: "/app/atualizacoes", icon: DownloadCloud },
   { title: "Configurações", url: "/app/config", icon: Settings },
 

@@ -18,6 +18,7 @@ import { Route as AppWayneRouteImport } from './routes/app.wayne'
 import { Route as AppSombraRouteImport } from './routes/app.sombra'
 import { Route as AppSalaRouteImport } from './routes/app.sala'
 import { Route as AppRevisaoRouteImport } from './routes/app.revisao'
+import { Route as AppRendasRouteImport } from './routes/app.rendas'
 import { Route as AppRelatoriosRouteImport } from './routes/app.relatorios'
 import { Route as AppProtocolosRouteImport } from './routes/app.protocolos'
 import { Route as AppPropositoRouteImport } from './routes/app.proposito'
@@ -37,10 +38,13 @@ import { Route as AppIdeiasRouteImport } from './routes/app.ideias'
 import { Route as AppHidratacaoRouteImport } from './routes/app.hidratacao'
 import { Route as AppFumRouteImport } from './routes/app.fum'
 import { Route as AppEvolucaoRouteImport } from './routes/app.evolucao'
+import { Route as AppDojoRouteImport } from './routes/app.dojo'
+import { Route as AppCorteRouteImport } from './routes/app.corte'
 import { Route as AppCorpoDeFerroRouteImport } from './routes/app.corpo-de-ferro'
 import { Route as AppConfigRouteImport } from './routes/app.config'
 import { Route as AppCifraRouteImport } from './routes/app.cifra'
 import { Route as AppCadeiasRouteImport } from './routes/app.cadeias'
+import { Route as AppAuditoriaRouteImport } from './routes/app.auditoria'
 import { Route as AppAtualizacoesRouteImport } from './routes/app.atualizacoes'
 
 const AuthRoute = AuthRouteImport.update({
@@ -86,6 +90,11 @@ const AppSalaRoute = AppSalaRouteImport.update({
 const AppRevisaoRoute = AppRevisaoRouteImport.update({
   id: '/revisao',
   path: '/revisao',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRendasRoute = AppRendasRouteImport.update({
+  id: '/rendas',
+  path: '/rendas',
   getParentRoute: () => AppRoute,
 } as any)
 const AppRelatoriosRoute = AppRelatoriosRouteImport.update({
@@ -183,6 +192,16 @@ const AppEvolucaoRoute = AppEvolucaoRouteImport.update({
   path: '/evolucao',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDojoRoute = AppDojoRouteImport.update({
+  id: '/dojo',
+  path: '/dojo',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCorteRoute = AppCorteRouteImport.update({
+  id: '/corte',
+  path: '/corte',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppCorpoDeFerroRoute = AppCorpoDeFerroRouteImport.update({
   id: '/corpo-de-ferro',
   path: '/corpo-de-ferro',
@@ -203,6 +222,11 @@ const AppCadeiasRoute = AppCadeiasRouteImport.update({
   path: '/cadeias',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAuditoriaRoute = AppAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAtualizacoesRoute = AppAtualizacoesRouteImport.update({
   id: '/atualizacoes',
   path: '/atualizacoes',
@@ -214,10 +238,13 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/app/atualizacoes': typeof AppAtualizacoesRoute
+  '/app/auditoria': typeof AppAuditoriaRoute
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
   '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
+  '/app/corte': typeof AppCorteRoute
+  '/app/dojo': typeof AppDojoRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -237,6 +264,7 @@ export interface FileRoutesByFullPath {
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/rendas': typeof AppRendasRoute
   '/app/revisao': typeof AppRevisaoRoute
   '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
@@ -248,10 +276,13 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app/atualizacoes': typeof AppAtualizacoesRoute
+  '/app/auditoria': typeof AppAuditoriaRoute
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
   '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
+  '/app/corte': typeof AppCorteRoute
+  '/app/dojo': typeof AppDojoRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -271,6 +302,7 @@ export interface FileRoutesByTo {
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/rendas': typeof AppRendasRoute
   '/app/revisao': typeof AppRevisaoRoute
   '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
@@ -284,10 +316,13 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/app/atualizacoes': typeof AppAtualizacoesRoute
+  '/app/auditoria': typeof AppAuditoriaRoute
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
   '/app/corpo-de-ferro': typeof AppCorpoDeFerroRoute
+  '/app/corte': typeof AppCorteRoute
+  '/app/dojo': typeof AppDojoRoute
   '/app/evolucao': typeof AppEvolucaoRoute
   '/app/fum': typeof AppFumRoute
   '/app/hidratacao': typeof AppHidratacaoRoute
@@ -307,6 +342,7 @@ export interface FileRoutesById {
   '/app/proposito': typeof AppPropositoRoute
   '/app/protocolos': typeof AppProtocolosRoute
   '/app/relatorios': typeof AppRelatoriosRoute
+  '/app/rendas': typeof AppRendasRoute
   '/app/revisao': typeof AppRevisaoRoute
   '/app/sala': typeof AppSalaRoute
   '/app/sombra': typeof AppSombraRoute
@@ -321,10 +357,13 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/app/atualizacoes'
+    | '/app/auditoria'
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
     | '/app/corpo-de-ferro'
+    | '/app/corte'
+    | '/app/dojo'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -344,6 +383,7 @@ export interface FileRouteTypes {
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/rendas'
     | '/app/revisao'
     | '/app/sala'
     | '/app/sombra'
@@ -355,10 +395,13 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/app/atualizacoes'
+    | '/app/auditoria'
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
     | '/app/corpo-de-ferro'
+    | '/app/corte'
+    | '/app/dojo'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -378,6 +421,7 @@ export interface FileRouteTypes {
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/rendas'
     | '/app/revisao'
     | '/app/sala'
     | '/app/sombra'
@@ -390,10 +434,13 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/app/atualizacoes'
+    | '/app/auditoria'
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
     | '/app/corpo-de-ferro'
+    | '/app/corte'
+    | '/app/dojo'
     | '/app/evolucao'
     | '/app/fum'
     | '/app/hidratacao'
@@ -413,6 +460,7 @@ export interface FileRouteTypes {
     | '/app/proposito'
     | '/app/protocolos'
     | '/app/relatorios'
+    | '/app/rendas'
     | '/app/revisao'
     | '/app/sala'
     | '/app/sombra'
@@ -490,6 +538,13 @@ declare module '@tanstack/react-router' {
       path: '/revisao'
       fullPath: '/app/revisao'
       preLoaderRoute: typeof AppRevisaoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/rendas': {
+      id: '/app/rendas'
+      path: '/rendas'
+      fullPath: '/app/rendas'
+      preLoaderRoute: typeof AppRendasRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/relatorios': {
@@ -625,6 +680,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEvolucaoRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/dojo': {
+      id: '/app/dojo'
+      path: '/dojo'
+      fullPath: '/app/dojo'
+      preLoaderRoute: typeof AppDojoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/corte': {
+      id: '/app/corte'
+      path: '/corte'
+      fullPath: '/app/corte'
+      preLoaderRoute: typeof AppCorteRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/corpo-de-ferro': {
       id: '/app/corpo-de-ferro'
       path: '/corpo-de-ferro'
@@ -653,6 +722,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCadeiasRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/auditoria': {
+      id: '/app/auditoria'
+      path: '/auditoria'
+      fullPath: '/app/auditoria'
+      preLoaderRoute: typeof AppAuditoriaRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/atualizacoes': {
       id: '/app/atualizacoes'
       path: '/atualizacoes'
@@ -665,10 +741,13 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppAtualizacoesRoute: typeof AppAtualizacoesRoute
+  AppAuditoriaRoute: typeof AppAuditoriaRoute
   AppCadeiasRoute: typeof AppCadeiasRoute
   AppCifraRoute: typeof AppCifraRoute
   AppConfigRoute: typeof AppConfigRoute
   AppCorpoDeFerroRoute: typeof AppCorpoDeFerroRoute
+  AppCorteRoute: typeof AppCorteRoute
+  AppDojoRoute: typeof AppDojoRoute
   AppEvolucaoRoute: typeof AppEvolucaoRoute
   AppFumRoute: typeof AppFumRoute
   AppHidratacaoRoute: typeof AppHidratacaoRoute
@@ -688,6 +767,7 @@ interface AppRouteChildren {
   AppPropositoRoute: typeof AppPropositoRoute
   AppProtocolosRoute: typeof AppProtocolosRoute
   AppRelatoriosRoute: typeof AppRelatoriosRoute
+  AppRendasRoute: typeof AppRendasRoute
   AppRevisaoRoute: typeof AppRevisaoRoute
   AppSalaRoute: typeof AppSalaRoute
   AppSombraRoute: typeof AppSombraRoute
@@ -698,10 +778,13 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAtualizacoesRoute: AppAtualizacoesRoute,
+  AppAuditoriaRoute: AppAuditoriaRoute,
   AppCadeiasRoute: AppCadeiasRoute,
   AppCifraRoute: AppCifraRoute,
   AppConfigRoute: AppConfigRoute,
   AppCorpoDeFerroRoute: AppCorpoDeFerroRoute,
+  AppCorteRoute: AppCorteRoute,
+  AppDojoRoute: AppDojoRoute,
   AppEvolucaoRoute: AppEvolucaoRoute,
   AppFumRoute: AppFumRoute,
   AppHidratacaoRoute: AppHidratacaoRoute,
@@ -721,6 +804,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppPropositoRoute: AppPropositoRoute,
   AppProtocolosRoute: AppProtocolosRoute,
   AppRelatoriosRoute: AppRelatoriosRoute,
+  AppRendasRoute: AppRendasRoute,
   AppRevisaoRoute: AppRevisaoRoute,
   AppSalaRoute: AppSalaRoute,
   AppSombraRoute: AppSombraRoute,

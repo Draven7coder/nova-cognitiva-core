@@ -186,6 +186,42 @@ export type Database = {
         }
         Relationships: []
       }
+      cut_rituals: {
+        Row: {
+          category: string
+          created_at: string
+          decision: string
+          executed_at: string | null
+          id: string
+          item: string
+          reason: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          decision?: string
+          executed_at?: string | null
+          id?: string
+          item: string
+          reason?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          decision?: string
+          executed_at?: string | null
+          id?: string
+          item?: string
+          reason?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_checkins: {
         Row: {
           ai_summary: string | null
@@ -399,6 +435,42 @@ export type Database = {
           values_text?: string | null
           weaknesses?: string | null
           worldview?: string | null
+        }
+        Relationships: []
+      }
+      income_streams: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          ref_month: string
+          stream_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          ref_month?: string
+          stream_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          ref_month?: string
+          stream_type?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1075,6 +1147,36 @@ export type Database = {
         }
         Relationships: []
       }
+      system_audits: {
+        Row: {
+          checklist: Json
+          created_at: string
+          id: string
+          notes: string | null
+          score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          checklist?: Json
+          created_at?: string
+          id?: string
+          notes?: string | null
+          score?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          checklist?: Json
+          created_at?: string
+          id?: string
+          notes?: string | null
+          score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trinarius_reflections: {
         Row: {
           answer: string
@@ -1180,6 +1282,48 @@ export type Database = {
           updated_at?: string
           user_id?: string
           word?: string
+        }
+        Relationships: []
+      }
+      will_dojo_sessions: {
+        Row: {
+          category: string
+          challenge: string
+          completed: boolean
+          created_at: string
+          discomfort_level: number
+          duration_min: number
+          id: string
+          log_date: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          challenge: string
+          completed?: boolean
+          created_at?: string
+          discomfort_level?: number
+          duration_min?: number
+          id?: string
+          log_date?: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          challenge?: string
+          completed?: boolean
+          created_at?: string
+          discomfort_level?: number
+          duration_min?: number
+          id?: string
+          log_date?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
