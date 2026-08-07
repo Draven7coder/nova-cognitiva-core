@@ -44,6 +44,7 @@ import { Route as AppCorpoDeFerroRouteImport } from './routes/app.corpo-de-ferro
 import { Route as AppConfigRouteImport } from './routes/app.config'
 import { Route as AppCifraRouteImport } from './routes/app.cifra'
 import { Route as AppCadeiasRouteImport } from './routes/app.cadeias'
+import { Route as AppAuditoriaRouteImport } from './routes/app.auditoria'
 import { Route as AppAtualizacoesRouteImport } from './routes/app.atualizacoes'
 
 const AuthRoute = AuthRouteImport.update({
@@ -221,6 +222,11 @@ const AppCadeiasRoute = AppCadeiasRouteImport.update({
   path: '/cadeias',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAuditoriaRoute = AppAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAtualizacoesRoute = AppAtualizacoesRouteImport.update({
   id: '/atualizacoes',
   path: '/atualizacoes',
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/app/atualizacoes': typeof AppAtualizacoesRoute
+  '/app/auditoria': typeof AppAuditoriaRoute
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
@@ -269,6 +276,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/app/atualizacoes': typeof AppAtualizacoesRoute
+  '/app/auditoria': typeof AppAuditoriaRoute
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
@@ -308,6 +316,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/auth': typeof AuthRoute
   '/app/atualizacoes': typeof AppAtualizacoesRoute
+  '/app/auditoria': typeof AppAuditoriaRoute
   '/app/cadeias': typeof AppCadeiasRoute
   '/app/cifra': typeof AppCifraRoute
   '/app/config': typeof AppConfigRoute
@@ -348,6 +357,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/app/atualizacoes'
+    | '/app/auditoria'
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
@@ -385,6 +395,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/app/atualizacoes'
+    | '/app/auditoria'
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
@@ -423,6 +434,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/auth'
     | '/app/atualizacoes'
+    | '/app/auditoria'
     | '/app/cadeias'
     | '/app/cifra'
     | '/app/config'
@@ -710,6 +722,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCadeiasRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/auditoria': {
+      id: '/app/auditoria'
+      path: '/auditoria'
+      fullPath: '/app/auditoria'
+      preLoaderRoute: typeof AppAuditoriaRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/atualizacoes': {
       id: '/app/atualizacoes'
       path: '/atualizacoes'
@@ -722,6 +741,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppAtualizacoesRoute: typeof AppAtualizacoesRoute
+  AppAuditoriaRoute: typeof AppAuditoriaRoute
   AppCadeiasRoute: typeof AppCadeiasRoute
   AppCifraRoute: typeof AppCifraRoute
   AppConfigRoute: typeof AppConfigRoute
@@ -758,6 +778,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAtualizacoesRoute: AppAtualizacoesRoute,
+  AppAuditoriaRoute: AppAuditoriaRoute,
   AppCadeiasRoute: AppCadeiasRoute,
   AppCifraRoute: AppCifraRoute,
   AppConfigRoute: AppConfigRoute,
